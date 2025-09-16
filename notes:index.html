@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Notes — synomare</title>
+  <meta name="description" content="Notes / Blog by synomare">
+  <meta property="og:title" content="Notes — synomare">
+  <meta property="og:description" content="Notes / Blog by synomare">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://your-domain.example/notes/">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="preconnect" href="https://use.typekit.net" crossorigin>
+  <style>
+    :root{
+      --bg: oklch(25.11% 0.006 258.36);
+      --fg: oklch(91.87% 0.003 264.54);
+      --muted: color-mix(in oklch, var(--fg) 60%, var(--bg));
+      --accent: var(--fg);
+      --maxw: 75ch;
+      --font-body: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans JP", Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      --font-brand: var(--font-body);
+      --menu-bg: color-mix(in oklch, black 88%, var(--bg) 12%);
+      --menu-fg: color-mix(in oklch, white 94%, var(--bg) 6%);
+      --menu-divider: color-mix(in oklch, var(--menu-fg) 12%, var(--menu-bg));
+    }
+    html,body{height:100%}
+    body{margin:0; background:var(--bg); color:var(--fg); font:400 16px/1.7 var(--font-body); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
+    a{color:inherit; text-decoration-line:underline; text-decoration-color:var(--accent); text-decoration-thickness:.05em; text-underline-offset:.08em; text-decoration-skip-ink:auto}
+    header{display:flex; align-items:center; justify-content:space-between; padding:clamp(12px,2.5vw,24px); border-bottom:1px solid color-mix(in oklch, var(--fg) 15%, var(--bg))}
+    .brand{letter-spacing:.02em; font-weight:400; font-family:var(--font-brand)}
+    details.nav{position:relative}
+    details.nav>summary{list-style:none; cursor:pointer; user-select:none; padding:.4rem .7rem; border:1px solid color-mix(in oklch, var(--fg) 20%, var(--bg)); border-radius:999px; font-size:.95rem}
+    details.nav[open]>summary{background: var(--menu-bg); color: var(--menu-fg); border-color: var(--menu-divider)}
+    details.nav>summary::-webkit-details-marker{display:none}
+    .menu{position:absolute; right:0; margin-top:.5rem; z-index:1000; background:var(--menu-bg); color:var(--menu-fg); border:1px solid var(--menu-divider); border-radius:16px; min-width:260px; padding:.4rem; box-shadow:0 16px 48px rgba(0,0,0,.55)}
+    .menu a{display:block; padding:.6rem .9rem; border-radius:10px; color:inherit; text-decoration:none; letter-spacing:.005em}
+    .menu a + a{border-top:1px solid var(--menu-divider)}
+    .menu a:hover{background: color-mix(in oklch, var(--menu-bg) 82%, var(--menu-fg))}
+    main{padding:clamp(24px,6vw,80px)}
+    .wrap{max-width:var(--maxw); margin:0 auto}
+    .index a{display:block; padding:.6rem 0}
+    time{opacity:.8; font-size:.9rem}
+    h1{font-weight:600; font-size:clamp(22px,3vw,28px); margin:0 0 .8rem}
+    h2{margin:.2rem 0 .2rem; font-weight:600; font-size:clamp(20px,2.6vw,28px)}
+    article{margin:0 0 1.2rem; font-size:clamp(18px,2.2vw,20px); line-height:1.7}
+    nav.breadcrumb{margin-bottom:1rem}
+    footer{padding:24px; color:var(--muted); border-top:1px solid color-mix(in oklch, var(--fg) 15%, var(--bg))}
+    @media (max-width:520px){body{font-size:15px}}
+    html.wf-active{--font-body:"Hina Mincho","Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif; --font-brand:var(--font-body)}
+  </style>
+  <script>
+  (function(d){
+    var config={kitId:'ifg4slm',scriptTimeout:3000,async:true},h=d.documentElement,t=setTimeout(function(){h.className=h.className.replace(/\bwf-loading\b/g,"")+" wf-inactive";},config.scriptTimeout),tk=d.createElement("script"),f=false,s=d.getElementsByTagName("script")[0],a;h.className+=" wf-loading";tk.src='https://use.typekit.net/'+config.kitId+'.js';tk.async=true;tk.onload=tk.onreadystatechange=function(){a=this.readyState;if(f||a&&a!="complete"&&a!="loaded")return;f=true;clearTimeout(t);try{Typekit.load(config)}catch(e){}};s.parentNode.insertBefore(tk,s)
+  })(document);
+  </script>
+</head>
+<body>
+  <a class="sr-only" href="#main">Skip to Content</a>
+  <header>
+    <div class="brand">synomare</div>
+    <details class="nav">
+      <summary><span id="menuLabel">Open Menu</span></summary>
+      <nav class="menu" aria-label="site">
+        <a href="../">Home</a>
+        <a href="mailto:synomare@gmail.com">Contact</a>
+        <a href="../#content">About</a>
+        <a href="https://x.com/synomare" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://www.instagram.com/syno_mare/?utm_source=qr" target="_blank" rel="noopener">Instagram</a>
+      </nav>
+    </details>
+  </header>
+  <main id="main">
+    <div class="wrap">
+      <nav class="breadcrumb"><a href="../">Home</a> / <strong>Notes</strong></nav>
+      <div class="index" aria-live="polite"></div>
+      <article class="entry" hidden></article>
+    </div>
+    <template id="post-source">
+      <article data-slug="hello" data-title="最初の投稿" data-date="2025-09-16">
+        <p>ここに本文を書いてください。複数段落でもOKです。</p>
+        <p>追記は自由です。絵文字やリンクも使えます。</p>
+      </article>
+    </template>
+  </main>
+  <footer>
+    <small>© <span id="year"></span> synomare — all rights reserved.</small>
+  </footer>
+  <script>
+    (function(){
+      var y=document.getElementById('year'); if(y) y.textContent=new Date().getFullYear();
+      var d=document.querySelector('details.nav'); var label=document.getElementById('menuLabel');
+      var set=function(){if(d&&label) label.textContent=d.open?'Close Menu':'Open Menu'}; if(d&&label){set(); d.addEventListener('toggle',set)}
+      var theme=document.querySelector('meta[name="theme-color"]'); if(theme){var bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim(); theme.setAttribute('content',bg)}
+    })();
+  </script>
+  <script>
+    (function(){
+      var root=document;
+      var idx=document.querySelector('.index'); var entry=document.querySelector('.entry');
+      var tpl=document.getElementById('post-source');
+      var posts=[];
+      if(tpl){ tpl.content.querySelectorAll('article').forEach(function(a){ posts.push({slug:a.dataset.slug,title:a.dataset.title,date:a.dataset.date,html:a.innerHTML}); }); }
+      function renderIndex(){ idx.innerHTML=''; entry.hidden=true; idx.hidden=false;
+        posts.sort(function(a,b){return a.date<b.date?1:-1});
+        posts.forEach(function(p){ var a=document.createElement('a'); a.href='#post/'+p.slug; a.innerHTML='<h2>'+p.title+'</h2><time datetime="'+p.date+'">'+p.date+'</time>'; idx.appendChild(a); });
+        window.scrollTo(0,0);
+      }
+      function renderPost(slug){ var p=posts.find(function(x){return x.slug===slug}); if(!p){ location.hash=''; return; }
+        idx.hidden=true; entry.hidden=false; entry.innerHTML='';
+        var h=document.createElement('h1'); h.textContent=p.title; var t=document.createElement('time'); t.setAttribute('datetime',p.date); t.textContent=p.date;
+        entry.appendChild(h); entry.appendChild(t); var body=document.createElement('div'); body.innerHTML=p.html; entry.appendChild(body);
+        window.scrollTo(0,0);
+      }
+      function route(){ var h=location.hash||''; if(h.startsWith('#post/')){ renderPost(h.split('/')[1]); } else { renderIndex(); } }
+      route(); window.addEventListener('hashchange',route);
+    })();
+  </script>
+</body>
+</html>
