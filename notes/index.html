@@ -46,22 +46,7 @@
     article{margin:0 0 1.2rem; font-size:clamp(18px,2.2vw,20px); line-height:1.7}
     nav.breadcrumb{margin-bottom:1rem}
     footer{padding:24px; color:var(--muted); border-top:1px solid color-mix(in oklch, var(--fg) 15%, var(--bg))}
-    @media (max-width:720px){
-      header{flex-wrap:wrap; gap:.75rem; align-items:flex-start}
-      details.nav{width:100%}
-      details.nav>summary{width:100%; display:flex; align-items:center; justify-content:center}
-      .menu{position:static; width:100%; box-sizing:border-box; margin-top:.75rem; border-radius:14px; padding:.5rem; box-shadow:0 12px 36px rgba(0,0,0,.45)}
-      .menu a{padding:.65rem .85rem}
-      main{padding:clamp(28px,8vw,56px) clamp(18px,7vw,40px)}
-      .wrap{width:100%}
-      nav.breadcrumb{margin-bottom:1.2rem}
-    }
-    @media (max-width:520px){
-      body{font-size:15px}
-      details.nav>summary{padding:.55rem .9rem; font-size:1rem}
-      .menu{padding:.35rem}
-      .menu a{padding:.6rem .75rem}
-    }
+  @media (max-width:520px){.copy{font-size:clamp(18px,5.2vw,26px)}}
     html.wf-active{--font-body:"Hina Mincho","Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif; --font-brand:var(--font-body)}
   </style>
   <script>
