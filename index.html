@@ -59,7 +59,20 @@
     .copy a{ text-decoration:none; background-image:linear-gradient(currentColor,currentColor); background-repeat:no-repeat; background-size:100% .035em; background-position:0 calc(100% - .03em); -webkit-box-decoration-break:clone; box-decoration-break:clone; padding-bottom:.03em }
     .muted{color:var(--muted)}
     footer{padding:24px; color:var(--muted); border-top:1px solid color-mix(in oklch, var(--fg) 15%, var(--bg))}
-  @media (max-width:520px){.copy{font-size:clamp(18px,5.2vw,26px)}}
+  @media (max-width:520px){
+    main{
+      align-content:start;
+      align-items:start;
+      justify-items:stretch;
+      padding:clamp(16px,6vw,32px) clamp(18px,7vw,28px) clamp(32px,9vw,40px);
+      row-gap:clamp(16px,6vw,28px);
+    }
+    .copy{
+      max-width:100%;
+      width:100%;
+      font-size:clamp(18px,5.2vw,26px);
+    }
+  }
     html.wf-active{--font-body:"Hina Mincho","Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif; --font-brand:var(--font-body)}
   </style>
   <script type="application/ld+json">
