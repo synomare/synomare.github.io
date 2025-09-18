@@ -59,7 +59,23 @@
     .copy a{ text-decoration:none; background-image:linear-gradient(currentColor,currentColor); background-repeat:no-repeat; background-size:100% .035em; background-position:0 calc(100% - .03em); -webkit-box-decoration-break:clone; box-decoration-break:clone; padding-bottom:.03em }
     .muted{color:var(--muted)}
     footer{padding:24px; color:var(--muted); border-top:1px solid color-mix(in oklch, var(--fg) 15%, var(--bg))}
-    @media (max-width:520px){.copy{font-size:clamp(18px,5.2vw,26px)}}
+    @media (max-width:720px){
+      header{flex-wrap:wrap; gap:.75rem; align-items:flex-start}
+      details.nav{width:100%}
+      details.nav>summary{width:100%; display:flex; align-items:center; justify-content:center}
+      .menu{position:static; width:100%; box-sizing:border-box; margin-top:.75rem; border-radius:14px; padding:.5rem; box-shadow:0 12px 36px rgba(0,0,0,.45)}
+      .menu a{padding:.65rem .85rem}
+      main{place-items:start; align-content:start; justify-items:stretch; padding:clamp(28px,8vw,64px) clamp(18px,7vw,40px)}
+      .copy{font-size:clamp(22px,6.8vw,34px); line-height:1.24; letter-spacing:-0.02em}
+      .copy.tight{line-height:1.20; letter-spacing:-0.03em}
+      .copy p{margin-bottom:.9em}
+    }
+    @media (max-width:520px){
+      details.nav>summary{padding:.55rem .9rem; font-size:1rem}
+      .menu{padding:.35rem}
+      .menu a{padding:.6rem .75rem}
+      .copy{font-size:clamp(20px,6.2vw,28px)}
+    }
     html.wf-active{--font-body:"Hina Mincho","Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif; --font-brand:var(--font-body)}
   </style>
   <script type="application/ld+json">
