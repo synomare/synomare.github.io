@@ -1,0 +1,56 @@
+name: Deploy site to GitHub Pages
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # （任意）Markdown→HTML を CI で再生成したい場合だけ有効化。
+      # 運用メモの想定では node scripts/new-post.mjs --rebuild を叩く設計です。
+      # スクリプトがないならこの2ステップは消してOK。
+      - name: Setup Node
+        if: hashFiles('scripts/new-post.mjs') != ''
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Rebuild from Markdown (optional)
+        if: hashFiles('scripts/new-post.mjs') != ''
+        run: node scripts/new-post.mjs --rebuild
+
+      # Jekyll 無効化（_から始まるパス等の誤検知防止。ないならそのままで害なし）
+      - name: Add .nojekyll
+        run: touch .nojekyll
+
+      # 静的ファイル一式を Artifact 化（ルート配下をそのまま公開したいので path: "."）
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "."
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
