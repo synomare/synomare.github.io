@@ -1,6 +1,5 @@
 [
   {
-<<<<<<< HEAD
     "slug": "sample",
     "title": "タグ対応テスト",
     "date": "2025-09-18",
@@ -19,15 +18,5 @@
       "intro",
       "update"
     ]
-=======
-    "slug": "test",
-    "title": "サイト開設",
-    "date": "2025-09-22",
-    "summary": "テスト投稿",
-    "tags": [
-      "test"
-    ],
-    "href": "test.html"
->>>>>>> 75ff897 (Initial commit)
   }
 ]

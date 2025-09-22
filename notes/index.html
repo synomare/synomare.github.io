@@ -109,16 +109,12 @@
         list.appendChild(empty);
         return;
       }
-<<<<<<< HEAD
       posts.sort(function(a,b){
         if(a.date===b.date) return 0;
         if(!a.date) return 1;
         if(!b.date) return -1;
         return a.date<b.date?1:-1;
       });
-=======
-      posts.sort(function(a,b){return a.date<b.date?1:-1});
->>>>>>> 75ff897 (Initial commit)
       posts.forEach(function(post){
         var li=document.createElement('li');
         var link=document.createElement('a');
