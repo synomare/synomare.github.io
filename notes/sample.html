@@ -112,7 +112,12 @@
         nav.appendChild(back);
         return;
       }
-      posts.sort(function(a,b){return a.date<b.date?1:-1});
+      posts.sort(function(a,b){
+        if(a.date===b.date) return 0;
+        if(!a.date) return 1;
+        if(!b.date) return -1;
+        return a.date<b.date?1:-1;
+      });
       var backLink=document.createElement('a');
       backLink.href='index.html';
       backLink.textContent='一覧へ戻る';
