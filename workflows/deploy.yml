@@ -21,8 +21,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # （任意）Markdown→HTML を CI で再生成したい場合だけ有効化。
-      # 運用メモの想定では node scripts/new-post.mjs --rebuild を叩く設計です。
+      # （任意）posts.json / posts.js を既存データから CI で再生成したい場合だけ有効化。
+      # Markdown→HTML の再生成が必要なら scripts/new-post.mjs --rebuild 内で処理してください。
       # スクリプトがないならこの2ステップは消してOK。
       - name: Setup Node
         if: hashFiles('scripts/new-post.mjs') != ''

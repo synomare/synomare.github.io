@@ -16,8 +16,17 @@ function logError(message){
 }
 
 function usage(){
-  console.log(`Usage: node scripts/new-post.mjs <slug> <title> [--date=YYYY-MM-DD] [--summary="テキスト"] [--tags=タグ1,タグ2] [--tag=タグ]...\n` +
-    `例: node scripts/new-post.mjs my-new-post "新しい記事" --summary="概要文" --tags=diary,update\n`);
+  console.log(`Usage:\n` +
+    `  node scripts/new-post.mjs <slug> <title> [--date=YYYY-MM-DD] [--summary="テキスト"] [--tags=タグ1,タグ2] [--tag=タグ]...\n` +
+    `  node scripts/new-post.mjs --rebuild\n\n` +
+    `Options:\n` +
+    `  --rebuild             既存の posts.json / posts.js を再生成します。\n` +
+    `  --date=YYYY-MM-DD     新規作成時の日付を指定します。\n` +
+    `  --summary="テキスト"  新規作成時のサマリーを指定します。\n` +
+    `  --tags=タグ1,タグ2    新規作成時のタグをカンマ区切りで指定します。\n` +
+    `  --tag=タグ            --tags を複数回指定する書式です。\n\n` +
+    `例:\n` +
+    `  node scripts/new-post.mjs my-new-post "新しい記事" --summary="概要文" --tags=diary,update\n`);
 }
 
 function parseArgs(argv){
@@ -90,6 +99,20 @@ async function readPosts(){
   }
 }
 
+function sortPosts(posts){
+  posts.sort((a, b) => {
+    const aDate = typeof a.date === 'string' ? a.date : '';
+    const bDate = typeof b.date === 'string' ? b.date : '';
+    if(aDate === bDate){
+      const aSlug = typeof a.slug === 'string' ? a.slug : '';
+      const bSlug = typeof b.slug === 'string' ? b.slug : '';
+      return aSlug.localeCompare(bSlug);
+    }
+    return aDate < bDate ? 1 : -1;
+  });
+  return posts;
+}
+
 function validateSlug(slug){
   if(!slug) throw new Error('slug が指定されていません。');
   if(!/^[a-z0-9-]+$/.test(slug)){
@@ -160,8 +183,44 @@ async function writeHtml({ slug, title, date, summary }){
   return targetPath;
 }
 
+async function rebuildPosts(){
+  const posts = await readPosts();
+  if(!Array.isArray(posts)){
+    throw new Error(`${path.relative(repoRoot, postsJsonPath)} の内容が配列ではありません。`);
+  }
+  sortPosts(posts);
+  await writeJson(posts);
+  await writePostsJs(posts);
+
+  console.log('\n投稿メタデータを再生成しました。');
+  console.log(`- メタデータ: ${path.relative(repoRoot, postsJsonPath)}`);
+  console.log(`- 一覧データ: ${path.relative(repoRoot, postsJsPath)}`);
+  console.log(`- 対象件数: ${posts.length}`);
+}
+
 (async function main(){
   const { positional, options } = parseArgs(process.argv.slice(2));
+  const rebuildMode = Object.prototype.hasOwnProperty.call(options, 'rebuild');
+
+  if(rebuildMode){
+    if(typeof options.rebuild === 'string' && options.rebuild !== ''){
+      logError('再生成モードに値は指定できません。');
+      usage();
+      process.exit(1);
+    }
+    if(positional.length > 0){
+      logError('再生成モードでは追加の引数を指定できません。');
+      usage();
+      process.exit(1);
+    }
+    try{
+      await rebuildPosts();
+      return;
+    }catch(err){
+      logError(err.message);
+      process.exit(1);
+    }
+  }
   if(positional.length < 2){
     usage();
     process.exit(1);
@@ -210,12 +269,7 @@ async function writeHtml({ slug, title, date, summary }){
     }
 
     posts.push({ slug, title, date, summary, tags });
-    posts.sort((a, b) => {
-      if(a.date === b.date){
-        return a.slug.localeCompare(b.slug);
-      }
-      return a.date < b.date ? 1 : -1;
-    });
+    sortPosts(posts);
 
     await writeJson(posts);
     await writePostsJs(posts);
