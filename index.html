@@ -50,7 +50,7 @@
     .menu a + a{border-top:1px solid var(--menu-divider)}
     .menu a:hover{background: color-mix(in oklch, var(--menu-bg) 82%, var(--menu-fg))}
     main{display:grid; place-items:center; padding:clamp(24px,6vw,80px)}
-    .copy{max-width:var(--maxw); font-size:var(--dynamic-font-size, clamp(26px,6.8vw,56px)); line-height:1.10; letter-spacing:-0.03em; font-kerning:normal; font-variant-east-asian:proportional-width; font-feature-settings:"palt" 1, "kern" 1; text-rendering:optimizeLegibility; line-break:strict; hanging-punctuation:allow-end; touch-action:manipulation}
+    .copy{max-width:var(--maxw); font-size:var(--dynamic-font-size, clamp(26px,6.8vw,56px)); line-height:1.10; letter-spacing:-0.03em; font-kerning:normal; font-variant-east-asian:proportional-width; font-feature-settings:"palt" 1, "kern" 1; text-rendering:optimizeLegibility; line-break:strict; hanging-punctuation:allow-end; touch-action:none; overscroll-behavior:contain}
     .copy p{margin:0 0 .55em}
     .copy.tight{ line-height:1.03; letter-spacing:-0.055em }
     .copy .c{ display:inline-block; --ix:1; --iy:1; transform: translateX(var(--tx,0)) translateY(var(--ty,0)) scale(var(--sx,1), var(--sy,1)) scale(var(--ix,1), var(--iy,1)); transform-origin:50% 75%; will-change: transform; transition:transform .28s cubic-bezier(.25,.82,.25,1) }
@@ -479,20 +479,36 @@
       copy.addEventListener('pointermove',function(e){
         if(activePointerId!==null && e.pointerId!==activePointerId && e.pointerType!=='mouse') return;
         updatePointerFromEvent(e);
-        if(e.pointerType==='mouse') pointer.active=true;
+        if(e.pointerType==='touch'){
+          if(e.isPrimary && typeof copy.setPointerCapture==='function'){
+            try{ copy.setPointerCapture(e.pointerId); }catch(err){}
+          }
+          if(e.cancelable) e.preventDefault();
+        }else if(e.pointerType==='mouse'){
+          pointer.active=true;
+        }
         schedule();
-      });
+      },{passive:false});
 
       copy.addEventListener('pointerdown',function(e){
         activePointerId=e.pointerId;
         updatePointerFromEvent(e);
         pointer.active=true;
+        if(e.pointerType==='touch'){
+          if(typeof copy.setPointerCapture==='function'){
+            try{ copy.setPointerCapture(e.pointerId); }catch(err){}
+          }
+          if(e.cancelable) e.preventDefault();
+        }
         schedule();
-      });
+      },{passive:false});
 
       function handlePointerEnd(e){
         if(activePointerId!==null && e.pointerId!==activePointerId && e.pointerType!=='mouse') return;
         if(e.pointerId===activePointerId) activePointerId=null;
+        if(e.pointerType==='touch' && typeof copy.releasePointerCapture==='function'){
+          try{ copy.releasePointerCapture(e.pointerId); }catch(err){}
+        }
         pointer.active=false;
         schedule();
       }
