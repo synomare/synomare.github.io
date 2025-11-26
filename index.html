@@ -154,7 +154,7 @@
       text-rendering: optimizeLegibility;
       line-break: strict;
       hanging-punctuation: allow-end;
-      touch-action: none;
+      touch-action: pan-y;
       overscroll-behavior: contain
     }
 
@@ -570,7 +570,7 @@
       var metricsDirty = true;
       var raf = null;
       var activePointerId = null;
-      var pointer = { x: 0, y: 0, targetX: 0, targetY: 0, strength: 0, active: false };
+      var pointer = { x: 0, y: 0, targetX: 0, targetY: 0, strength: 0, active: false, type: 'mouse' };
 
       function measure() {
         var scrollX = window.scrollX || window.pageXOffset;
@@ -638,7 +638,7 @@
           }
         }
 
-        var radius = 45; // Narrow radius for precise toggling
+        var radius = (pointer.type === 'touch') ? 60 : 45; // Larger radius for touch
         var radiusSq = radius * radius;
         var scrollX = window.scrollX || window.pageXOffset;
         var scrollY = window.scrollY || window.pageYOffset;
@@ -729,6 +729,7 @@
       function updatePointerFromEvent(e) {
         pointer.targetX = e.clientX;
         pointer.targetY = e.clientY;
+        if (e.pointerType) pointer.type = e.pointerType;
       }
 
       copy.addEventListener('pointerenter', function (e) {
@@ -744,7 +745,7 @@
           if (e.isPrimary && typeof copy.setPointerCapture === 'function') {
             try { copy.setPointerCapture(e.pointerId); } catch (err) { }
           }
-          if (e.cancelable) e.preventDefault();
+          // if (e.cancelable) e.preventDefault(); // Removed to allow scrolling
         } else if (e.pointerType === 'mouse') {
           pointer.active = true;
         }
@@ -759,7 +760,7 @@
           if (typeof copy.setPointerCapture === 'function') {
             try { copy.setPointerCapture(e.pointerId); } catch (err) { }
           }
-          if (e.cancelable) e.preventDefault();
+          // if (e.cancelable) e.preventDefault(); // Removed to allow scrolling
         }
         schedule();
       }, { passive: false });
