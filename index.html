@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>synomare — personal site</title>
+  <meta name="description" content="A minimal, one‑page personal site with oversized type and a deadpan bio.">
+  <meta property="og:title" content="synomare — personal site">
+  <meta property="og:description" content="A minimal, one‑page personal site with oversized type and a deadpan bio.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://your-domain.example/">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="preconnect" href="https://use.typekit.net" crossorigin>
+  <style>
+    :root {
+      --bg: oklch(25.11% 0.006 258.36);
+      --fg: oklch(91.87% 0.003 264.54);
+      --muted: color-mix(in oklch, var(--fg) 60%, var(--bg));
+      --accent: var(--fg);
+      --maxw: 160ch;
+      --font-body: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans JP", Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      --font-brand: var(--font-body);
+      --menu-bg: color-mix(in oklch, black 88%, var(--bg) 12%);
+      --menu-fg: color-mix(in oklch, white 94%, var(--bg) 6%);
+      --menu-divider: color-mix(in oklch, var(--menu-fg) 12%, var(--menu-bg));
+    }
+
+    html,
+    body {
+      height: 100%
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font: 400 16px/1.5 var(--font-body);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      min-height: 100svh;
+    }
+
+    a {
+      color: inherit;
+      text-decoration-line: underline;
+      text-decoration-color: var(--accent);
+      text-decoration-thickness: .05em;
+      text-underline-offset: .08em;
+      text-decoration-skip-ink: auto
+    }
+
+    a:hover {
+      opacity: .9
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: clamp(12px, 2.5vw, 24px);
+      border-bottom: 1px solid color-mix(in oklch, var(--fg) 15%, var(--bg))
+    }
+
+    .brand {
+      letter-spacing: .02em;
+      font-weight: 400;
+      font-family: var(--font-brand)
+    }
+
+    details.nav {
+      position: relative
+    }
+
+    details.nav>summary {
+      list-style: none;
+      cursor: pointer;
+      user-select: none;
+      padding: .4rem .7rem;
+      border: 1px solid color-mix(in oklch, var(--fg) 20%, var(--bg));
+      border-radius: 999px;
+      font-size: .95rem
+    }
+
+    details.nav[open]>summary {
+      background: var(--menu-bg);
+      color: var(--menu-fg);
+      border-color: var(--menu-divider)
+    }
+
+    details.nav>summary::-webkit-details-marker {
+      display: none
+    }
+
+    .menu {
+      position: absolute;
+      right: 0;
+      margin-top: .5rem;
+      z-index: 1000;
+      background: var(--menu-bg);
+      color: var(--menu-fg);
+      border: 1px solid var(--menu-divider);
+      border-radius: 16px;
+      min-width: 260px;
+      padding: .4rem;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, .55)
+    }
+
+    .menu a {
+      display: block;
+      padding: .6rem .9rem;
+      border-radius: 10px;
+      color: inherit;
+      text-decoration: none;
+      letter-spacing: .005em
+    }
+
+    .menu a+a {
+      border-top: 1px solid var(--menu-divider)
+    }
+
+    .menu a:hover {
+      background: color-mix(in oklch, var(--menu-bg) 82%, var(--menu-fg))
+    }
+
+    main {
+      display: grid;
+      place-items: center;
+      padding: clamp(24px, 6vw, 80px)
+    }
+
+    .copy {
+      max-width: var(--maxw);
+      font-size: var(--dynamic-font-size, clamp(26px, 6.8vw, 56px));
+      line-height: 1.10;
+      letter-spacing: -0.03em;
+      font-kerning: normal;
+      font-variant-east-asian: proportional-width;
+      font-feature-settings: "palt" 1, "kern" 1;
+      text-rendering: optimizeLegibility;
+      line-break: strict;
+      hanging-punctuation: allow-end;
+      touch-action: pan-y;
+      overscroll-behavior: contain
+    }
+
+    .copy p {
+      margin: 0 0 .55em
+    }
+
+    .copy.tight {
+      line-height: 1.03;
+      letter-spacing: -0.055em
+    }
+
+    .copy .c {
+      display: inline-block;
+      --ix: 1;
+      --iy: 1;
+      transform: translateX(var(--tx, 0)) translateY(var(--ty, 0)) scale(var(--sx, 1), var(--sy, 1)) scale(var(--ix, 1), var(--iy, 1));
+      transform-origin: 50% 75%;
+      will-change: transform;
+      transition: transform .1s cubic-bezier(.25, .82, .25, 1);
+      opacity: 0;
+      translate: 0 15px;
+      scale: 0.95;
+      filter: blur(4px);
+      animation: reveal 0.8s cubic-bezier(0.2, 1, 0.3, 1) forwards;
+      animation-delay: calc(var(--i) * 0.003s + 0.1s);
+    }
+
+    @keyframes reveal {
+      0% {
+        opacity: 0;
+        translate: 0 15px;
+        scale: 0.95;
+        filter: blur(4px);
+      }
+
+      100% {
+        opacity: 1;
+        translate: 0 0;
+        scale: 1;
+        filter: blur(0);
+      }
+    }
+
+    .copy .c.punct {
+      margin-left: -0.03em;
+      margin-right: -0.03em
+    }
+
+    .copy .c.latin {
+      margin-right: -0.015em
+    }
+
+    .copy a {
+      text-decoration: none;
+      background-image: linear-gradient(currentColor, currentColor);
+      background-repeat: no-repeat;
+      background-size: 100% .035em;
+      background-position: 0 calc(100% - .03em);
+      -webkit-box-decoration-break: clone;
+      box-decoration-break: clone;
+      padding-bottom: .03em;
+      position: relative;
+      z-index: 1;
+      cursor: pointer;
+      pointer-events: auto;
+    }
+
+    .muted {
+      color: var(--muted)
+    }
+
+    footer {
+      padding: 24px;
+      color: var(--muted);
+      border-top: 1px solid color-mix(in oklch, var(--fg) 15%, var(--bg))
+    }
+
+    @media (max-width:520px) {
+      main {
+        align-content: start;
+        align-items: start;
+        justify-items: stretch;
+        padding: clamp(16px, 6vw, 32px) clamp(18px, 7vw, 28px) clamp(32px, 9vw, 40px);
+        row-gap: clamp(16px, 6vw, 28px);
+      }
+
+      .copy {
+        max-width: 100%;
+        width: 100%;
+        font-size: var(--dynamic-font-size, clamp(18px, 5.2vw, 26px));
+        filter: drop-shadow(0 0 8px oklch(0.9 0.1 260 / 0.3));
+      }
+
+    }
+
+
+    .noise-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.06;
+      mix-blend-mode: overlay;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9998;
+      background: radial-gradient(circle at 50% 50%, transparent 60%, rgba(0, 0, 0, 0.6) 100%);
+    }
+
+    html.wf-active {
+      --font-body: "Hina Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+      --font-brand: var(--font-body)
+    }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"Person",
+    "name":"synomare",
+    "url":"https://your-domain.example/",
+    "jobTitle":"Writer / Artist / Designer",
+    "address":{"@type":"PostalAddress","addressLocality":"Tokyo","addressCountry":"JP"},
+    "sameAs":["https://x.com/synomare","https://www.instagram.com/syno_mare/"]
+  }
+  </script>
+  <script>
+    (function (d) {
+      var config = { kitId: 'ifg4slm', scriptTimeout: 3000, async: true }, h = d.documentElement, t = setTimeout(function () { h.className = h.className.replace(/\bwf-loading\b/g, "") + " wf-inactive"; }, config.scriptTimeout), tk = d.createElement("script"), f = false, s = d.getElementsByTagName("script")[0], a; h.className += " wf-loading"; tk.src = 'https://use.typekit.net/' + config.kitId + '.js'; tk.async = true; tk.onload = tk.onreadystatechange = function () { a = this.readyState; if (f || a && a != "complete" && a != "loaded") return; f = true; clearTimeout(t); try { Typekit.load(config) } catch (e) { } }; s.parentNode.insertBefore(tk, s)
+    })(document);
+  </script>
+</head>
+
+<body>
+  <a class="sr-only" href="#content">Skip to Content</a>
+  <header>
+    <div class="brand">synomare</div>
+    <details class="nav">
+      <summary><span id="menuLabel">Open Menu</span></summary>
+      <nav class="menu" aria-label="site">
+        <a href="notes/">Notes / Blog</a>
+        <a href="mailto:synomare@gmail.com">Contact</a>
+        <a href="#content">About</a>
+        <a href="https://x.com/synomare" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://www.instagram.com/syno_mare/?utm_source=qr" target="_blank" rel="noopener">Instagram</a>
+      </nav>
+    </details>
+  </header>
+  <main id="content">
+    <h1 class="sr-only">synomare</h1>
+    <div class="copy">
+      <p>synomare テクスト。デザイン。グラフィック。<br><br>
+        synomare テクスト<span class="muted">を書いて、</span>デザイン<span class="muted">して、</span>グラフィック<span
+          class="muted">を作ります。</span><br><br>
+        synomare<span class="muted">っていいます。</span>テクスト<span class="muted">を書くことがあります。</span>デザイン<span
+          class="muted">もやったことがあります。</span>グラフィック<span class="muted">を作ることもあります。ここに</span>
+        <a href="https://www.instagram.com/syno_mare/?utm_source=qr">過去の制作物</a><span
+          class="muted">をまとめています。よろしくね。</span><br><br>
+        synomare<span class="muted">っていう名前なんです。どんな人か知りたいなら</span><a href="https://x.com/synomare">Xのアカウント</a><span
+          class="muted">を見てね。</span>テクスト<span class="muted">を書いていることもあるみたいです。</span>デザイン<span
+          class="muted">もやってみたことがあります。</span>グラフィック<span class="muted">を作ることもあります。そういえば</span><a
+          href="https://www.instagram.com/syno_mare/?utm_source=qr">過去の制作物</a><span
+          class="muted">をここにまとめてたので、よかったら見てみてくださいね。みんなよろしくね。</span><br><br>
+        synomare<span class="muted">っていう名前を使っているはずです。</span><a href="https://x.com/synomare">Xのアカウント</a><span
+          class="muted">に書いてたのでそうなんだと思います。</span>テクスト<span class="muted">を書いてたんだっけな。</span>デザイン<span
+          class="muted">、うん、やっていたことがあったと思います。</span>グラフィック<span class="muted">を、そうなんですね。</span><a
+          href="https://www.instagram.com/syno_mare/?utm_source=qr">過去の制作物</a><span
+          class="muted">がここにまとめられてるんだ。</span><a href="https://note.com/synomare" target="_blank"
+          rel="noopener">日記</a><span class="muted">はここに。なるほど。自分のことなのにすいません。みなさん、よろしくね。</span>ばいばい。<br><br>
+
+        名前、えっと、なんだっけ。忘れちゃった。あ、でも、えっと、たしかテクストって書いてたらしいんです。うん。あとデザインもやったことがあったのかな。えーっと、うん、それと、うん。いや、えーグラフィックを作ることがあったって聞いたことがありました。うん。そっか、そうですよね。うん。なんだったっけ、あ、そうだ!
+        たしかsynomareっていう名前でした。そうでしたよね？いやきっとそうだったはずです。あなたが覚えていてくれたんですよね。ありがとう。じゃあ、またね!<br><br>
+      </p>
+
+      <div class="noise-overlay"></div>
+    </div>
+  </main>
+
+  <footer>
+    <small>© <span id="year"></span> synomare — all rights reserved.</small>
+  </footer>
+  <script>
+    (function () {
+      var y = document.getElementById('year');
+      if (y) y.textContent = new Date().getFullYear();
+      var d = document.querySelector('details.nav');
+      var label = document.getElementById('menuLabel');
+      var set = function () { if (d && label) label.textContent = d.open ? 'Close Menu' : 'Open Menu' };
+      if (d && label) { set(); d.addEventListener('toggle', set) }
+      var theme = document.querySelector('meta[name="theme-color"]');
+      if (theme) { var bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim(); theme.setAttribute('content', bg) }
+    })();
+  </script>
+  <script>
+    (function () {
+      var root = document.querySelector('.copy');
+      if (!root) return;
+      root.classList.add('tight');
+      var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: function (n) { return n.nodeValue.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT } });
+      var nodes = []; while (walker.nextNode()) { nodes.push(walker.currentNode); }
+      function classify(cp) {
+        if ((cp >= 0x0041 && cp <= 0x024F) || (cp >= 0x0030 && cp <= 0x0039)) return 'latin';
+        if (cp >= 0x3040 && cp <= 0x309F) return 'hira';
+        if (cp >= 0x30A0 && cp <= 0x30FF) return 'kata';
+        if (cp >= 0x4E00 && cp <= 0x9FFF) return 'kanji';
+        return 'other';
+      }
+      function intentFactor(start) {
+        var ax = 1, ay = 1, at = 1; var el = start;
+        while (el && el !== root) {
+          if (el.classList && el.classList.contains('muted')) { ax *= 0.75; ay *= 0.80; at *= 0.80; }
+          var di = el.getAttribute && el.getAttribute('data-intent');
+          if (di === 'calm') { ax *= 0.70; ay *= 0.78; at *= 0.78; }
+          if (di === 'loud') { ax *= 1.35; ay *= 1.25; at *= 1.20; }
+          if (el.nodeName === 'A' || di === 'link') { ax *= 0.95; ay *= 0.95; }
+          el = el.parentNode;
+        }
+        return { ax: ax, ay: ay, at: at };
+      }
+      function quant(x, step) { return Math.round(x / step) * step; }
+      var graphemeSegmenter = (typeof Intl !== 'undefined' && typeof Intl.Segmenter === 'function') ? new Intl.Segmenter('ja', { granularity: 'grapheme' }) : null;
+      function toGraphemes(str) {
+        if (graphemeSegmenter) {
+          return Array.from(graphemeSegmenter.segment(str), function (entry) { return entry.segment; });
+        }
+        return fallbackGraphemes(str);
+      }
+      function fallbackGraphemes(str) {
+        var result = [];
+        var index = 0;
+        while (index < str.length) {
+          var cp = str.codePointAt(index);
+          var cluster = String.fromCodePoint(cp);
+          index += cp > 0xFFFF ? 2 : 1;
+          while (index < str.length) {
+            var nextCp = str.codePointAt(index);
+            if (nextCp === 0x200D) {
+              cluster += String.fromCodePoint(nextCp);
+              index += 1;
+              if (index < str.length) {
+                nextCp = str.codePointAt(index);
+                cluster += String.fromCodePoint(nextCp);
+                index += nextCp > 0xFFFF ? 2 : 1;
+                continue;
+              }
+              break;
+            }
+            if (nextCp === 0xFE0F || nextCp === 0xFE0E) {
+              cluster += String.fromCodePoint(nextCp);
+              index += 1;
+              continue;
+            }
+            if (nextCp >= 0x1F3FB && nextCp <= 0x1F3FF) {
+              cluster += String.fromCodePoint(nextCp);
+              index += nextCp > 0xFFFF ? 2 : 1;
+              continue;
+            }
+            break;
+          }
+          result.push(cluster);
+        }
+        return result;
+      }
+      var punctStr = '、。，．！？・：；（）［］｛｝「」『』—…‥,.!?;:(){}[]—–…‥';
+      var stepS = 0.005, stepE = 0.002;
+      var globalIndex = 0;
+      for (var i = 0; i < nodes.length; i++) {
+        var node = nodes[i]; var text = node.nodeValue; var frag = document.createDocumentFragment();
+        var chars = toGraphemes(text);
+        for (var j = 0; j < chars.length; j++) {
+          var ch = chars[j]; var cp = ch.codePointAt(0);
+          if (cp === 32 || cp === 9 || cp === 10 || cp === 13 || cp === 160) { frag.appendChild(document.createTextNode(ch)); continue }
+          var isPunct = punctStr.indexOf(ch) !== -1; var cls = classify(cp);
+          var span = document.createElement('span');
+          var r1 = (Math.abs(Math.sin((j + 1) * (cp + 1) * 12.9898)) * 43758.5453) % 1;
+          var r2 = (Math.abs(Math.sin((j + 1) * (cp + 1) * 78.233)) * 96485.3321) % 1;
+          var F = intentFactor(node.parentNode);
+          var sxMin = 0.78, sxRange = 0.56, syMin = 0.82, syRange = 0.40;
+          if (isPunct) { sxMin = 0.97; sxRange = 0.06; syMin = 0.97; syRange = 0.06; }
+          else if (cls === 'latin') { sxMin = 0.86; sxRange = 0.38; syMin = 0.88; syRange = 0.30; }
+          else if (cls === 'hira' || cls === 'kata') { sxMin = 0.76; sxRange = 0.52; syMin = 0.84; syRange = 0.36; }
+          else if (cls === 'kanji') { sxMin = 0.72; sxRange = 0.56; syMin = 0.80; syRange = 0.40; }
+          sxRange *= F.ax; syRange *= F.ay;
+          var sx = sxMin + sxRange * r1; var sy = syMin + syRange * r2;
+          var tx = ((r1 - 0.5) * 0.026 * F.ax); var ty = ((r2 - 0.5) * 0.056 * F.at);
+          sx = quant(sx, stepS); sy = quant(sy, stepS); tx = quant(tx, stepE); ty = quant(ty, stepE);
+          span.style.setProperty('--sx', sx.toFixed(3));
+          span.style.setProperty('--sy', sy.toFixed(3));
+          span.style.setProperty('--tx', tx.toFixed(3) + 'em');
+          span.style.setProperty('--ty', ty.toFixed(3) + 'em');
+          span.dataset.lensX = ((r1 * 2) - 1).toFixed(3);
+          span.dataset.lensY = ((r2 * 2) - 1).toFixed(3);
+          var r3 = (Math.abs(Math.sin((j + 1) * (cp + 1) * 192.456)) * 83521.123) % 1;
+          var r4 = (Math.abs(Math.sin((j + 1) * (cp + 1) * 421.887)) * 274922.522) % 1;
+          var geo = r3 > 0.68;
+          span.dataset.lensMode = geo ? 'geo' : 'organic';
+          var stepX, stepY, blendSeed;
+          if (geo) {
+            stepX = 0.22 + r3 * 0.28;
+            stepY = 0.26 + r4 * 0.32;
+            blendSeed = 0.58 + r4 * 0.24;
+          } else {
+            stepX = 0.16 + r3 * 0.10;
+            stepY = 0.20 + r4 * 0.12;
+            blendSeed = 0.18 + r4 * 0.20;
+          }
+          span.dataset.lensStepX = stepX.toFixed(3);
+          span.dataset.lensStepY = stepY.toFixed(3);
+          span.dataset.lensBlend = blendSeed.toFixed(3);
+          span.style.setProperty('--i', globalIndex++);
+          var cn = 'c'; if (isPunct) cn += ' punct'; if (cls === 'latin') cn += ' latin'; span.className = cn;
+          span.textContent = ch; frag.appendChild(span);
+        }
+        node.parentNode.replaceChild(frag, node);
+      }
+    })();
+  </script>
+  <script>
+    (function () {
+      var main = document.querySelector('main');
+      var copy = document.querySelector('.copy');
+      if (!main || !copy) return;
+      var mq = window.matchMedia('(max-width: 520px)');
+      var scheduled = false;
+      function fit() {
+        scheduled = false;
+        copy.style.removeProperty('--dynamic-font-size');
+        if (!mq.matches) return;
+        requestAnimationFrame(function () {
+          var mainStyle = getComputedStyle(main);
+          var paddingTop = parseFloat(mainStyle.paddingTop) || 0;
+          var paddingBottom = parseFloat(mainStyle.paddingBottom) || 0;
+          var available = main.clientHeight - paddingTop - paddingBottom;
+          if (available <= 0) return;
+          var baseSize = parseFloat(getComputedStyle(copy).fontSize);
+          if (!isFinite(baseSize) || baseSize <= 0) return;
+          copy.style.setProperty('--dynamic-font-size', baseSize + 'px');
+          var rect = copy.getBoundingClientRect();
+          if (rect.height >= available * 0.98) return;
+          var low = baseSize;
+          var high = baseSize;
+          var height = rect.height;
+          while (height < available && high < baseSize * 3) {
+            high *= 1.12;
+            copy.style.setProperty('--dynamic-font-size', high + 'px');
+            height = copy.getBoundingClientRect().height;
+          }
+          if (height < available) {
+            copy.style.setProperty('--dynamic-font-size', high.toFixed(2) + 'px');
+          } else {
+            var best = low;
+            for (var i = 0; i < 14; i++) {
+              var mid = (low + high) / 2;
+              copy.style.setProperty('--dynamic-font-size', mid + 'px');
+              height = copy.getBoundingClientRect().height;
+              if (height > available) {
+                high = mid;
+              } else {
+                best = mid;
+                low = mid;
+              }
+            }
+            copy.style.setProperty('--dynamic-font-size', best.toFixed(2) + 'px');
+          }
+          if (copy.scrollWidth > main.clientWidth + 1) {
+            var ratio = (main.clientWidth + 1) / copy.scrollWidth;
+            var adjusted = parseFloat(getComputedStyle(copy).fontSize) * ratio;
+            copy.style.setProperty('--dynamic-font-size', adjusted.toFixed(2) + 'px');
+          }
+        });
+      }
+      function schedule() {
+        if (scheduled) return;
+        scheduled = true;
+        requestAnimationFrame(fit);
+      }
+      window.addEventListener('resize', schedule, { passive: true });
+      if (mq.addEventListener) {
+        mq.addEventListener('change', schedule);
+      } else if (mq.addListener) {
+        mq.addListener(schedule);
+      }
+      if (document.fonts) {
+        if (document.fonts.ready) {
+          document.fonts.ready.then(schedule).catch(function () { });
+        }
+        if (document.fonts.addEventListener) {
+          document.fonts.addEventListener('loadingdone', schedule);
+          document.fonts.addEventListener('loadingerror', schedule);
+        }
+      }
+      schedule();
+    })();
+  </script>
+  <script>
+    (function () {
+      var copy = document.querySelector('.copy');
+      if (!copy) return;
+      var letters = Array.prototype.slice.call(copy.querySelectorAll('.c'));
+      if (!letters.length) return;
+      var metrics = [];
+      var metricsDirty = true;
+      var raf = null;
+      var activePointerId = null;
+      var pointer = { x: 0, y: 0, targetX: 0, targetY: 0, strength: 0, active: false, type: 'mouse' };
+
+      function measure() {
+        var scrollX = window.scrollX || window.pageXOffset;
+        var scrollY = window.scrollY || window.pageYOffset;
+        metrics = letters.map(function (el) {
+          var rect = el.getBoundingClientRect();
+          return {
+            el: el,
+            absX: rect.left + rect.width / 2 + scrollX,
+            absY: rect.top + rect.height / 2 + scrollY,
+            seedX: parseFloat(el.dataset.lensX || 0),
+            seedY: parseFloat(el.dataset.lensY || 0),
+            mode: el.dataset.lensMode || 'organic',
+            stepX: parseFloat(el.dataset.lensStepX || '0.28'),
+            stepY: parseFloat(el.dataset.lensStepY || '0.34'),
+            blend: parseFloat(el.dataset.lensBlend || '0.32'),
+            active: false,
+            toggled: false,
+            hovered: false,
+            currentIntensity: 0
+          };
+        });
+        metricsDirty = false;
+      }
+
+      function schedule() {
+        if (raf) return;
+        raf = requestAnimationFrame(update);
+      }
+
+      function scheduleMeasure() {
+        metricsDirty = true;
+        if (pointer.active || pointer.strength > 0.001) schedule();
+      }
+
+      function flushStyles() {
+        for (var i = 0; i < metrics.length; i++) {
+          if (metrics[i].active) {
+            metrics[i].el.style.removeProperty('--ix');
+            metrics[i].el.style.removeProperty('--iy');
+            metrics[i].active = false;
+          }
+        }
+      }
+
+      function update() {
+        raf = null;
+        if (!letters.length) return;
+        if (metricsDirty) measure();
+        pointer.x += (pointer.targetX - pointer.x) * 0.22;
+        pointer.y += (pointer.targetY - pointer.y) * 0.22;
+        var targetStrength = pointer.active ? 1 : 0;
+        pointer.strength += (targetStrength - pointer.strength) * 0.16;
+
+        if (pointer.strength < 0.001 && !pointer.active) {
+          // Keep loop running if any intensity is > 0
+          var anyActive = false;
+          for (var i = 0; i < metrics.length; i++) {
+            if (metrics[i].currentIntensity > 0.001) { anyActive = true; break; }
+          }
+          if (!anyActive) {
+            pointer.strength = 0;
+            flushStyles();
+            return;
+          }
+        }
+
+        var radius = (pointer.type === 'touch') ? 60 : 45; // Larger radius for touch
+        var radiusSq = radius * radius;
+        var scrollX = window.scrollX || window.pageXOffset;
+        var scrollY = window.scrollY || window.pageYOffset;
+
+        for (var i = 0; i < metrics.length; i++) {
+          var info = metrics[i];
+          var dx = pointer.x - (info.absX - scrollX);
+          var dy = pointer.y - (info.absY - scrollY);
+          var distSq = dx * dx + dy * dy;
+
+          // Toggle Logic
+          if (distSq < radiusSq) {
+            if (!info.hovered) {
+              info.toggled = !info.toggled;
+              info.hovered = true;
+            }
+          } else {
+            info.hovered = false;
+          }
+
+          // Intensity Interpolation
+          var targetIntensity = info.toggled ? 1.0 : 0.0;
+          info.currentIntensity += (targetIntensity - info.currentIntensity) * 0.08;
+
+          if (info.currentIntensity < 0.001) {
+            if (info.active) {
+              info.el.style.removeProperty('--ix');
+              info.el.style.removeProperty('--iy');
+              info.active = false;
+            }
+            continue;
+          }
+
+          var seedX = info.seedX;
+          var seedY = info.seedY;
+          // Directional influence is less relevant for toggle, but we can keep a subtle version
+          // based on the last interaction or just use static noise.
+          // Let's use a static directional factor based on seed to keep it interesting but stable.
+          var directional = info.seedX * 0.5;
+
+          var stretchX = 1 + info.currentIntensity * (1.48 + seedX * 0.85 + directional * 0.42);
+          var stretchY = 1 + info.currentIntensity * (1.82 + seedY * 1.05 - directional * 0.36);
+          var stepX = isFinite(info.stepX) ? info.stepX : 0.28;
+          var stepY = isFinite(info.stepY) ? info.stepY : 0.34;
+          var baseBlend = isFinite(info.blend) ? info.blend : 0.32;
+          if (!(stepX > 0)) stepX = 0.28;
+          if (!(stepY > 0)) stepY = 0.34;
+          if (info.mode === 'geo') {
+            var blend = Math.min(0.94, Math.max(0.42, baseBlend + info.currentIntensity * 0.35));
+            var steppedX = 1 + Math.round((stretchX - 1) / stepX) * stepX;
+            var steppedY = 1 + Math.round((stretchY - 1) / stepY) * stepY;
+            stretchX = stretchX * (1 - blend) + steppedX * blend;
+            stretchY = stretchY * (1 - blend) + steppedY * blend;
+            stretchX += (info.seedX * 0.12 + info.seedY * 0.08) * info.currentIntensity;
+            stretchY += (info.seedY * 0.14 - info.seedX * 0.05) * info.currentIntensity;
+          } else {
+            var softBlend = Math.max(0, Math.min(0.55, baseBlend * info.currentIntensity));
+            if (softBlend > 0.02) {
+              var easedX = 1 + Math.round((stretchX - 1) / stepX) * stepX;
+              var easedY = 1 + Math.round((stretchY - 1) / stepY) * stepY;
+              stretchX = stretchX * (1 - softBlend) + easedX * softBlend;
+              stretchY = stretchY * (1 - softBlend) + easedY * softBlend;
+            }
+          }
+          if (stretchX < 1) stretchX = 1;
+          else if (stretchX > 8.0) stretchX = 8.0;
+          if (stretchY < 1) stretchY = 1;
+          else if (stretchY > 9.0) stretchY = 9.0;
+
+          info.el.style.setProperty('--ix', stretchX.toFixed(3));
+          info.el.style.setProperty('--iy', stretchY.toFixed(3));
+          info.active = true;
+        }
+
+        // Check if we need to keep animating
+        var keepAnimating = pointer.active || pointer.strength > 0.002;
+        if (!keepAnimating) {
+          for (var i = 0; i < metrics.length; i++) {
+            if (metrics[i].currentIntensity > 0.001 || metrics[i].toggled) {
+              keepAnimating = true;
+              break;
+            }
+          }
+        }
+        if (keepAnimating) schedule();
+      }
+
+      function updatePointerFromEvent(e) {
+        pointer.targetX = e.clientX;
+        pointer.targetY = e.clientY;
+        if (e.pointerType) pointer.type = e.pointerType;
+      }
+
+      copy.addEventListener('pointerenter', function (e) {
+        updatePointerFromEvent(e);
+        pointer.active = true;
+        schedule();
+      });
+
+      copy.addEventListener('pointermove', function (e) {
+        if (activePointerId !== null && e.pointerId !== activePointerId && e.pointerType !== 'mouse') return;
+        updatePointerFromEvent(e);
+        if (e.pointerType === 'touch') {
+          if (e.isPrimary && typeof copy.setPointerCapture === 'function') {
+            try { copy.setPointerCapture(e.pointerId); } catch (err) { }
+          }
+          // if (e.cancelable) e.preventDefault(); // Removed to allow scrolling
+        } else if (e.pointerType === 'mouse') {
+          pointer.active = true;
+        }
+        schedule();
+      }, { passive: false });
+
+      copy.addEventListener('pointerdown', function (e) {
+        activePointerId = e.pointerId;
+        updatePointerFromEvent(e);
+        pointer.active = true;
+        if (e.pointerType === 'touch') {
+          if (typeof copy.setPointerCapture === 'function') {
+            try { copy.setPointerCapture(e.pointerId); } catch (err) { }
+          }
+          // if (e.cancelable) e.preventDefault(); // Removed to allow scrolling
+        }
+        schedule();
+      }, { passive: false });
+
+      function handlePointerEnd(e) {
+        if (activePointerId !== null && e.pointerId !== activePointerId && e.pointerType !== 'mouse') return;
+        if (e.pointerId === activePointerId) activePointerId = null;
+        if (e.pointerType === 'touch' && typeof copy.releasePointerCapture === 'function') {
+          try { copy.releasePointerCapture(e.pointerId); } catch (err) { }
+        }
+        pointer.active = false;
+        schedule();
+      }
+
+      copy.addEventListener('pointerup', handlePointerEnd);
+      copy.addEventListener('pointercancel', handlePointerEnd);
+      copy.addEventListener('pointerleave', function (e) {
+        if (e.pointerType === 'mouse') {
+          pointer.active = false;
+          schedule();
+        }
+      });
+
+      window.addEventListener('resize', scheduleMeasure, { passive: true });
+      // Scroll listener removed for performance. Metrics are absolute now.
+      // window.addEventListener('scroll', function () {
+      //   metricsDirty = true;
+      //   if (pointer.active || pointer.strength > 0.01) schedule();
+      // }, { passive: true });
+
+      if (document.fonts) {
+        if (document.fonts.ready) {
+          document.fonts.ready.then(scheduleMeasure).catch(function () { });
+        }
+        if (document.fonts.addEventListener) {
+          document.fonts.addEventListener('loadingdone', scheduleMeasure);
+          document.fonts.addEventListener('loadingerror', scheduleMeasure);
+        }
+      }
+
+      if (window.matchMedia) {
+        var orientationMq = window.matchMedia('(orientation: portrait)');
+        if (orientationMq && orientationMq.addEventListener) {
+          orientationMq.addEventListener('change', scheduleMeasure);
+        }
+      }
+
+      measure();
+      setTimeout(scheduleMeasure, 400);
+    })();
+  </script>
+
+  <script>
+    (function () {
+      var canvas = document.createElement('canvas');
+      canvas.width = 128;
+      canvas.height = 128;
+      var ctx = canvas.getContext('2d');
+      var idata = ctx.createImageData(128, 128);
+      var buffer32 = new Uint32Array(idata.data.buffer);
+      var len = buffer32.length;
+      for (var i = 0; i < len; i++) {
+        if (Math.random() < 0.5) buffer32[i] = 0xff000000;
+      }
+      ctx.putImageData(idata, 0, 0);
+      var url = canvas.toDataURL();
+      var style = document.createElement('style');
+      style.textContent = '.noise-overlay { background-image: url(' + url + '); }';
+      document.head.appendChild(style);
+    })();
+  </script>
+</body>
+
+</html>

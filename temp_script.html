@@ -1,0 +1,17 @@
+<script>
+    (function () {
+        var copy = document.querySelector('.copy');
+        if (!copy) return;
+        var p = copy.querySelector('p');
+        if (!p) return;
+        var content = p.innerHTML;
+        var limit = window.innerHeight * 2.5; // Fill 2.5x screen height for good measure
+
+        // Initial fill
+        while (copy.offsetHeight < limit) {
+            var newP = document.createElement('p');
+            newP.innerHTML = content;
+            copy.appendChild(newP);
+        }
+    })();
+</script>
