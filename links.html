@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Links — synomare</title>
+    <meta name="description" content="Mutual links and friends of synomare.">
+    <meta property="og:title" content="Links — synomare">
+    <meta property="og:description" content="Mutual links and friends of synomare.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://your-domain.example/links.html">
+    <meta name="theme-color" content="#0a0a0a">
+    <link rel="preconnect" href="https://use.typekit.net" crossorigin>
+    <style>
+        :root {
+            --bg: oklch(25.11% 0.006 258.36);
+            --fg: oklch(91.87% 0.003 264.54);
+            --muted: color-mix(in oklch, var(--fg) 60%, var(--bg));
+            --accent: var(--fg);
+            --maxw: 160ch;
+            --font-body: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans JP", Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+            --font-brand: var(--font-body);
+            --menu-bg: color-mix(in oklch, black 88%, var(--bg) 12%);
+            --menu-fg: color-mix(in oklch, white 94%, var(--bg) 6%);
+            --menu-divider: color-mix(in oklch, var(--menu-fg) 12%, var(--menu-bg));
+        }
+
+        html,
+        body {
+            height: 100%
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--fg);
+            font: 400 16px/1.5 var(--font-body);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            min-height: 100svh;
+        }
+
+        a {
+            color: inherit;
+            text-decoration-line: underline;
+            text-decoration-color: var(--accent);
+            text-decoration-thickness: .05em;
+            text-underline-offset: .08em;
+            text-decoration-skip-ink: auto
+        }
+
+        a:hover {
+            opacity: .9
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: clamp(12px, 2.5vw, 24px);
+            border-bottom: 1px solid color-mix(in oklch, var(--fg) 15%, var(--bg))
+        }
+
+        .brand {
+            letter-spacing: .02em;
+            font-weight: 400;
+            font-family: var(--font-brand)
+        }
+
+        details.nav {
+            position: relative
+        }
+
+        details.nav>summary {
+            list-style: none;
+            cursor: pointer;
+            user-select: none;
+            padding: .4rem .7rem;
+            border: 1px solid color-mix(in oklch, var(--fg) 20%, var(--bg));
+            border-radius: 999px;
+            font-size: .95rem
+        }
+
+        details.nav[open]>summary {
+            background: var(--menu-bg);
+            color: var(--menu-fg);
+            border-color: var(--menu-divider)
+        }
+
+        details.nav>summary::-webkit-details-marker {
+            display: none
+        }
+
+        .menu {
+            position: absolute;
+            right: 0;
+            margin-top: .5rem;
+            z-index: 1000;
+            background: var(--menu-bg);
+            color: var(--menu-fg);
+            border: 1px solid var(--menu-divider);
+            border-radius: 16px;
+            min-width: 260px;
+            padding: .4rem;
+            box-shadow: 0 16px 48px rgba(0, 0, 0, .55)
+        }
+
+        .menu a {
+            display: block;
+            padding: .6rem .9rem;
+            border-radius: 10px;
+            color: inherit;
+            text-decoration: none;
+            letter-spacing: .005em
+        }
+
+        .menu a+a {
+            border-top: 1px solid var(--menu-divider)
+        }
+
+        .menu a:hover {
+            background: color-mix(in oklch, var(--menu-bg) 82%, var(--menu-fg))
+        }
+
+        main {
+            padding: clamp(24px, 6vw, 80px);
+            width: 100%;
+            box-sizing: border-box;
+            max-width: var(--maxw);
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-weight: 400;
+            font-size: clamp(24px, 4vw, 32px);
+            margin: 0 0 2rem;
+            letter-spacing: -0.02em;
+        }
+
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .link-card {
+            display: block;
+            text-decoration: none;
+            padding: 1.5rem;
+            border: 1px solid color-mix(in oklch, var(--fg) 15%, var(--bg));
+            border-radius: 12px;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        .link-card:hover {
+            background: color-mix(in oklch, var(--fg) 5%, var(--bg));
+            transform: translateY(-2px);
+            opacity: 1;
+        }
+
+        .link-title {
+            display: block;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            text-decoration: underline;
+            text-decoration-color: var(--accent);
+            text-decoration-thickness: .05em;
+            text-underline-offset: .08em;
+        }
+
+        .link-desc {
+            display: block;
+            font-size: 0.95rem;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        footer {
+            padding: 24px;
+            color: var(--muted);
+            border-top: 1px solid color-mix(in oklch, var(--fg) 15%, var(--bg))
+        }
+
+        .noise-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.06;
+            mix-blend-mode: overlay;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9998;
+            background: radial-gradient(circle at 50% 50%, transparent 60%, rgba(0, 0, 0, 0.6) 100%);
+        }
+
+        html.wf-active {
+            --font-body: "Hina Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+            --font-brand: var(--font-body)
+        }
+    </style>
+    <script>
+        (function (d) {
+            var config = { kitId: 'ifg4slm', scriptTimeout: 3000, async: true }, h = d.documentElement, t = setTimeout(function () { h.className = h.className.replace(/\bwf-loading\b/g, "") + " wf-inactive"; }, config.scriptTimeout), tk = d.createElement("script"), f = false, s = d.getElementsByTagName("script")[0], a; h.className += " wf-loading"; tk.src = 'https://use.typekit.net/' + config.kitId + '.js'; tk.async = true; tk.onload = tk.onreadystatechange = function () { a = this.readyState; if (f || a && a != "complete" && a != "loaded") return; f = true; clearTimeout(t); try { Typekit.load(config) } catch (e) { } }; s.parentNode.insertBefore(tk, s)
+        })(document);
+    </script>
+</head>
+
+<body>
+    <a class="sr-only" href="#content">Skip to Content</a>
+    <header>
+        <div class="brand">synomare</div>
+        <details class="nav">
+            <summary><span id="menuLabel">Open Menu</span></summary>
+            <nav class="menu" aria-label="site">
+                <a href="./">Home</a>
+                <a href="notes/">Notes / Blog</a>
+                <a href="links.html">Links</a>
+                <a href="mailto:synomare@gmail.com">Contact</a>
+                <a href="./#content">About</a>
+                <a href="https://x.com/synomare" target="_blank" rel="noopener">X / Twitter</a>
+                <a href="https://www.instagram.com/syno_mare/?utm_source=qr" target="_blank"
+                    rel="noopener">Instagram</a>
+            </nav>
+        </details>
+    </header>
+    <main id="content">
+        <h1>Links</h1>
+        <div class="links-grid">
+            <!-- Example Link (Reference)
+      <a href="https://example.com" class="link-card" target="_blank" rel="noopener">
+        <span class="link-title">Example Site</span>
+        <span class="link-desc">A wonderful place on the internet.</span>
+      </a>
+      -->
+            <a href="https://mori-chka.github.io/bunko-site/" class="link-card" target="_blank" rel="noopener">
+                <span class="link-title">さなぎのなかから</span>
+                <span class="link-desc">もりちか</span>
+            </a>
+            <!-- Add more links here -->
+        </div>
+        <div class="noise-overlay"></div>
+    </main>
+
+    <footer>
+        <small>© <span id="year"></span> synomare — all rights reserved.</small>
+    </footer>
+    <script>
+        (function () {
+            var y = document.getElementById('year');
+            if (y) y.textContent = new Date().getFullYear();
+            var d = document.querySelector('details.nav');
+            var label = document.getElementById('menuLabel');
+            var set = function () { if (d && label) label.textContent = d.open ? 'Close Menu' : 'Open Menu' };
+            if (d && label) { set(); d.addEventListener('toggle', set) }
+            var theme = document.querySelector('meta[name="theme-color"]');
+            if (theme) { var bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim(); theme.setAttribute('content', bg) }
+        })();
+    </script>
+</body>
+
+</html>
