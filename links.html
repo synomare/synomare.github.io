@@ -243,11 +243,8 @@
                 <a href="./">Home</a>
                 <a href="notes/">Notes / Blog</a>
                 <a href="links.html">Links</a>
+                <a href="about.html">About</a>
                 <a href="mailto:synomare@gmail.com">Contact</a>
-                <a href="./#content">About</a>
-                <a href="https://x.com/synomare" target="_blank" rel="noopener">X / Twitter</a>
-                <a href="https://www.instagram.com/syno_mare/?utm_source=qr" target="_blank"
-                    rel="noopener">Instagram</a>
             </nav>
         </details>
     </header>
@@ -282,6 +279,25 @@
             if (d && label) { set(); d.addEventListener('toggle', set) }
             var theme = document.querySelector('meta[name="theme-color"]');
             if (theme) { var bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim(); theme.setAttribute('content', bg) }
+        })();
+    </script>
+    <script>
+        (function () {
+            var overlay = document.querySelector('.noise-overlay');
+            if (!overlay) return;
+            var canvas = document.createElement('canvas');
+            canvas.width = 128;
+            canvas.height = 128;
+            var ctx = canvas.getContext('2d');
+            var idata = ctx.createImageData(128, 128);
+            var buffer32 = new Uint32Array(idata.data.buffer);
+            var len = buffer32.length;
+            for (var i = 0; i < len; i++) {
+                if (Math.random() < 0.5) buffer32[i] = 0xff000000;
+            }
+            ctx.putImageData(idata, 0, 0);
+            overlay.style.backgroundImage = 'url(' + canvas.toDataURL() + ')';
+            overlay.style.backgroundRepeat = 'repeat';
         })();
     </script>
 </body>
