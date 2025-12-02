@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>About — synomare</title>
+    <meta name="description" content="About synomare.">
+    <meta property="og:title" content="About — synomare">
+    <meta property="og:description" content="About synomare.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://your-domain.example/about.html">
+    <meta name="theme-color" content="#0a0a0a">
+    <link rel="preconnect" href="https://use.typekit.net" crossorigin>
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --fg: #e5e5e5;
+            --muted: #444;
+            --line: #222;
+            --accent: #fff;
+            --font-mincho: "Hina Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+            --font-gothic: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+            font-size: clamp(16px, 1.6vw, 32px);
+        }
+
+        html,
+        body {
+            /* height: 100%;  Removed to allow scrolling */
+            overflow-x: hidden;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--fg);
+            font-family: var(--font-mincho);
+            -webkit-font-smoothing: antialiased;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            min-height: 100svh;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+            border-bottom: 1px solid var(--muted);
+        }
+
+        a:hover {
+            border-bottom-color: var(--accent);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Header & Footer */
+        header,
+        footer {
+            padding: 0.8rem 1rem;
+            border-color: var(--line);
+            font-family: var(--font-gothic);
+            font-size: 0.65rem;
+            letter-spacing: 0.1em;
+            z-index: 100;
+            background: var(--bg);
+            text-shadow: none;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--line);
+            position: sticky;
+            top: 0;
+        }
+
+        footer {
+            border-top: 1px solid var(--line);
+            text-align: right;
+        }
+
+        /* Navigation */
+        details.nav {
+            position: relative;
+        }
+
+        details.nav>summary {
+            list-style: none;
+            cursor: pointer;
+            border: 1px solid var(--line);
+            padding: 0.2em 0.8em;
+            border-radius: 0;
+            text-transform: uppercase;
+        }
+
+        details.nav>summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .menu {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            margin-top: -1px;
+            background: var(--bg);
+            border: 1px solid var(--line);
+            padding: 1rem;
+            min-width: 180px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        /* Main Layout - 24 Column Grid */
+        main {
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            /* overflow: hidden; Removed to allow scrolling */
+            padding: 2rem 2rem 0 2rem;
+            /* Removed bottom padding */
+            box-sizing: border-box;
+            display: grid;
+            grid-template-columns: repeat(24, 1fr);
+            grid-auto-rows: minmax(2.5rem, auto);
+            gap: 0;
+            padding-bottom: 0;
+            /* Remove bottom padding to stop scroll at content end */
+            height: fit-content;
+            min-height: 100vh;
+            grid-template-rows: repeat(23, minmax(2.5rem, auto));
+            /* Force grid to end at row 23 */
+            overflow: hidden;
+            /* Hide anything that spills over */
+        }
+
+        /* Typography */
+        .txt {
+            font-feature-settings: "palt" 1, "kern" 1;
+            text-align: justify;
+            word-break: break-all;
+        }
+
+        .txt-micro {
+            font-size: 0.45rem;
+            letter-spacing: 0.08em;
+            line-height: 1.6;
+            color: var(--muted);
+            font-family: var(--font-gothic);
+            text-transform: uppercase;
+        }
+
+        .txt-xs {
+            font-size: 0.6rem;
+            letter-spacing: 0.02em;
+            line-height: 1.8;
+        }
+
+        .txt-sm {
+            font-size: 0.75rem;
+            letter-spacing: -0.01em;
+            line-height: 1.7;
+        }
+
+        .txt-md {
+            font-size: 1rem;
+            letter-spacing: -0.03em;
+            line-height: 1.5;
+        }
+
+        .txt-lg {
+            font-size: clamp(4rem, 12vw, 10rem);
+            letter-spacing: -0.06em;
+            line-height: 0.85;
+            font-weight: 400;
+            margin-left: -0.05em;
+        }
+
+        .txt-xl {
+            font-size: clamp(2rem, 6vw, 4rem);
+            letter-spacing: -0.04em;
+            line-height: 1;
+            font-weight: 400;
+            opacity: 0.3;
+        }
+
+        .vertical {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+        }
+
+        .muted {
+            color: var(--muted);
+        }
+
+        /* Utility: Borders & Layout */
+        .b-r {
+            border-right: 1px solid var(--line);
+        }
+
+        .b-l {
+            border-left: 1px solid var(--line);
+        }
+
+        .b-t {
+            border-top: 1px solid var(--line);
+        }
+
+        .b-b {
+            border-bottom: 1px solid var(--line);
+        }
+
+        .pad-sm {
+            padding: 1rem;
+        }
+
+        .pad-md {
+            padding: 2rem;
+        }
+
+        .pad-lg {
+            padding: 4rem;
+        }
+
+        .flex-col {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .flex-end {
+            justify-content: flex-end;
+        }
+
+        .flex-between {
+            justify-content: space-between;
+        }
+
+        /* Zones - 3D Floating Cards */
+        .card-effect {
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Title Block - Floating Text */
+        .z-title {
+            grid-column: 1 / 14;
+            grid-row: 1 / 6;
+            padding: 0 2rem 2rem 0;
+            margin: 0;
+            background: transparent;
+            mix-blend-mode: saturation;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            border: none;
+            position: relative;
+            z-index: 100;
+            text-shadow: none !important;
+        }
+
+        .z-title * {
+            text-shadow: none !important;
+            box-shadow: none !important;
+        }
+
+
+
+        /* Main Detail Text - Card */
+        .z-detail {
+            grid-column: 6 / 14;
+            grid-row: 6 / 18;
+            padding: 3rem;
+            mix-blend-mode: hard-light;
+            background: transparent;
+            backdrop-filter: blur(0px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: none;
+            position: relative;
+            z-index: 10;
+            overflow: visible;
+        }
+
+        .z-detail p {
+            font-size: 2rem;
+            line-height: 1;
+            letter-spacing: -0.1em;
+            transform: scaleY(1.5);
+            transform-origin: top left;
+        }
+
+        /* Noise Column - Card */
+        .z-noise {
+            grid-column: 12 / 20;
+            grid-row: 9 / 19;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            overflow: hidden;
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 1;
+        }
+
+        .z-title h1 {
+            background: transparent;
+            box-shadow: none;
+            text-shadow: none !important;
+            filter: none;
+        }
+
+        /* Echo / Noise Background */
+        .z-echo {
+            grid-column: 14 / 25;
+            grid-row: 1 / 12;
+            padding: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-content: flex-start;
+            opacity: 0.4;
+            z-index: 0;
+            pointer-events: none;
+            filter: blur(1px);
+        }
+
+        /* Intro Text - Card */
+        .z-intro {
+            grid-column: 14 / 21;
+            grid-row: 4 / 6;
+            padding: 2rem;
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Vertical Stream 1 - Floating Text (Poetry Zone) */
+        .z-vert-1 {
+            grid-column: 12 / 25;
+            grid-row: 2 / 14;
+            padding: 1rem;
+            /* Unbound Layout */
+            display: block;
+            justify-self: end;
+            width: auto;
+            background: transparent;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            box-shadow: none;
+            border: none;
+            position: relative;
+            z-index: 15;
+            text-shadow: 0 0 5px rgba(10, 10, 10, 1), 0 0 10px rgba(10, 10, 10, 0.8);
+            overflow: visible;
+            margin-top: -15rem;
+        }
+
+        /* Vertical Stream 2 - Floating Text */
+        .z-vert-2 {
+            grid-column: 12 / 25;
+            grid-row: 2 / 14;
+            padding: 1rem;
+            /* Unbound Layout */
+            display: block;
+            justify-self: end;
+            width: auto;
+            margin-right: 20rem;
+            /* Offset from Poetry Zone */
+            background: transparent;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            box-shadow: none;
+            border: none;
+            position: relative;
+            z-index: 15;
+            text-shadow: 0 0 5px rgba(10, 10, 10, 1), 0 0 10px rgba(10, 10, 10, 0.8);
+            overflow: visible;
+        }
+
+        /* Dense Data Block - Card */
+        .z-data {
+            grid-column: 1 / 6;
+            grid-row: 6 / 10;
+            padding: 1.5rem;
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 10;
+        }
+
+
+
+        /* Background Collage - Large Image */
+        .z-bg-collage {
+            grid-column: 2 / 16;
+            grid-row: 2 / 16;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 0;
+            overflow: visible;
+        }
+
+        /* Left Background Image - Bleeding off screen */
+        .z-bg-left {
+            grid-column: 1 / 9;
+            grid-row: 3 / 15;
+            padding: 0;
+            display: flex;
+            align-items: start;
+            justify-content: center;
+            pointer-events: none;
+            z-index: -1;
+            overflow: visible;
+            transform: translateX(-35%);
+        }
+
+        /* Right Background Image - Far Right */
+        .z-bg-right {
+            grid-column: 16 / 26;
+            grid-row: 4 / 20;
+            padding: 0;
+            display: flex;
+            align-items: start;
+            justify-content: center;
+            pointer-events: none;
+            z-index: -1;
+            overflow: visible;
+            transform: translateX(10%) scaleY(2.5) scaleX(1.2);
+            transform-origin: top center;
+            filter: invert(1);
+        }
+
+        /* Collage Images - Grid Strict */
+        .z-collage-1 {
+            grid-column: 20 / 26;
+            grid-row: 10 / 18;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 5;
+            mix-blend-mode: hard-light;
+            filter: contrast(1.5);
+            transform: rotate(90deg) scale(4.5);
+            transform-origin: center;
+        }
+
+        .z-collage-2 {
+            grid-column: 4 / 10;
+            grid-row: 16 / 22;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 0;
+            mix-blend-mode: exclusion;
+            opacity: 0.4;
+            /* transform: rotate(-10deg); Removed */
+        }
+
+        .z-collage-3 {
+            grid-column: 10 / 18;
+            grid-row: 1 / 8;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 0;
+            mix-blend-mode: exclusion;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5)) invert(1);
+            transform: scale(1.5) scaleY(1.5);
+        }
+
+        .z-collage-4 {
+            grid-column: 1 / 7;
+            grid-row: 1 / 6;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 0;
+            mix-blend-mode: difference;
+            filter: grayscale(1) contrast(2.0);
+            transform: scale(1.1) scaleY(3.5);
+            transform-origin: top;
+        }
+
+        .z-collage-5 {
+            grid-column: 18 / 25;
+            grid-row: 4 / 12;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 0;
+            mix-blend-mode: difference;
+            /* transform: rotate(90deg); Removed */
+        }
+
+        .z-collage-6 {
+            grid-column: 10 / 18;
+            grid-row: 18 / 24;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 0;
+            mix-blend-mode: overlay;
+            filter: blur(1px);
+            transform: scaleX(-1);
+        }
+
+        .z-collage-7 {
+            grid-column: 1 / 6;
+            grid-row: 14 / 20;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 0;
+            mix-blend-mode: color-dodge;
+            /* transform: rotate(-20deg); Removed */
+        }
+
+        .z-collage-8 {
+            grid-column: 5 / 12;
+            grid-row: 2 / 9;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 0;
+            mix-blend-mode: hard-light;
+            filter: invert(1) hue-rotate(180deg);
+            transform: scale(1.8);
+        }
+
+        .z-collage-9 {
+            grid-column: 16 / 24;
+            grid-row: 14 / 20;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 0;
+            mix-blend-mode: difference;
+            transform: scaleY(2.5);
+            transform-origin: bottom;
+        }
+
+        .z-collage-10 {
+            grid-column: 2 / 10;
+            grid-row: 8 / 16;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 0;
+            mix-blend-mode: overlay;
+            opacity: 0.6;
+            /* transform: skewX(10deg); Removed */
+        }
+
+        .z-collage-11 {
+            grid-column: 12 / 18;
+            grid-row: 6 / 14;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 0;
+            mix-blend-mode: hard-light;
+            transform: scale(0.8);
+        }
+
+        .z-collage-12 {
+            grid-column: 14 / 20;
+            grid-row: 2 / 10;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 0;
+            mix-blend-mode: exclusion;
+            filter: invert(1) contrast(1.5);
+            transform: rotate(180deg) scaleY(2.5);
+        }
+
+        .z-collage-13 {
+            grid-column: 2 / 10;
+            grid-row: 6 / 14;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 0;
+            mix-blend-mode: hard-light;
+            filter: hue-rotate(90deg) saturate(2);
+        }
+
+
+
+
+
+        .z-collage-15 {
+            grid-column: 6 / 14;
+            grid-row: 12 / 18;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 0;
+            mix-blend-mode: color-burn;
+            opacity: 0.7;
+            /* transform: rotate(-30deg); Removed */
+        }
+
+        .z-collage-16 {
+            grid-column: 16 / 22;
+            grid-row: 8 / 16;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 0;
+            mix-blend-mode: overlay;
+            filter: contrast(2) brightness(1.2);
+            transform: scale(1.5);
+        }
+
+        .z-collage-17 {
+            grid-column: 1 / 25;
+            grid-row: 1 / 24;
+            /* Reduced from 25 to 24 */
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: -2;
+            mix-blend-mode: hard-light;
+            filter: grayscale(1) contrast(1.6);
+            opacity: 1;
+        }
+
+        .z-collage-18 {
+            grid-column: 3 / 12;
+            grid-row: 5 / 15;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 0;
+            mix-blend-mode: hard-light;
+            filter: invert(1);
+            transform: scaleY(1.6);
+            transform-origin: center;
+        }
+
+        .z-collage-19 {
+            grid-column: 18 / 26;
+            grid-row: 2 / 10;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 0;
+            mix-blend-mode: color-dodge;
+            filter: contrast(2.0) saturate(2.0);
+            transform: scale(1.4);
+        }
+
+        .z-collage-20 {
+            grid-column: 8 / 16;
+            grid-row: 15 / 22;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 0;
+            mix-blend-mode: color-dodge;
+            opacity: 0.8;
+            /* transform: skewY(-10deg); Removed */
+        }
+
+        .z-collage-21 {
+            grid-column: 1 / 7;
+            grid-row: 10 / 18;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 0;
+            mix-blend-mode: difference;
+            /* transform: rotate(45deg); Removed */
+        }
+
+
+
+        .z-collage-23 {
+            grid-column: 20 / 26;
+            grid-row: 1 / 8;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 0;
+            mix-blend-mode: difference;
+            filter: invert(1);
+            transform: scale(1.5) scaleX(2.5);
+        }
+
+        .z-collage-24 {
+            grid-column: 1 / 8;
+            grid-row: 18 / 24;
+            /* Reduced from 25 to 24 to tighten bottom */
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: -1;
+            mix-blend-mode: multiply;
+            opacity: 0.7;
+            /* transform: skewX(-20deg); Removed */
+        }
+
+        .z-collage-25 {
+            grid-column: 14 / 22;
+            grid-row: 12 / 20;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 5;
+            mix-blend-mode: hard-light;
+            filter: contrast(1.5) saturate(1.5);
+            opacity: 1;
+            transform: scale(1.8);
+            transform-origin: bottom;
+        }
+
+        .z-collage-26 {
+            grid-column: 6 / 20;
+            grid-row: 6 / 20;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 6;
+            mix-blend-mode: difference;
+            filter: invert(1) contrast(2);
+            transform: scale(3.0);
+            opacity: 0.8;
+        }
+
+        /* Stream of Consciousness - Floating Text */
+        .z-stream {
+            grid-column: 17 / 21;
+            grid-row: 6 / 14;
+            padding: 2rem;
+            background: transparent;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            box-shadow: none;
+            border: none;
+            position: relative;
+            z-index: 6;
+            text-shadow: 0 0 0px rgba(10, 10, 10, 1), 0 0 10px rgba(10, 10, 10, 0.8);
+        }
+
+        /* Bottom Zone - Repurposed Footer Area */
+        .z-bottom-zone {
+            grid-column: 1 / 10;
+            grid-row: 12 / 14;
+            padding: 2rem;
+            margin-top: auto;
+            background: transparent;
+            backdrop-filter: blur(0.5px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Minimal Copyright - Fixed */
+        .z-copyright {
+            position: fixed;
+            bottom: 1rem;
+            right: 2rem;
+            z-index: 1000;
+            pointer-events: none;
+            mix-blend-mode: difference;
+        }
+
+        /* Horizontal Rules */
+        .hr-1 {
+            grid-column: 1 / 25;
+            grid-row: 6 / 7;
+            border-top: 1px solid var(--line);
+            height: 1px;
+            margin-top: -1px;
+        }
+
+        .hr-2 {
+            grid-column: 1 / 14;
+            grid-row: 10 / 11;
+            border-top: 1px solid var(--line);
+            height: 1px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .txt-lg {
+                font-size: 5rem;
+            }
+
+            main {
+                grid-template-columns: repeat(12, 1fr);
+                padding: 1rem;
+            }
+
+            .z-title {
+                grid-column: 1 / 13;
+                grid-row: auto;
+                border: none;
+                border-bottom: 1px solid var(--line);
+            }
+
+            .z-echo {
+                display: none;
+            }
+
+            .z-intro {
+                grid-column: 1 / 9;
+                grid-row: auto;
+                border: none;
+                border-bottom: 1px solid var(--line);
+            }
+
+            .z-vert-1,
+            .z-vert-2 {
+                display: none;
+            }
+
+            /* Hide vertical on tablet/mobile */
+            .z-data {
+                grid-column: 9 / 13;
+                grid-row: auto;
+                border: none;
+                border-left: 1px solid var(--line);
+                border-bottom: 1px solid var(--line);
+            }
+
+            .z-detail {
+                grid-column: 1 / 13;
+                grid-row: auto;
+                border: none;
+                border-bottom: 1px solid var(--line);
+                padding: 2rem;
+            }
+
+            .z-noise {
+                display: none;
+            }
+
+            .z-stream {
+                grid-column: 1 / 13;
+                grid-row: auto;
+                border: none;
+                border-bottom: 1px solid var(--line);
+            }
+
+            .z-footer {
+                grid-column: 1 / 13;
+                grid-row: auto;
+                border: none;
+            }
+
+            .hr-1,
+            .hr-2 {
+                display: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .txt-lg {
+                font-size: 3.5rem;
+            }
+
+            .z-data {
+                grid-column: 1 / 13;
+                border-left: none;
+            }
+
+            /* Dynamic Schematic Lines */
+            .line-extend {
+                display: flex;
+                align-items: baseline;
+                white-space: nowrap;
+                width: 100%;
+            }
+
+            .line-extend::after {
+                content: '';
+                flex-grow: 1;
+                border-bottom: 1px solid var(--line);
+                margin-left: 1rem;
+                opacity: 0.3;
+                transform: translateY(-0.3em);
+            }
+
+            .ruled-bg {
+                background-image: linear-gradient(to bottom, transparent 95%, var(--line) 95%);
+                background-size: 100% 1.5em;
+                /* Matches line-height of .txt-md */
+                line-height: 1.5em;
+                padding-bottom: 2px;
+                /* Align text to baseline */
+            }
+
+            .ruled-bg-sm {
+                background-image: linear-gradient(to bottom, transparent 95%, var(--line) 95%);
+                background-size: 100% 1.7em;
+                /* Matches line-height of .txt-sm */
+                line-height: 1.7em;
+            }
+
+            /* Typekit Loader */
+            html.wf-loading body {
+                opacity: 0;
+            }
+
+            html.wf-active body,
+            html.wf-inactive body {
+                opacity: 1;
+                transition: opacity 0.5s;
+            }
+        }
+    </style>
+    <script>
+        (function (d) {
+            var config = { kitId: 'ifg4slm', scriptTimeout: 3000, async: true }, h = d.documentElement, t = setTimeout(function () { h.className = h.className.replace(/\bwf-loading\b/g, "") + " wf-inactive"; }, config.scriptTimeout), tk = d.createElement("script"), f = false, s = d.getElementsByTagName("script")[0], a; h.className += " wf-loading"; tk.src = 'https://use.typekit.net/' + config.kitId + '.js'; tk.async = true; tk.onload = tk.onreadystatechange = function () { a = this.readyState; if (f || a && a != "complete" && a != "loaded") return; f = true; clearTimeout(t); try { Typekit.load(config) } catch (e) { } }; s.parentNode.insertBefore(tk, s)
+        })(document);
+    </script>
+</head>
+
+<body>
+    <header>
+        <div class="brand">synomare</div>
+        <details class="nav">
+            <summary>MENU</summary>
+            <nav class="menu">
+                <a href="./">HOME</a>
+                <a href="notes/">NOTES</a>
+                <a href="links.html">LINKS</a>
+                <a href="about.html">ABOUT</a>
+                <a href="mailto:synomare@gmail.com">CONTACT</a>
+            </nav>
+        </details>
+    </header>
+
+    <main>
+        <!-- Title Block -->
+        <section class="z-title flex-col flex-between">
+            <h1 class="txt txt-lg line-extend">synomare</h1>
+            <div class="pad-md">
+
+            </div>
+        </section>
+
+        <!-- Echo Chamber (Visual Noise) -->
+        <section class="z-echo">
+            <span
+                class="txt-xl">まだ棒でなく、名もない法則の骨。BGMのような低音が腹膜で震える。表面に細い刻み。目盛り。だが単位が印字されていない。単位は内臓で測るもの。誰が観測しても、白は白でなく温度である。</span>
+        </section>
+
+
+
+        <!-- Vertical Stream 1 -->
+        <section class="z-vert-1">
+            <div class="txt txt-sm vertical" style="white-space: pre;">
+
+                　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　複数があって多数ではない
+                　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　し、 形を入れ替えていいことを、一つの約束にする。
+                　　　　　　　　　　 沈潜する一本の線。遠い煙を　　　　　　　　投げ合うそこは庭にされる。
+                　　　　　　　　　　 　（かつて）決まりとしていた姿勢が少し剥がれて、いくつか
+                　　　　　　　　　　 浮かび直した（ 日差しから声が鳴って、くすぐったくされ 　　　　　　　　　　　　　　　）
+                　　　　　　　　　　 水面で　　　曲がったから仄暗い ここに
+                　　　　　　　　　　 　揺れて映るものを、片目ずつ目らしく、当たり前にする。
+                　　　　　　　　　　 下手な呼吸は上手な呼吸がおもしろい。
+
+                　　　　　　　　　　 　　　　　　　　「今から始まるのは
+                　　　　　　　　　　　　　　　　　　（埋まった血を使い直そうとする努力で、（ 　　　　　　　　　　　　　　　　　　　　　ここに
+                　　　　　　　　　　 　　　　　　　　　　　　　　　　　　）ここに昔、花があった（中断）
+                　　　　　　　　　　 　　　　　　　　　）」
+
+                　　　　　 　　　　　 　　　　　　　　　　　　　　　　　　波を閉じる矩形になる。
+                　　　　　 　　　　　 　　　　　　　　　　　　　　　　　　猿らしく思い出す。握る手が御座します。しめる。
+                　　　　　 　　　　　 　　　　　　　　　　　　　　　　　　むすんで ひらけばきっと繰り返すことになる。
+                　　　　　 　　　　　　　　　　　　　　　　　　　　　　　これは何度目なんだろうね？ あなたに迷ってほしい。
+            </div>
+        </section>
+
+        <!-- Vertical Stream 2 -->
+        <section class="z-vert-2">
+            <div class="txt txt-sm vertical" style="white-space: pre;">
+                <br><br>
+                　　　　　　　　　　　　　 　　　　　　　　　　　　　　　　　　　　　　　　　　　今
+                　　　　　　　　　　　 　　あなたが（それがだれ　でもよかった、ということにしない）
+                　　　　　　　　　　　　　　 は、靴を履いていないから足先がつめた〜い　お休みの日。
+
+                　こどもの作った砂山をカニはいつ　の間にか変わった街の景色とした　駄菓子屋はいつ
+                の間にかなくなっていたから散歩道が変わった　山沿いを通る線路があって、二十年前に
+                海岸線　　　　　　　　　　そこは　見えるけど
+                　　歩いて渡ったりしない（
+                　　　　　　　　　島とされた平台が水に浮か　されている。　誰かがそう　させる。　　）　　　誰か
+                <br>
+                そこに
+                （配置は避けがたく　動かされてもいい）
+                人ら
+
+                　　　　　　　　　　　　　　あの高くまで伸びている灯台は「タワー」と呼ばれていて、その根元には
+                水底だった砂が積もっている。
+                ・つらいこと 　　　　　　　　（それは成分を調べてもただの砂）
+                ・島民 　　　　　　　　　　　根っこみたいな蟻の巣に、今は誰もいないから入れておいた
+                ・約束 　　　　　　　　　　　呻きだけが響く
+                　　　　　　　　　　　　　　木の高さで浮かんだ雲
+                　　　　　　　　　　　　　　まだ　こどもだと言われているけれど誰も見たことがない
+                　　が立っている。
+            </div>
+        </section>
+
+        <!-- Main Detail -->
+        <section class="z-detail">
+            <p class="txt txt-sm ruled-bg-sm">
+                いつか生体認証技術が今よりずっと高度になったら、機械はたくさんの人の生の全ての瞬間を、一度に全部見分けられるようになるだろう。おしゃべりな視線たちは、脆く、不確かな、でもおかしなやり方で宇宙を見つめる魂を気にかけて離そうとしない。夢の中に入る入り口の扉を見守っている門番は、門番の役割しか与えられていないから、中に入っていく人を後ろ姿でしか知らなかった。いつか友達になれたらいいな。きっとまた会えるから、今は他人でも構わないと思った。<br>ふと、このまま年老いて、表情も姿勢も変わって、すっかり今と見分けがつかなくなったその人を、それでも他の似た魂と見分けられるか分からなくなる気がした。機械は機械として完璧でなかったし、人間が人間の姿のままであり続ける確証なんてどこにもなかった。数百年後にはあなたの肉体は地上に残らない。他の誰かのと混ぜられた、意識の深い水たまりの中を回遊するbotが、あなたごと水面を時々くすぐって退屈しないように見張っているだろう。そうして時が来たら、悪い夢に出てくるみたいな、矛盾した姿のキメラのようなサイボーグの鋳型にあなたのことを注ぐだろう。でも、その人が虫に似ても魚に似ても鳥に似ても石に似ても花に似ても、なんだって、あなたがあなたであるならどんな姿だって、きっと分かってあげられると信じておくことにした。その約束は、世界から隠された静かな約束の一つになって、きっと、私たちの中に漂っている。だからきっと、誰もがずっと生き続けてる。
+            </p>
+        </section>
+
+        <!-- Noise Column -->
+        <section class="z-noise" style="padding: 0;">
+            <img src="assets/images/noise.png" alt="Noise"
+                style="width: 100%; height: 100%; object-fit: cover; opacity: 0.8; mix-blend-mode: luminosity;">
+        </section>
+
+        <!-- Stream of Consciousness -->
+        <section class="z-stream">
+            <p class="txt"
+                style="font-size: 2rem; line-height: 1; letter-spacing: -0.05em; background-size: 100% 3em; transform: scaleX(-1.75); transform-origin: right; width: 110%; margin-left: -40%;">
+                「私は現地で、あなたは反応だった。たまには交代が必要でしょう？」<br>
+                畳まれていた海岸線がほどかれて、僕は眠気に耐えきれなくて目を閉じた。そういえばいつから私語を信じるようになったんだろう？誤変換があったけれど修正する時間が僕には残されていなかったし、私語が死後だったとしても、どちらにせよ生きる魂の制作物だったから手放すほかなかった。
+            </p>
+
+            <p class="txt"
+                style="font-size: 2rem;  line-height: 0.8; letter-spacing: -0.5em; background-size: 100% 3em; transform: scaleX(2.5); transform-origin: right; width: 110%; margin-left: -40%;">
+                食材を　　　　　　直接捕食することの　　　　　　教育効果<br>は、言語による伝達や<br><br><br><br><br><br><br>あらゆる手段を用いて食材を口へと運ぶ。<br>その過程の激しさと方法の多様さ、それらが選び取られる即興の過
+            </p>
+            <p>
+                ワークショップ形式の体験学習のそれを遥かに凌ぐ。あらゆる手段を用いて食材を口へと運ぶ。<br>その過程の激しさと方法の多様さ、それらが選び取られる即興の過程、その速度。目の前にいるのは私たち人間を含めた哺乳類と同様の進化系統を見出すことが出来ないような種類の生物なのだが、時に窒息死によって命を落としかねないほどの勢いで生き物を捕食する生物は、果たして自分自身を恐れすることは無いのだろうか。そういった感情が一片たりとも浮かんでこないなら、捕食行動はおそらく私たちにとっての呼吸のような非随意行動に近いのだろう。捕食者の生存戦略に巻き込まれ続けて死ぬ無数の生命のことを考えるたび胃腸の下の奥の方に言葉にしがたい感覚が堆積していきいずれ吐き出した。
+            </p>
+        </section>
+
+        <!-- Background Collage -->
+        <section class="z-bg-collage">
+            <img src="assets/images/bg-collage.png" alt="Collage"
+                style="width: 100%; height: auto; opacity: 0.6; mix-blend-mode: screen;">
+        </section>
+
+        <!-- Left Background Image -->
+        <section class="z-bg-left">
+            <img src="assets/images/bg-left.png" alt="Left BG"
+                style="width: 100%; height: auto; opacity: 0.8; mix-blend-mode: multiply;">
+        </section>
+
+        <!-- Right Background Image -->
+        <section class="z-bg-right">
+            <img src="assets/images/bg-right.png" alt="Right BG"
+                style="width: 100%; height: auto; opacity: 0.8; mix-blend-mode: multiply;">
+        </section>
+
+        <!-- Collage Image 1 (Hands) -->
+        <section class="z-collage-1">
+            <img src="assets/images/collage-1.jpg" alt="Collage 1" style="width: 100%; height: auto; opacity: 0.7;">
+        </section>
+
+        <!-- Collage Image 2 (Scan) -->
+        <div class="z-collage-23">
+            <img src="assets/images/collage-23.jpg" alt="" style="width: 100%; height: auto;">
+        </div>
+        <div class="z-collage-24">
+            <img src="assets/images/collage-24.jpg" alt="" style="width: 100%; height: auto;">
+        </div>
+        <div class="z-collage-25">
+            <img src="assets/images/collage-25.jpg" alt="" style="width: 100%; height: auto;">
+        </div>
+        <div class="z-collage-26">
+            <img src="assets/images/collage-26.png" alt="" style="width: 100%; height: auto;">
+        </div>
+        <!-- Original Collage Image 2 (Scan) - Renamed/Moved -->
+        <section class="z-collage-2">
+            <img src="assets/images/collage-2.jpg" alt="Collage 2" style="width: 100%; height: auto; opacity: 0.6;">
+        </section>
+
+        <!-- Collage Image 3 (Moon) -->
+        <section class="z-collage-3">
+            <img src="assets/images/collage-3.jpg" alt="Collage 3" style="width: 100%; height: auto; opacity: 0.8;">
+        </section>
+
+        <!-- Collage Image 4 (Eyes) -->
+        <section class="z-collage-4">
+            <img src="assets/images/collage-4.jpg" alt="Collage 4" style="width: 100%; height: auto; opacity: 0.6;">
+        </section>
+
+        <!-- Collage Image 5 (Dark) -->
+        <section class="z-collage-5">
+            <img src="assets/images/collage-5.jpg" alt="Collage 5" style="width: 100%; height: auto; opacity: 0.7;">
+        </section>
+
+        <!-- Collage Image 6 (City) -->
+        <section class="z-collage-6">
+            <img src="assets/images/collage-6.jpg" alt="Collage 6" style="width: 100%; height: auto; opacity: 0.6;">
+        </section>
+
+        <!-- Collage Image 7 (Flowers) -->
+        <section class="z-collage-7">
+            <img src="assets/images/collage-7.jpg" alt="Collage 7" style="width: 100%; height: auto; opacity: 0.8;">
+        </section>
+
+        <!-- Collage Image 8 (Sketch) -->
+        <section class="z-collage-8">
+            <img src="assets/images/collage-8.jpg" alt="Collage 8" style="width: 100%; height: auto; opacity: 0.8;">
+        </section>
+
+        <!-- Collage Image 9 (Glitch) -->
+        <section class="z-collage-9">
+            <img src="assets/images/collage-9.jpg" alt="Collage 9" style="width: 100%; height: auto; opacity: 0.8;">
+        </section>
+
+        <!-- Collage Image 10 (Hand/Globe) -->
+        <section class="z-collage-10">
+            <img src="assets/images/collage-10.jpg" alt="Collage 10" style="width: 100%; height: auto; opacity: 0.6;">
+        </section>
+
+        <!-- Collage Image 11 (Red) -->
+        <section class="z-collage-11">
+            <img src="assets/images/collage-11.jpg" alt="Collage 11" style="width: 100%; height: auto; opacity: 0.9;">
+        </section>
+
+        <!-- Collage Image 12 (White/Abstract) -->
+        <section class="z-collage-12">
+            <img src="assets/images/collage-12.jpg" alt="Collage 12" style="width: 100%; height: auto; opacity: 0.8;">
+        </section>
+
+        <!-- Collage Image 13 (Rainbow) -->
+        <section class="z-collage-13">
+            <img src="assets/images/collage-13.jpg" alt="Collage 13" style="width: 100%; height: auto; opacity: 0.8;">
+        </section>
+
+        <!-- Collage Image 14 (Dark Structure) -->
+
+
+        <!-- Collage Image 15 (Texture) -->
+        <section class="z-collage-15">
+            <img src="assets/images/collage-15.jpg" alt="Collage 15" style="width: 100%; height: auto; opacity: 0.7;">
+        </section>
+
+        <!-- Collage Image 16 (Hand/Ball) -->
+        <section class="z-collage-16">
+            <img src="assets/images/collage-16.jpg" alt="Collage 16" style="width: 100%; height: auto; opacity: 0.9;">
+        </section>
+
+        <!-- Collage Image 17 (Deep Background) -->
+        <section class="z-collage-17">
+            <img src="assets/images/collage-17.jpg" alt="Collage 17"
+                style="width: 100%; height: 100%; object-fit: cover; opacity: 0.5;">
+        </section>
+
+        <!-- Bottom Zone (Repurposed) -->
+        <section class="z-bottom-zone" style="white-space: pre;">
+            <p class="txt txt-sm">
+                だから　ひと　つ　はひとりではない。
+                組み立てられた　あや。
+                あたたかさは緑に　なる。そう測る、この高さ。
+                そう、される　忘れないうちにそうされる。
+                放られる線が、風に吹かれて束ねられる。
+                集まっていく。
+                解かれていく。
+                「ほんとうに思い出せない？」
+                数の数え方を手でつかめない。
+                それだけにしておく。こう傾いた、調べもの　の、積まれた床ではあ　たたかさ　が効いてくる。
+                「あなたが話すべきこともきっとあるよ」
+                「そ　れは火のこ　と　ですか」
+                火だ。もつれながら、見られた、あの高さにあること　だ。
+                そう確かめておく、ため　の　調べもの。
+                「わたし　の、ね。ここにあ　る忘れ物の　こと　ば、　かり　気、にする」
+                「でも、もうこの部屋閉めちゃう時間だよ」
+                「あぁ、ねむたかったか　ら。　少し」
+                かわす足、右ずつの　音です。つ、ま先が　捨ててある。こうする形で、明日　水、をさわることにしてお、く。そうして、閉じられる。話すことのいくつ。ひどいこ、とをねむたくして　おく。教えるこ、とを　手で　わたす。また、また、また、また、その手を　冷たく　し　される。そうする、明日食べることを　作るみたい、にたくさんの、壁には　りつけて。その言う　こと　を、明日ずつの小さな　調べ　にしてね、　むる。
+
+                眠ると、　めをみる。新しい明るさだ。こちらを見ている。開き、　いき　をして閉じる。くらい中、にいて　きっと　誰　から、来た。　
+                「盲人は輪郭を共有しない。だからあなたの相貌は開かれている。散らばった無数の線は、その余白は、盲人の近傍で束ねられ、それが肉を象っている」
+                　め　は、少しほ　どけた。
+
+            </p>
+        </section>
+
+        <!-- Minimal Copyright -->
+        <div class="z-copyright">
+            <p class="txt txt-xs muted">
+                &copy; <span id="year"></span> synomare. All rights reserved.
+            </p>
+        </div>
+
+        <!-- Horizontal Interruption Lines -->
+        <div class="hr-1"></div>
+        <div class="hr-2"></div>
+
+    </main>
+
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+</body>
+
+</html>
