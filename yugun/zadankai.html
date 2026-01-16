@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>振り返り座談会 — 嶼群 — synomare</title>
+  <meta name="description" content="振り返り座談会">
+  <meta property="og:title" content="振り返り座談会 — synomare">
+  <meta property="og:type" content="article">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="preconnect" href="https://use.typekit.net" crossorigin>
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --fg: #e5e5e5;
+      --muted: #555;
+      --line: #222;
+      --accent: #fff;
+      --font-mincho: "Hina Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+      --font-gothic: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+      font-size: clamp(15px, 1.4vw, 20px);
+    }
+
+    html, body { overflow-x: hidden; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-mincho);
+      -webkit-font-smoothing: antialiased;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      min-height: 100svh;
+    }
+
+    a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--muted); }
+    a:hover { border-bottom-color: var(--accent); background: rgba(255, 255, 255, 0.08); }
+
+    /* Header & Footer */
+    header, footer {
+      padding: 0.8rem 1rem;
+      font-family: var(--font-gothic);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      z-index: 100;
+      background: var(--bg);
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+    }
+
+    footer {
+      border-top: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Navigation */
+    details.nav { position: relative; }
+    details.nav>summary {
+      list-style: none;
+      cursor: pointer;
+      border: 1px solid var(--line);
+      padding: 0.2em 0.8em;
+      text-transform: uppercase;
+    }
+    details.nav>summary::-webkit-details-marker { display: none; }
+
+    .menu {
+      position: absolute;
+      right: 0;
+      top: 100%;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      padding: 1rem;
+      min-width: 180px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      z-index: 1000;
+    }
+
+    /* Breadcrumb */
+    .breadcrumb {
+      display: flex;
+      gap: 0.5rem;
+      font-size: 0.6rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .breadcrumb a { color: var(--muted); border: none; }
+    .breadcrumb a:hover { color: var(--fg); }
+
+    /* Main */
+    main {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr minmax(auto, 72ch) 1fr;
+      padding: 0;
+    }
+
+    /* Article */
+    article {
+      grid-column: 2;
+      padding: 3rem 2rem 4rem;
+      line-height: 1.9;
+    }
+
+    article h1 {
+      font-size: 2rem;
+      font-weight: 400;
+      letter-spacing: -0.04em;
+      margin: 0 0 0.5rem;
+      line-height: 1.2;
+    }
+
+    article h2 {
+      font-size: 1.3rem;
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      margin: 3rem 0 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--line);
+    }
+
+    article p {
+      margin: 0 0 1.2rem;
+    }
+
+    article p strong {
+      color: var(--accent);
+      font-weight: 400;
+    }
+
+    article hr {
+      border: none;
+      border-top: 1px solid var(--line);
+      margin: 2.5rem 0;
+    }
+
+    article ul {
+      padding-left: 1.2rem;
+      margin: 0 0 1.2rem;
+    }
+
+    article li {
+      margin-bottom: 0.3rem;
+    }
+
+    article em {
+      color: var(--muted);
+      font-style: normal;
+    }
+
+    /* Sidebar decorative element */
+    .sidebar-left {
+      grid-column: 1;
+      border-right: 1px solid var(--line);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sidebar-left::after {
+      content: "座談会";
+      position: absolute;
+      top: 3rem;
+      right: 1rem;
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      font-family: var(--font-gothic);
+      text-transform: uppercase;
+    }
+
+    .sidebar-right {
+      grid-column: 3;
+      border-left: 1px solid var(--line);
+    }
+
+    /* Footer Nav */
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .nav-links a { color: var(--muted); border: none; }
+    .nav-links a:hover { color: var(--fg); }
+
+    /* Vignette */
+    body::after {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 9998;
+      background: radial-gradient(circle at 50% 50%, transparent 60%, rgba(0, 0, 0, 0.35) 100%);
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      main {
+        display: block;
+      }
+      article {
+        padding: 2rem 1.5rem 3rem;
+      }
+      article h1 { font-size: 1.6rem; }
+      article h2 { font-size: 1.15rem; }
+      .sidebar-left, .sidebar-right { display: none; }
+    }
+
+    html.wf-loading body { opacity: 0; }
+    html.wf-active body, html.wf-inactive body { opacity: 1; transition: opacity 0.5s; }
+  </style>
+  <script>
+    (function (d) {
+      var config = { kitId: 'ifg4slm', scriptTimeout: 3000, async: true }, h = d.documentElement, t = setTimeout(function () { h.className = h.className.replace(/\bwf-loading\b/g, "") + " wf-inactive"; }, config.scriptTimeout), tk = d.createElement("script"), f = false, s = d.getElementsByTagName("script")[0], a; h.className += " wf-loading"; tk.src = 'https://use.typekit.net/' + config.kitId + '.js'; tk.async = true; tk.onload = tk.onreadystatechange = function () { a = this.readyState; if (f || a && a != "complete" && a != "loaded") return; f = true; clearTimeout(t); try { Typekit.load(config) } catch (e) { } }; s.parentNode.insertBefore(tk, s)
+    })(document);
+  </script>
+</head>
+
+<body>
+  <header>
+    <a href="../" class="brand" style="border:none">synomare</a>
+    <nav class="breadcrumb">
+      <a href="../">Home</a>
+      <span>/</span>
+      <a href="index.html">嶼群</a>
+      <span>/</span>
+      <span style="color:var(--fg)">座談会</span>
+    </nav>
+    <details class="nav">
+      <summary>MENU</summary>
+      <nav class="menu">
+        <a href="../">HOME</a>
+        <a href="../notes/">NOTES</a>
+        <a href="../about.html">ABOUT</a>
+      </nav>
+    </details>
+  </header>
+
+  <main>
+    <aside class="sidebar-left"></aside>
+    <article>
+      <h1>嶼群（博物館（たち））　全公演終了後 振り返り座談会</h1>
+<hr>
+<p><strong>出演</strong></p>
+<ul>
+<li>島民</li>
+<li>つらいこと</li>
+<li>誤字</li>
+<li>約束</li>
+<li>synomare（演出）</li>
+</ul>
+<hr>
+<p><strong>synomare</strong>　えーと、全公演が終わりまして。お疲れ様でした。</p>
+<p><strong>全員</strong>　お疲れ様でした。</p>
+<p><strong>島民</strong>　終わったね。</p>
+<p><strong>つらいこと</strong>　終わった……。</p>
+<p><strong>誤字</strong>　おわた。</p>
+<p><strong>約束</strong>　お疲れ様でした。</p>
+<p><strong>synomare</strong>　今日は振り返り座談会ということで、ゆっくり話せればと思います。飲み物は各自持ってきてください。僕はビール開けます。</p>
+<p><strong>島民</strong>　僕もビールで。</p>
+<p><strong>つらいこと</strong>　私はお茶……あ、やっぱりビール。</p>
+<p><strong>誤字</strong>　ぼくはオレンジジュースで。</p>
+<p><strong>約束</strong>　私は水で大丈夫です。</p>
+<p><strong>つらいこと</strong>　約束さん本当にお酒飲まないよね。</p>
+<p><strong>約束</strong>　うん……飲めないわけじゃないんだけど。</p>
+<p><strong>島民</strong>　飲んでるとこ見たことない。</p>
+<p><strong>約束</strong>　稽古で一回だけ飲んだよ。</p>
+<p><strong>誤字</strong>　え、いつ？</p>
+<p><strong>約束</strong>　誤字くんが来なかった日。</p>
+<p><strong>誤字</strong>　あー、あの日か。すまん、道間違えた。</p>
+<p><strong>つらいこと</strong>　三駅も間違えたんでしょ？</p>
+<p><strong>誤字</strong>　逆方向に乗った。</p>
+<p><strong>synomare</strong>　（笑）あのとき僕、本気で心配したんですよ。連絡つかないし。</p>
+<p><strong>誤字</strong>　携帯の充電切れてた。</p>
+<p><strong>島民</strong>　誤字らしいね。</p>
+<hr>
+<p><strong>島民</strong>　そういえばそらくんは来ないの？</p>
+<p><strong>synomare</strong>　今回は演者の座談会だから。後日、僕と二人で話したやつも公開される感じ。</p>
+<p><strong>つらいこと</strong>　え〜。</p>
+<p><strong>synomare</strong>　まあ、また飲み会でもやればいいでしょ。正直、僕も疲れてて。</p>
+<p><strong>島民</strong>　synomareさんも疲れてる？</p>
+<p><strong>synomare</strong>　かなり。今日ここに来るまでに二回昼寝した。</p>
+<p><strong>つらいこと</strong>　（笑）</p>
+<p><strong>synomare</strong>　いや、本当に。千秋楽終わってからずっと頭がぼんやりしてて。あと、正直に言うと、反省点もたくさんあって。そういうのをみなさんと話しながら整理したいっていうのもある。</p>
+<p><strong>約束</strong>　反省点？</p>
+<p><strong>synomare</strong>　うん。演出として、もっとこうすればよかったなっていうとこ。でも、それは後で話します。</p>
+<hr>
+<h2>タイトルについて</h2>
+<p><strong>島民</strong>　そういえばさ、タイトルのことって聞いた？　「嶼群（博物館（たち））」って、どういう意味なの。</p>
+<p><strong>つらいこと</strong>　私もずっと気になってた。</p>
+<p><strong>誤字</strong>　ぼくは読み方すらわからなかった。「しょぐん」？</p>
+<p><strong>約束</strong>　私は「しまむら」って読んでた、最初（笑）</p>
+<p><strong>synomare</strong>　あー、実は僕だけ聞いてるんだよね。</p>
+<p><strong>島民</strong>　え、そうなの？</p>
+<p><strong>つらいこと</strong>　ずるい。</p>
+<p><strong>synomare</strong>　いや、稽古始まる前に一回だけ話してくれて。</p>
+<p><strong>約束</strong>　どういう意味だったの？</p>
+<p><strong>synomare</strong>　えーと、まず「島嶼群」っていう言葉があるじゃないですか。島がいっぱいある場所のこと。</p>
+<p><strong>島民</strong>　うん。</p>
+<p><strong>synomare</strong>　で、このタイトルでは「島」が消えてるんですよ。「嶼群」だけになってて。</p>
+<p><strong>つらいこと</strong>　あ、そう。それなんでかなって。</p>
+<p><strong>synomare</strong>　その消えた「島」は、記憶の層の奥に保存されていて、だから探しに行く。それがこのお話の一つの筋だって言ってた。</p>
+<p><strong>誤字</strong>　探しに行く。</p>
+<p><strong>synomare</strong>　うん。で、その保存されてる場所が「博物館」。記憶を保管しておく場所として。</p>
+<p><strong>約束</strong>　それで括弧の中に「博物館」があるんだ。</p>
+<p><strong>synomare</strong>　そう。で、さらに「たち」っていうのは、島がそれぞれの演者ごとに違う形を持つだろうから、って言ってた。僕の島と、島民にとっての島と、つらいことにとっての島、みたいな感じでみんな違うから。</p>
+<p><strong>島民</strong>　……なるほど。</p>
+<p><strong>つらいこと</strong>　だからさらに括弧で留保されてるんだ。まあ、よくそんなことまで……</p>
+<p><strong>synomare</strong>　うん。確定させないで、宙ぶらりんにしておくために。</p>
+<p><strong>誤字</strong>　括弧が入れ子になってるのってそういうことか。</p>
+<p><strong>約束</strong>　私、今初めて腑に落ちた。</p>
+<p><strong>島民</strong>　それ、最初に言ってほしかったな。</p>
+<p><strong>synomare</strong>　いや、「別に言わないでいい」って言われて。</p>
+<p><strong>つらいこと</strong>　なんで？</p>
+<p><strong>synomare</strong>　「知らないまま演じた方がいいかも」って。</p>
+<p><strong>島民</strong>　……まあ、そういうこと言いそうだよね。</p>
+<hr>
+<h2>それぞれの役について</h2>
+<p><strong>synomare</strong>　この機会に聞いておきたいんですけど、みなさん、自分の役についてどう思ってますか。演じてみて。</p>
+<p><strong>島民</strong>　僕は……「島民」って、最初すごく抽象的に感じたんですよね。島の民って何？　どこの島？　って。</p>
+<p><strong>synomare</strong>　今はどうですか。僕も演出として、島民くんの解釈が気になってて。</p>
+<p><strong>島民</strong>　今は……うーん、ちょっとわかってきたかも。僕にとっての「島民」は、ずっとそこにいる人なんです。動けない人。動きたくないわけじゃなくて、動けない。生まれついたその場所に根が生えてる感じ。</p>
+<p><strong>約束</strong>　根が生えてる。あの砂場の中に立ってるとき、そういう感じしたね。</p>
+<p><strong>島民</strong>　うん。だから再開発の告知が来るっていうのが、すごく怖いことなんだろうなと想像してた。根を引っこ抜かれる感じ。</p>
+<p><strong>つらいこと</strong>　私は「つらいこと」っていう名前が、最初嫌だった。</p>
+<p><strong>synomare</strong>　嫌だった？</p>
+<p><strong>つらいこと</strong>　だって、つらいことでしょ。誰もなりたくないじゃないですか。でも、誰かがやらないといけなくて。</p>
+<p><strong>誤字</strong>　貧乏くじ？</p>
+<p><strong>つらいこと</strong>　貧乏くじ……うん、そうかも。でも、演じてるうちに、つらいことって必要なんだなって思うようになった。</p>
+<p><strong>synomare</strong>　それ、僕も稽古の最初から感じてた。言葉にするの難しいんですけど。</p>
+<p><strong>つらいこと</strong>　つらいことがないと、何も覚えていられない気がして。楽しいことだけだと、全部流れていっちゃう。つらいことがあるから、そこに引っかかって、記憶が残る。それに、つらいことって、誰かの代わりに引き受けてるものだと思うんです。あなたがつらかったことを、私が覚えてなる。私がつらかったことを、誰かが覚えている。そういうリレーなんだなって。</p>
+<p><strong>約束</strong>　……それはわかる気がする。私も、誰かの代わりに引き受けてる感覚、約束にもあったから。</p>
+<p><strong>つらいこと</strong>　だから、私は自分のつらさだけを演じてるんじゃないんですよ。この島にあった全部のつらさを、預かっている。それがすごく重いんだけど、でも誰かがやらないといけないから。</p>
+<hr>
+<p><strong>誤字</strong>　ぼくは「誤字」が好きです。</p>
+<p><strong>島民</strong>　好き？</p>
+<p><strong>誤字</strong>　うん。誰も傷つけないから。間違えても、「あ、間違えた」で終わる。取り返しがつく。</p>
+<p><strong>synomare</strong>　取り返しがつく。それ、僕も大事だと思ってた。演出もそうあるべきだって。</p>
+<p><strong>誤字</strong>　そう。殺したり壊したりしないから。間違えて、直して、また間違える。その繰り返し。</p>
+<p><strong>つらいこと</strong>　それは……優しいね。</p>
+<p><strong>誤字</strong>　優しいかな。わからないけど。</p>
+<p><strong>島民</strong>　誤字くん、稽古中に「間違えるのが仕事って楽だな」って言ってたよね。</p>
+<p><strong>誤字</strong>　言った。でも、ぼくはこの役が好き。世の中って、正しいことばかり求められるじゃないですか。でも、誰だって間違える。それを許さない世界は息苦しい。ぼくが間違えることで、少しだけその息苦しさが和らぐなら、それでいいと思う。</p>
+<p><strong>約束</strong>　なんか、誤字くんがそういうふうに言葉にするの、初めて聞いたかも。</p>
+<p><strong>誤字</strong>　そう？　まあ、間違いは悪いことじゃない。ただのズレ。それを直してもいいし、直さなくてもいい。</p>
+<hr>
+<p><strong>synomare</strong>　約束さんはどうですか。</p>
+<p><strong>約束</strong>　私は……約束って、守られないこともあるじゃないですか。</p>
+<p><strong>synomare</strong>　そうですね。</p>
+<p><strong>約束</strong>　だから、演じてて怖かった。私が約束を演じてるのに、その約束が破られたらどうしようって。私のせいになるんじゃないかって。</p>
+<p><strong>島民</strong>　それは約束さんのせいじゃないよ。</p>
+<p><strong>約束</strong>　わかってる。でも、約束って、守る人と守られる人の間にあるものだから。私だけじゃ成立しない。だから、他の三人がいて、迷ってる私にちゃんとそれぞれの考えとか伝えてくれて、すごく助かった。稽古中、何度も「これでいいのかな」って不安になったんです。約束って、形がないから。見えないものを演じるのは、すごく難しかった。でも、島民さんが「そこにいればいいんだよ」って言ってくれたとき、あ、約束ってそういうことなんだ、って思った。そこにいること。待っていること。それだけでいいんだって。</p>
+<p><strong>つらいこと</strong>　私たち、約束守れてたかな。</p>
+<p><strong>島民</strong>　僕は守れてたと思う。少なくとも、忘れようとしなかった。</p>
+<p><strong>約束</strong>　守れてたと思う。少なくとも、忘れられてはいなかった。それだけで、私は十分だった。</p>
+<p><strong>synomare</strong>　僕も、忘れたことはなかった。この作品のこと。</p>
+<hr>
+<h2>この作品のストーリーについて</h2>
+<p><strong>synomare</strong>　ストーリーというか、この作品で何が起きてるのか、みなさんはどう解釈してますか。</p>
+<p><strong>島民</strong>　えーと……正直、よくわからないまま演じてたところがある。</p>
+<p><strong>つらいこと</strong>　私も。</p>
+<p><strong>誤字</strong>　ぼくも。</p>
+<p><strong>約束</strong>　私も……かな。</p>
+<p><strong>synomare</strong>　（笑）全員わからないまま。</p>
+<p><strong>島民</strong>　でも、なんとなく感じてることはあって。この作品って、何かがなくなっていく話だと思うんです。</p>
+<p><strong>synomare</strong>　何かがなくなっていく。</p>
+<p><strong>島民</strong>　うん。島がなくなって、記憶がなくなって、最後に告知が来て、博物館ごっこもなくなる。全部なくなっていく。</p>
+<hr>
+<p><strong>つらいこと</strong>　でも、最初のところ、水の描写がすごく多いよね。「浮かぶ」「沈む」「潜む」「水面」って。</p>
+<p><strong>synomare</strong>　そうですね。僕も最初に読んだとき、冒頭の「下手な呼吸」からして、水の中にいる感じがあった。演出として、水のイメージをどう作るかっていうのは最後まで悩んでた。</p>
+<p><strong>島民</strong>　僕はあそこ、息を止めて言ってた。</p>
+<p><strong>約束</strong>　え、本当に？</p>
+<p><strong>島民</strong>　うん。「埋まった血を使い直す」っていう台詞のところ。息を止めて、苦しくなってきたところで言うと、声が変わるから。</p>
+<p><strong>つらいこと</strong>　それで声が震えてたんだ。</p>
+<p><strong>島民</strong>　うん。水の中にいる人の声になりたかった。</p>
+<hr>
+<p><strong>誤字</strong>　「猿らしく思い出す」ってところ、好きだった。</p>
+<p><strong>synomare</strong>　どういうところが？</p>
+<p><strong>誤字</strong>　冒頭部分は一応、ト書きってことで進めてたじゃん。だから演者への指示として「猿らしく思い出す」ってなんだろうって考えてた。初めは猿って、なんか滑稽な感じがして。人間じゃないけど、人間に似てる。正しくないけど、近いとか思ってた。でも、猿は猿の理屈があって、別に人間の真似事や模造品じゃないじゃん。その、なんか無意識の見下しみたいなものを突きつけられて、猿らしく思い出すって、そういう役と演者の間の距離みたいなこととも通じるのかな、とか。</p>
+<p><strong>つらいこと</strong>　なるほどね。そういう、忘れるってこと自体のそもそもの暴力性みたいなものは私も作品全体に感じてたね。</p>
+<p><strong>誤字</strong>　うん。ぼくは猿として読んでた、あそこ。</p>
+<hr>
+<p><strong>synomare</strong>　個別のシーンの話から少し離れて、全体として何の話だったのか。僕は僕の解釈があるんですけど、みなさんはどう思いますか。</p>
+<p><strong>島民</strong>　僕は……喪失の話だと思ってる。何かがなくなっていく話。</p>
+<p><strong>つらいこと</strong>　私もそう思う。でも、ただなくなるんじゃなくて、なくなるものを誰かが覚えているっていう話でもある。</p>
+<p><strong>約束</strong>　記憶の話？</p>
+<p><strong>つらいこと</strong>　うん。記憶の話でもあるし、記憶の限界の話でもある。覚えていたいけど、覚えていられない。</p>
+<p><strong>誤字</strong>　覚えていても、間違えて覚えちゃう。</p>
+<p><strong>つらいこと</strong>　そう。それでも覚えていようとする話。</p>
+<hr>
+<p><strong>島民</strong>　僕は、もう一つの軸として、開発の話だと思ってる。</p>
+<p><strong>synomare</strong>　再開発、ですね。</p>
+<p><strong>島民</strong>　うん。でもそれはもっと大きなものの例えで。島があって、そこに人が住んでいて、でも誰かがそれを壊そうとしている。壊して新しいものを建てようとしている。その力に抗えない感じ。</p>
+<p><strong>約束</strong>　でも、抗おうとはしてるよね。博物館を作って、記憶を保存しようとしてる。</p>
+<p><strong>島民</strong>　うん。でも、それも結局は壊される。再開発の告知が来て、終わる。</p>
+<p><strong>つらいこと</strong>　それが一番つらいところだと思う。どれだけ頑張っても、外から来る力には勝てない。</p>
+<p><strong>誤字</strong>　僕たちの声は届かない。</p>
+<p><strong>synomare</strong>　「反対意見については一定の考慮を行ったものの」っていう一文がありますよね。</p>
+<p><strong>島民</strong>　あれ、すごく残酷だよね。聞いたふりだけして、結局何も変わらない。</p>
+<hr>
+<p><strong>約束</strong>　でも、私は、この作品がただ悲しい話だとは思わなかった。</p>
+<p><strong>synomare</strong>　うん。</p>
+<p><strong>約束</strong>　確かに島は壊される。博物館も壊される。でも、最後まで約束を守ろうとした人たちがいた。「ずっと覚えていてあげる」って言った人がいた。その約束は、島がなくなっても、残るんじゃないかって。</p>
+<p><strong>島民</strong>　形がなくなっても、約束は残る？</p>
+<p><strong>約束</strong>　うん。守られたかどうかはわからない。でも、約束しようとしたことは残る。</p>
+<p><strong>つらいこと</strong>　それが希望なのかな。</p>
+<p><strong>約束</strong>　希望っていうほど明るくはないけど……でも、絶望だけでもない。</p>
+<hr>
+<p><strong>誤字</strong>　ぼくは、この作品は「残らないもの」と「残るもの」の話だと思ってた。</p>
+<p><strong>synomare</strong>　残ると残らない。</p>
+<p><strong>誤字</strong>　正しく書かれたものは、書き換えられたら消える。でも、間違いは残る。誤字は、正しく直されても、一度間違えたっていう事実は消えない。</p>
+<p><strong>つらいこと</strong>　記憶も、正確じゃなくても残る。</p>
+<p><strong>誤字</strong>　そう。正確じゃないから残るのかもしれない。完璧なものは上書きされやすいけど、ズレてるものは残りやすい。</p>
+<p><strong>島民</strong>　それは……なんか希望だね。</p>
+<p><strong>synomare</strong>　僕もそう思う。この座談会も、完璧に正確に見れてるわけじゃないけど、そのズレも含めて残る。</p>
+<p><strong>誤字</strong>　希望かな。わからないけど。でも、ぼくが役として間違え続けることで、何かが残るなら、それでいいと思う。</p>
+<hr>
+<p><strong>synomare</strong>　この作品の構造として、最初は水の中から始まって、最後は告知文で終わる。水から陸へ、詩から散文へ、カオスから秩序へ、っていう流れがありますよね。</p>
+<p><strong>島民</strong>　最初はすごく抽象的で、どこにいるのかわからない。</p>
+<p><strong>つらいこと</strong>　でも、最後に向かうにつれて、どんどん具体的になっていく。地名が出てきたり、数字が出てきたり。</p>
+<p><strong>約束</strong>　そして最後に、完璧に具体的な告知文が来る。</p>
+<p><strong>誤字</strong>　近寄りがたい難解なものの冷たさと、すごく形式的で、でもそれだけだからっていう冷たさの二つがある。</p>
+<p><strong>つらいこと</strong>　それ、すごくわかる。どっちも冷たいんだけど、質が違う。</p>
+<p><strong>synomare</strong>　詩的な世界が、徐々に侵食されていく構造なのかもしれないですね。</p>
+<p><strong>島民</strong>　最初は守られていた空間が、だんだん外の論理に飲み込まれていく。</p>
+<p><strong>約束</strong>　それが、島が沈んでいくっていうことなのかも。</p>
+<p><strong>つらいこと</strong>　海に沈むんじゃなくて、現実に沈んでいく。</p>
+<hr>
+<p><strong>約束</strong>　終盤の「小さな博物館にしてあげるから」っていう台詞、あれが一番好き。</p>
+<p><strong>synomare</strong>　どこが好きですか。</p>
+<p><strong>約束</strong>　「あなたがおやすみする、そこを私が」っていう。誰かが眠る場所を、別の誰かが守るっていう。</p>
+<p><strong>島民</strong>　博物館って、普通は終わったものを入れる場所だよね。歴史になったもの。もう動かないもの。</p>
+<p><strong>約束</strong>　うん。でも、この作品では「おやすみする」って言ってる。死んでるんじゃなくて、眠ってる。この博物館は違う。眠ってるだけだから。いつか起きるかもしれないものを入れてる。</p>
+<p><strong>つらいこと</strong>　それって、棺桶と何が違うの？</p>
+<p><strong>約束</strong>　……棺桶は、起きないことが前提でしょ。でも、博物館は、見に来る人がいる。見に来る人がいる限り、完全には終わらない。</p>
+<p><strong>誤字</strong>　お客さんが来るから、眠ってるものが起きるかもしれない？</p>
+<p><strong>約束</strong>　うん。誰かが見ることで、眠ってるものが少しだけ動く。完全には起きないけど、完全に死んでもいない。</p>
+<p><strong>synomare</strong>　それは面白い解釈ですね。上演も同じかもしれない。</p>
+<p><strong>約束</strong>　そうかもしれない。私たちが上演することで、テキストが少しだけ起きる。でも、上演が終わったらまた眠る。</p>
+<p><strong>島民</strong>　また眠る。なるほどなぁ。</p>
+<p><strong>約束</strong>　うん。でも、次に誰かが上演したら、また起きる。そういう繰り返し。</p>
+<hr>
+<p><strong>つらいこと</strong>　私は、「小さな博物館にしてあげる」っていう言い方が気になった。「してあげる」って。</p>
+<p><strong>synomare</strong>　それ、僕も稽古中に考えてたんですよね。「してあげる」って言葉の持つ力。</p>
+<p><strong>つらいこと</strong>　上から目線っていうか……いや、そうじゃなくて。してあげるって言える人がいるってことは、される人がいるってことでしょ。</p>
+<p><strong>約束</strong>　守る人と、守られる人。</p>
+<p><strong>つらいこと</strong>　そう。私は、守られる側になりたいなって思った。普段の生活から、自分のことを忘れられたくないなって思うから。でも、この作品では、私たちは守る側なんだよね。</p>
+<p><strong>島民</strong>　僕たちが博物館を作る側。あの木枠を持って立つとき、そういう気持ちになった。</p>
+<p><strong>つらいこと</strong>　うん。それって、すごく責任が重い。ちゃんと守れるかわからないのに、守るって言わなきゃいけない。</p>
+<p><strong>約束</strong>　でも、守ろうとすることに意味があるんじゃないかな。結果じゃなくて。</p>
+<p><strong>つらいこと</strong>　そうかな……。</p>
+<p><strong>約束</strong>　守れなかったとしても、守ろうとしたことは残る。少なくとも、私はそう思いたい。</p>
+<hr>
+<p><strong>誤字</strong>　「ずっと覚えていてあげる」っていう約束、重いよね。</p>
+<p><strong>約束</strong>　重い？</p>
+<p><strong>誤字</strong>　だって、「ずっと」でしょ。いつまでかわからない。明日までかもしれないし、十年後かもしれないし、死ぬまでかもしれない。</p>
+<p><strong>島民</strong>　でも、約束ってそういうものじゃない？　終わりを決めないから約束になる。終わりを決めたら、それは契約だよ。</p>
+<p><strong>約束</strong>　……島民さんがそう言うと、そうかもしれないって思える。</p>
+<p><strong>つらいこと</strong>　私は、「ずっと覚えていてあげる」って言われたら、嬉しいけどつらい。忘れられないってことだから。</p>
+<p><strong>synomare</strong>　忘れられないのがつらい？</p>
+<p><strong>つらいこと</strong>　うん。忘れたい記憶もあるじゃないですか。つらかったこととか、恥ずかしかったこととか。でも、誰かが「ずっと覚えていてあげる」って言ったら、その人の中では忘れられない。自分が忘れても、誰かが覚えてる。それってすごく怖い。</p>
+<p><strong>約束</strong>　忘れたくても忘れられない。</p>
+<p><strong>つらいこと</strong>　そう。自分の意思とは関係なく、存在し続ける。</p>
+<p><strong>誤字</strong>　でも、逆もあるよね。忘れられたくない記憶もある。</p>
+<p><strong>つらいこと</strong>　うん。それはある。</p>
+<p><strong>誤字</strong>　大切な人のこととか、大切な場所のこととか。忘れたくないのに、だんだん忘れていく。それもつらい。</p>
+<p><strong>つらいこと</strong>　……そうだね。</p>
+<p><strong>誤字</strong>　だから、「ずっと覚えていてあげる」って言ってくれる人がいるのは、救いでもあると思う。自分が忘れても、誰かが覚えてくれてる。</p>
+<hr>
+<p><strong>島民</strong>　僕は、覚えていることの暴力性について考えてた。</p>
+<p><strong>synomare</strong>　暴力性。それ、僕も演出してて感じてた。覚えてるってことの持つ力。</p>
+<p><strong>島民</strong>　うん。覚えているって、ある意味で支配することでもあるから。相手が忘れたいと思っても、こちらが覚えていたら、相手は逃げられない。</p>
+<p><strong>約束</strong>　それは……怖いね。</p>
+<p><strong>島民</strong>　でも、同時に愛でもあると思う。忘れないでいることは、相手を大切にすることでもある。暴力と愛が、同じ行為の中にある。</p>
+<p><strong>synomare</strong>　それ、僕らがこの作品を上演すること自体もそうかもしれない。そらくんのテキストを覚えている。彼が忘れてほしいと思ってても、僕らは覚えている。</p>
+<p><strong>つらいこと</strong>　つらいことも、そういうところがあるかもしれない。つらい記憶を持ち続けることは、その人を忘れないことでもあるから。</p>
+<p><strong>誤字</strong>　でも、間違えて覚えてたらどうなるの？</p>
+<p><strong>島民</strong>　間違えて覚えてる？</p>
+<p><strong>誤字</strong>　うん。実際にはなかったことを、あったと思って覚えてるとか。あったことを、違う形で覚えてるとか。</p>
+<p><strong>島民</strong>　それは……どうなんだろう。</p>
+<p><strong>誤字</strong>　ぼくは、間違えて覚えてても、覚えてることには変わりないと思う。正確さより、覚えようとしたことが大事。</p>
+<p><strong>約束</strong>　間違えていても、約束は約束。</p>
+<p><strong>誤字</strong>　そう。完璧じゃなくても、約束しようとしたことは残る。</p>
+<hr>
+<p><strong>synomare</strong>　稽古中は、みなさんどうやってストーリーを掴もうとしてましたか。</p>
+<p><strong>島民</strong>　最初は全然わからなくて。台詞を言ってはみるけど、何を言ってるのかわからない状態が続いて。</p>
+<p><strong>つらいこと</strong>　私も。でも、二週目くらいから、なんとなく感覚で掴めてきたところがあって。</p>
+<p><strong>synomare</strong>　どういう感覚ですか。</p>
+<p><strong>つらいこと</strong>　言葉で説明できないんだけど……体がこう動きたがってる、みたいな。このタイミングでこう言いたい、っていうのが出てきて。</p>
+<p><strong>約束</strong>　私は、他の三人の動きを見てるうちにわかってきた。この人がこう動いたら、私はこう返すんだな、って。</p>
+<p><strong>誤字</strong>　ぼくは、とにかく稽古の時間でいろいろやってみる。毎回変える。違う言い方をしてみて、「あ、こっちじゃないな」って。</p>
+<hr>
+<p><strong>島民</strong>　稽古で一番苦戦したシーンってどこ？</p>
+<p><strong>つらいこと</strong>　私は「ずっと覚えていてあげる」のところ。あの台詞、何回言っても嘘っぽくなっちゃって。</p>
+<p><strong>synomare</strong>　あー、覚えてます。稽古の五日目くらいで、つらいことさんが「これ無理です」って言ったんですよね。</p>
+<p><strong>つらいこと</strong>　言った。本当に無理だと思った。</p>
+<p><strong>島民</strong>　あのとき、synomareさんが「無理なままでいい」って言ったの、覚えてる。</p>
+<p><strong>synomare</strong>　言いましたね。あれは……正直、僕もどうしていいかわからなくて。とりあえず言っただけなんですけど。</p>
+<p><strong>つらいこと</strong>　え、そうだったの？</p>
+<p><strong>synomare</strong>　うん。演出家として恥ずかしいんですけど、あのとき本当に答えがなくて。でも、「無理なままでいい」って言ったら、つらいことさんの声が変わったから、結果的には良かったのかな。</p>
+<p><strong>つらいこと</strong>　私、「無理なままでいい」って言われて、逆に楽になった。無理じゃなくしようとしてたから無理だったんだって気づいて。</p>
+<hr>
+<p><strong>誤字</strong>　ぼくは冒頭のところが一番時間かかった。</p>
+<p><strong>約束</strong>　「猿らしく思い出す」のあたり？</p>
+<p><strong>誤字</strong>　うん。稽古で十回くらい違うやり方試した。</p>
+<p><strong>島民</strong>　十回も？</p>
+<p><strong>誤字</strong>　うん。最初は普通に読んで、次は猿の声で読んで、次は逆に静かに読んで、次は早口で読んで……。</p>
+<p><strong>synomare</strong>　ありましたね。僕、あのとき内心「もう決めてくれ」って思ってた。</p>
+<p><strong>誤字</strong>　え、そうなの？</p>
+<p><strong>synomare</strong>　（笑）いや、試行錯誤は大事なんですけど、稽古時間が限られてたから。でも、誤字くんが納得するまでやった方がいいと思って、何も言わなかった。</p>
+<p><strong>誤字</strong>　ありがとう。結局、一番最初に読んだやつに戻ったんだけど。</p>
+<p><strong>島民</strong>　え、戻ったの？</p>
+<p><strong>誤字</strong>　うん。一周回って最初が一番良かった。</p>
+<p><strong>つらいこと</strong>　（笑）それ誤字らしいね。</p>
+<hr>
+<p><strong>約束</strong>　私は……稽古の三週目に、一回全部わからなくなったことがあって。</p>
+<p><strong>synomare</strong>　ありましたね。</p>
+<p><strong>約束</strong>　それまでなんとなく掴めてたものが、急に消えて。自分が何をしてるのかわからなくなって。</p>
+<p><strong>島民</strong>　あのとき、約束さんすごく静かだったよね。</p>
+<p><strong>約束</strong>　うん。何も言えなくなってた。</p>
+<p><strong>synomare</strong>　あの日、稽古後にみんなで話したんですよね。</p>
+<p><strong>つらいこと</strong>　ファミレスで。夜中まで。</p>
+<p><strong>誤字</strong>　ぼく、あのときドリンクバー七杯飲んだ。</p>
+<p><strong>島民</strong>　そんなこと覚えてるの？</p>
+<p><strong>誤字</strong>　うん。メロンソーダと、カルピスと、コーラと、ウーロン茶と……。</p>
+<p><strong>つらいこと</strong>　（笑）それはいいから。</p>
+<p><strong>約束</strong>　でも、あの夜にみんなと話して、少し楽になった。わからないのは私だけじゃないってわかったから。</p>
+<hr>
+<p><strong>synomare</strong>　本番を重ねるうちに、お客さんの反応で気づくこともありましたよね。</p>
+<p><strong>島民</strong>　うん。初日と千秋楽で、全然違う作品みたいだった。</p>
+<p><strong>つらいこと</strong>　初日はみんなガチガチだったよね。</p>
+<p><strong>島民</strong>　僕、初日の最初の台詞で声が裏返った。</p>
+<p><strong>synomare</strong>　気づいてましたよ。</p>
+<p><strong>島民</strong>　（笑）恥ずかしい。</p>
+<p><strong>synomare</strong>　でも、二日目から落ち着いてきて。</p>
+<p><strong>つらいこと</strong>　二日目はお客さんの反応が良くて、乗れた感じがあった。ある日の公演で、すごく静かに聞いてるお客さんがいて。その静けさで、あ、ここは大事なところなんだ、って気づいた。</p>
+<p><strong>約束</strong>　私は、お客さんが笑ったところで逆に考えた。ここ、笑うところだったんだ、って。</p>
+<p><strong>誤字</strong>　ぼくが間違えたとき、お客さんがちょっと笑ってくれて。それで救われた気がした。</p>
+<hr>
+<p><strong>synomare</strong>　回を重ねるごとに、変わっていったところってありますか。</p>
+<p><strong>島民</strong>　僕は、余白の使い方が変わった。初日は全部同じ長さだったけど、後半になるにつれて、場面によって変えるようになった。</p>
+<p><strong>つらいこと</strong>　私は声のトーンかな。最初は「つらいこと」だから暗くしなきゃって思ってたけど、後半は明るいところも出せるようになった。</p>
+<p><strong>約束</strong>　私は……動きが減った。</p>
+<p><strong>synomare</strong>　動きが減った？</p>
+<p><strong>約束</strong>　うん。最初はいろいろ動こうとしてたんだけど、途中から動かない方がいいって気づいて。約束って、待つものだから。動かないで待ってる方が、約束らしいなって。</p>
+<p><strong>誤字</strong>　ぼくは逆に、間違える箇所が増えた。</p>
+<p><strong>島民</strong>　（笑）</p>
+<p><strong>誤字</strong>　最初は決まった箇所で間違えてたんだけど、後半はどこで間違えるかわからなくなって。自分でも予測できなくなった。</p>
+<p><strong>synomare</strong>　それは……良いことなのかな。</p>
+<p><strong>誤字</strong>　わからない。でも、役としては正しい気がする。</p>
+<hr>
+<p><strong>島民</strong>　でも、最後までわからないこともたくさんあって。</p>
+<p><strong>つらいこと</strong>　うん。でも、わからないまま終わっていいんだな、って思えるようになった。</p>
+<p><strong>約束</strong>　全部わかろうとしなくていい。自分が感じたことだけ持っていればいい。</p>
+<p><strong>誤字</strong>　それぞれが違うものを持ち帰る。それでいいんだよね。</p>
+<p><strong>synomare</strong>　それが、この作品の特徴かもしれないですね。正解がない。僕も演出として、途中で「これでいいのかな」って不安になることが何度もあった。でも、正解がないからこそ、みなさんと一緒に探っていけたのかなって。</p>
+<p><strong>島民</strong>　正解がないから、怖いけど、自由でもある。</p>
+<hr>
+<p><strong>島民</strong>　ちょっと休憩しない？　喉乾いた。</p>
+<p><strong>synomare</strong>　あ、そうですね。みんなもう一杯どうぞ。</p>
+<p><strong>誤字</strong>　冷蔵庫にまだある？</p>
+<p><strong>synomare</strong>　あると思う。見てきていいよ。</p>
+<p><em>（誤字が席を立つ。しばらくして戻ってくる）</em></p>
+<p><strong>誤字</strong>　ビールとお茶しかなかった。あとヨーグルト。</p>
+<p><strong>島民</strong>　ヨーグルトは飲み物じゃないでしょ。</p>
+<p><strong>誤字</strong>　飲むヨーグルトだった。</p>
+<p><strong>つらいこと</strong>　（笑）</p>
+<p><strong>約束</strong>　synomareさん、普段からヨーグルト飲むんですか。</p>
+<p><strong>synomare</strong>　えーと……正直覚えてないです。いつ買ったかわからない。</p>
+<p><strong>島民</strong>　それ大丈夫？</p>
+<p><strong>synomare</strong>　賞味期限……三日前だった。</p>
+<p><strong>つらいこと</strong>　セーフ。</p>
+<p><strong>誤字</strong>　ぼく飲もうかな。</p>
+<p><strong>約束</strong>　やめなよ。</p>
+<p><strong>synomare</strong>　いや、大丈夫だと思う。僕が責任持って後で飲みます。</p>
+<hr>
+<h2>テキストのレイアウトについて</h2>
+<p><strong>synomare</strong>　じゃあ、テキストの話に移りましょうか。今回、かなり特殊なレイアウトで書かれてたんですけど。</p>
+<p><strong>島民</strong>　縦書きで、文字がページのあちこちに散ってるやつですよね。</p>
+<p><strong>synomare</strong>　そう。例えば「どうして？」「だから、私はあなたのことを」みたいな台詞が、一文字ずつ縦に並んでて、それが複数列で同時に走ってる。</p>
+<p><strong>つらいこと</strong>　あれ、最初見たとき読み方がわからなかった。</p>
+<p><strong>synomare</strong>　どう読みました？</p>
+<p><strong>つらいこと</strong>　左から右に読もうとして、意味がわからなくて、縦に読んだら通じて、でも隣の列と同時に進行してるから、結局どっちを先に読めばいいのかわからなくなって。</p>
+<p><strong>誤字</strong>　ぼくはそれ、誤読だと思ってた。最初。自分が間違えて読んでるのかと思った。</p>
+<p><strong>synomare</strong>　それは意図してたところで。読む順序が決まってないんですよね。</p>
+<p><strong>約束</strong>　私は、二つの声が同時に話してるんだと思いました。舞台上で。</p>
+<p><strong>synomare</strong>　そうなんです。実際の上演でどうしましたか、そこ。</p>
+<hr>
+<p><strong>島民</strong>　僕と約束さんで同時に喋ったんですよ。初日は。</p>
+<p><strong>約束</strong>　うん。</p>
+<p><strong>島民</strong>　でも、お客さんに聞こえてるのかわからなくて。二人の声が重なって、どっちも聞き取れなくなってる気がして。</p>
+<p><strong>つらいこと</strong>　二日目からは少しずらしたよね。</p>
+<p><strong>島民</strong>　そう。0.5秒くらいずらして、エコーみたいにした。</p>
+<p><strong>synomare</strong>　それは良かった。僕も照明ブースから聞いてて、二日目の方が断然良かった。テキスト上の「同時」って、物理的に同時である必要はなくて。</p>
+<p><strong>誤字</strong>　ズレてる方が、同時っぽい。</p>
+<p><strong>島民</strong>　それはどういう……？</p>
+<p><strong>誤字</strong>　完全に同時だと、一つの声に聞こえちゃうから。少しずれてる方が、二つあることがわかる。</p>
+<p><strong>約束</strong>　ああ。それはわかる。</p>
+<hr>
+<h2>余白について——発話か、身体か</h2>
+<p><strong>synomare</strong>　余白についてはどうでしたか。ページの大部分が空白で、文字がぽつんとある箇所とか。</p>
+<p><strong>つらいこと</strong>　あれが一番……なんていうか、格闘した。</p>
+<p><strong>島民</strong>　うん。稽古中ずっとそこで止まってたよね。</p>
+<p><strong>synomare</strong>　僕もめちゃくちゃ悔やんだところ。どこで止まってたんですか？</p>
+<p><strong>島民</strong>　余白が、発話への指示なのか、身体の動きへの指示なのか、わからなくて。</p>
+<p><strong>約束</strong>　そう。沈黙しろということなのか、動けということなのか。</p>
+<p><strong>誤字</strong>　舞踏譜みたいな。</p>
+<p><strong>つらいこと</strong>　舞踏譜って何？</p>
+<p><strong>誤字</strong>　ダンスの楽譜みたいなやつ。空間の中でどう動くかが書いてあるやつ。</p>
+<p><strong>島民</strong>　そらくんのテキストって、そういうところがあるよね。言葉だけじゃなくて、紙面そのものが空間になってる。</p>
+<hr>
+<p><strong>synomare</strong>　僕の方から補足すると、最初の稽古のとき、余白をどう扱うかで三つの選択肢を出したんですよね。</p>
+<p><strong>島民</strong>　ああ、そうだった。</p>
+<p><strong>synomare</strong>　一つ目は、余白を完全な沈黙として扱う。二つ目は、余白を動きの指示として扱う。三つ目は、余白を各自の自由時間として扱う。</p>
+<p><strong>つらいこと</strong>　最初は一つ目でやってみたんだよね。</p>
+<p><strong>synomare</strong>　そう。完全な沈黙。でも、それだと舞台が止まってしまって。観客が「止まった？」って思うくらいの静止になってしまった。</p>
+<p><strong>約束</strong>　あれは確かに長く感じた。</p>
+<p><strong>synomare</strong>　で、二つ目の動きとして扱うっていうのを試したら、今度は何をしていいかわからなくて。</p>
+<p><strong>誤字</strong>　ぼくがとっさに床に寝転がったのはそのときだよね。</p>
+<p><strong>synomare</strong>　そう。あれが転機になった。動きに正解がないなら、各自がその場で感じたことをやればいいって。</p>
+<hr>
+<p><strong>島民</strong>　synomareさん、稽古中に「余白の時間を測ってみよう」って言ったじゃないですか。</p>
+<p><strong>synomare</strong>　うん、言った。</p>
+<p><strong>島民</strong>　あれ、すごく助かった。</p>
+<p><strong>synomare</strong>　具体的にはですね、ページの余白の面積を計算して、それを秒数に変換する、っていう実験をしたんです。</p>
+<p><strong>つらいこと</strong>　ページの四分の一が空白なら、4秒の沈黙、みたいな？</p>
+<p><strong>synomare</strong>　そういう感じです。ただ、それをそのまま使うわけじゃなくて、目安として。あと、余白が上にあるのか下にあるのかで、意味が違うかもしれないって話もしましたよね。</p>
+<p><strong>約束</strong>　上にあると、これから何か言う前の沈黙。下にあると、言った後の余韻。</p>
+<p><strong>synomare</strong>　そうそう。それで、上の余白は短めに、下の余白は長めに、っていうルールを一回試してみた。</p>
+<p><strong>島民</strong>　でも、結局そのルールも崩れていったよね。</p>
+<p><strong>synomare</strong>　崩れましたね。本番が近づくにつれて、各自の感覚に任せる形になっていった。</p>
+<hr>
+<p><strong>誤字</strong>　あの寝転がるの、もう少し言うと、実は砂場の中に寝転がったら、砂が体について。それがすごく気持ちよくて。</p>
+<p><strong>synomare</strong>　うん。あのとき、誤字くんが寝転がったのを見て、余白って身体が脱力する時間でもあるのかな、って思ったんです。</p>
+<p><strong>誤字</strong>　脱力。それ、すごく締まった。</p>
+<p><strong>synomare</strong>　うん。言葉を発している間、身体は力んだり緊張したりする。余白は、その緊張を解く時間。会話の間の中で自然に生まれるそうした緩急を、もっと過剰に表に出すのがいい気がして。その過剰な揺らぎが作る不安定さが、テクスト自体のある種の不気味さや圧みたいなものに繋がっていくように思って。寝転がるのは、その極端な形。</p>
+<p><strong>つらいこと</strong>　私はあの余白のところで、ずっと立ってた。動けなくて。</p>
+<p><strong>島民</strong>　動けなかった？</p>
+<p><strong>つらいこと</strong>　うん。動こうとしても体が動かなくて。沈黙してるのか、固まってるのか、自分でもわからなかった。</p>
+<p><strong>synomare</strong>　それも良かった。固まるのも一つの身体の状態だから。むしろ、僕はあの固まり方が、つらいことって役に合ってると思った。</p>
+<p><strong>約束</strong>　私は歩いた。塩ビシートの上を、砂場を避けて、端から端までゆっくり。</p>
+<p><strong>synomare</strong>　約束さんの歩き方は印象的でした。すごくゆっくりで、一歩一歩確認するように歩いてた。シートのたわみを踏みしめる音が、すごく静かで。</p>
+<p><strong>約束</strong>　無意識だったんですけど……約束って、待つものだから。待ってる間、ゆっくり歩いてるイメージがあって。</p>
+<hr>
+<p><strong>synomare</strong>　照明との関係も考えましたよね。</p>
+<p><strong>島民</strong>　ああ、そうだった。</p>
+<p><strong>synomare</strong>　余白のところで照明を落とすか、そのままにするか。落とすと、余白が強調される。そのままだと、余白が流れていく。</p>
+<p><strong>つらいこと</strong>　結局、どうしたんでしたっけ。</p>
+<p><strong>synomare</strong>　場面によって変えました。長い余白のところは少し照明を落として、短い余白はそのまま。タワーの照明だけを残すこともあった。ただ、これも試行錯誤で、本番直前まで調整してた。</p>
+<p><strong>約束</strong>　照明が変わると、自分の演技も変わる感じがした。</p>
+<p><strong>synomare</strong>　それはすごく大事なことで。照明が暗くなると、身体が自然と静かになる。明るいと、動きやすくなる。そういう環境の力も使いたかった。</p>
+<p><strong>島民</strong>　でも、それでいいんだと思った。余白が何なのか決まってないから、それぞれが違う形で埋めていい。</p>
+<p><strong>誤字</strong>　埋めなくてもいい。</p>
+<p><strong>島民</strong>　そう。埋めなくてもいい。</p>
+<hr>
+<h2>改行について</h2>
+<p><strong>synomare</strong>　改行についてはどうでしたか。テキストの改行を、呼吸とか間に変換する作業。</p>
+<p><strong>島民</strong>　それも難しかった。</p>
+<p><strong>約束</strong>　改行の長さがわからなくて。</p>
+<p><strong>synomare</strong>　長さの判断。</p>
+<p><strong>約束</strong>　テキスト上では一行空いてるだけなのに、そこにどのくらいの時間を入れればいいのか。1秒なのか、5秒なのか、30秒なのか。</p>
+<p><strong>島民</strong>　ページをまたぐ改行と、同じページ内の改行で、違うのかどうかも。</p>
+<hr>
+<p><strong>synomare</strong>　改行については、僕の方でいくつか分類を試みたんですよね。</p>
+<p><strong>つらいこと</strong>　あ、あのリスト？</p>
+<p><strong>synomare</strong>　そう。テキストを読んで、改行の種類を整理してみた。大きく分けて四種類。</p>
+<p><strong>島民</strong>　四種類。</p>
+<p><strong>synomare</strong>　一つ目は、文の途中で終わってる改行。二つ目は、文が終わってからの改行。三つ目は、ページをまたぐ改行。四つ目は、複数行空いてる改行。</p>
+<p><strong>約束</strong>　それぞれ意味が違う？</p>
+<p><strong>synomare</strong>　違うと思ったんです。文の途中の改行は、息継ぎ。文が終わってからの改行は、思考の区切り。ページをまたぐ改行は、転換。複数行空いてる改行は、時間経過か、別の何か。</p>
+<p><strong>誤字</strong>　別の何か。</p>
+<p><strong>synomare</strong>　そう。それは各自の解釈に任せた。でも、この分類をしたことで、少なくとも全員が同じ基準で改行を見ることができた。</p>
+<hr>
+<p><strong>つらいこと</strong>　私は改行のたびに呼吸を一回入れた。短い改行は浅い呼吸、長い改行は深い呼吸。</p>
+<p><strong>synomare</strong>　それは身体的でいいですね。僕はそれを聞いて、なるほどと思った。改行を身体で処理するっていう発想。</p>
+<p><strong>つらいこと</strong>　でも、後半になると息が苦しくなって。改行が多いページ、息がもたなくなる。</p>
+<p><strong>synomare</strong>　それで、稽古の途中から「改行で息を吐く」っていうルールを試しましたよね。</p>
+<p><strong>つらいこと</strong>　ああ、そうだった。</p>
+<p><strong>synomare</strong>　吸うんじゃなくて、吐く。改行は空白だから、身体も空っぽにする。吐いてから、次の台詞で吸う。</p>
+<p><strong>島民</strong>　それやってみたら、すごく楽になった。</p>
+<p><strong>約束</strong>　私も。呼吸が自然になった。</p>
+<hr>
+<p><strong>誤字</strong>　改行で息をするの、いいな。ぼくは改行で目を閉じてた。</p>
+<p><strong>島民</strong>　え、そうだったの？</p>
+<p><strong>誤字</strong>　うん。テキストを見ないようにして、次の行を思い出そうとして。だから間違えることも多くて。</p>
+<p><strong>synomare</strong>　それで間違えてたのか。でも、目を閉じるのは意図的だったんですよね。</p>
+<p><strong>誤字</strong>　うん。目を閉じると、外の世界が消えて、自分の中に入れる。改行って、外と内の境目だと思ったから。</p>
+<p><strong>synomare</strong>　それはすごく詩的な解釈ですね。</p>
+<p><strong>誤字</strong>　詩的かな。でも、間違えることが役の機能だから、間違えやすい状況を作った方がいいと思って。</p>
+<hr>
+<p><strong>synomare</strong>　音響との連携も考えましたよね。</p>
+<p><strong>島民</strong>　あ、そうだった。改行のところで微かに音を入れるっていう。</p>
+<p><strong>synomare</strong>　環境音を入れるか入れないかで、かなり悩んだ。最初は、海の音を入れようとした。</p>
+<p><strong>つらいこと</strong>　水の音。</p>
+<p><strong>synomare</strong>　うん。この作品、水のイメージが強いから。でも、実際にやってみたら、うるさくなってしまって。</p>
+<p><strong>約束</strong>　沈黙の方が水っぽかった。</p>
+<p><strong>synomare</strong>　そうなんです。結局、改行のところは無音にした。無音が一番、水の中にいる感じがした。</p>
+<p><strong>誤字</strong>　音がないのが水なんだ。</p>
+<p><strong>synomare</strong>　そう。水の中では音が歪むから。聞こえるようで聞こえない。それを無音で表現した。</p>
+<hr>
+<h2>ルビについて——演出的な判断</h2>
+<p><strong>synomare</strong>　ルビについて話したいんですけど、これは演出的にかなり悩んだところで。</p>
+<p><strong>島民</strong>　「博物館」に「たち」ってルビが振ってあるところとか。</p>
+<p><strong>synomare</strong>　そう。あと、本文中にもいくつかルビがあって。</p>
+<p><strong>つらいこと</strong>　「海」に「記憶」ってルビが振ってあるところとか。</p>
+<p><strong>synomare</strong>　そうそう。で、これをどう声に出すかっていうのは、完全に演出判断なんですよね。テキストには答えが書いてない。通常の戯曲では、ルビは読み方の指示だから、ルビ通りに読めばいい。でも、この作品のルビは、読み方の指示じゃない。</p>
+<p><strong>島民</strong>　意味の重ね合わせ、みたいな。</p>
+<p><strong>synomare</strong>　そう。「海」と「記憶」が同時に存在してる。どちらか一方を選ぶんじゃなくて、両方が響いてる状態を作りたかった。</p>
+<hr>
+<p><strong>約束</strong>　私は最初、本文を読むのかルビを読むのかわからなくて。</p>
+<p><strong>synomare</strong>　どう決めましたか？</p>
+<p><strong>約束</strong>　場面によって変えた。静かなシーンではルビだけ、激しいシーンでは両方。</p>
+<p><strong>synomare</strong>　それは良い判断だと思います。僕の方では、いくつかの選択肢を整理してみたんですよね。</p>
+<p><strong>つらいこと</strong>　どんな選択肢？</p>
+<p><strong>synomare</strong>　一つ目は、本文だけを読んでルビは無視する。二つ目は、ルビだけを読んで本文は無視する。三つ目は、本文を読んでからルビを読む。四つ目は、ルビを読んでから本文を読む。五つ目は、本文とルビを同時に読む。六つ目は、本文を読みながら、ルビを別の人が囁く。</p>
+<p><strong>島民</strong>　六つ目、面白そうだね。</p>
+<p><strong>synomare</strong>　やってみたんですよ、稽古で。</p>
+<p><strong>つらいこと</strong>　え、そうだっけ？</p>
+<p><strong>synomare</strong>　一回だけ。島民くんが本文を読んで、約束さんがルビを囁くっていう実験をした。</p>
+<p><strong>約束</strong>　ああ、あれか。</p>
+<p><strong>synomare</strong>　結構面白かったんですけど、観客に聞こえるかどうかの問題があって。囁きすぎると聞こえない、大きすぎると囁きじゃなくなる。</p>
+<p><strong>誤字</strong>　ぼくがやればよかったのに。間違えて違うルビを囁くとか。</p>
+<p><strong>synomare</strong>　それも面白いですね。でも、時間がなくて、結局は各自の判断に任せることにした。</p>
+<hr>
+<p><strong>島民</strong>　僕は稽古中に一回、本文とルビを同時に言おうとしたんですよ。</p>
+<p><strong>synomare</strong>　同時に？</p>
+<p><strong>島民</strong>　うん。「博物館」って言いながら、口の形だけ「たち」にするっていう。</p>
+<p><strong>つらいこと</strong>　それ無理じゃない？</p>
+<p><strong>島民</strong>　無理だった。（笑）でも、やろうとしたら面白い音が出て。「はくぶたち」みたいな。</p>
+<p><strong>誤字</strong>　それはぼくの担当じゃん。</p>
+<p><strong>島民</strong>　そうだね。結果的に誤字になった。</p>
+<p><strong>synomare</strong>　でも、そういう試行錯誤は大事だと思います。失敗から発見が生まれることもあるから。実際、島民くんのその実験から、「完璧に発音しなくてもいい」っていう気づきがあった。</p>
+<p><strong>島民</strong>　ああ、そうだったね。</p>
+<p><strong>synomare</strong>　音が崩れても、意味が伝わればいい。むしろ、崩れた音の方が記憶に残ることもある。</p>
+<hr>
+<p><strong>synomare</strong>　演出として一番悩んだのは、ルビをどう可視化するかなんですよね。</p>
+<p><strong>つらいこと</strong>　可視化の話ね。あれ、いろいろ試したよね。</p>
+<p><strong>synomare</strong>　うん。声だけで処理するっていう選択肢もあったんですけど、もっと複合的にやることにした。</p>
+<p><strong>島民</strong>　プロジェクターと、声と、身振りと。</p>
+<p><strong>synomare</strong>　プロジェクターで壁にルビを投影する、別の人がルビを読む、身振りでルビを表現する。この三つを場面によって使い分けることにしたんです。</p>
+<p><strong>約束</strong>　どのルビをどの方法で処理するか、かなり話し合ったよね。</p>
+<p><strong>synomare</strong>　そう。稽古の最初の方で、全部のルビをリストアップして、これはプロジェクター、これは誰々が読む、これは身振り、って割り振っていった。</p>
+<hr>
+<p><strong>つらいこと</strong>　私は、自分の台詞のルビを誤字くんが読むっていうのが最初すごく違和感あった。</p>
+<p><strong>synomare</strong>　どういう違和感でしたか。</p>
+<p><strong>つらいこと</strong>　私が「海」って言ってるのに、誤字くんが「記憶」って囁く。私の声なのに、私じゃない声が重なってくる感じ。</p>
+<p><strong>誤字</strong>　ぼくも最初は戸惑った。自分の役じゃないものを声に出すのって、変な感じで。</p>
+<p><strong>島民</strong>　でも、途中からそれが面白くなってきたよね。</p>
+<p><strong>誤字</strong>　うん。ぼくがつらいことさんの声の一部になる。つらいことさんがぼくの声の一部になる。境界が曖昧になっていく。</p>
+<hr>
+<p><strong>synomare</strong>　プロジェクターの使い方も工夫しました。壁に投影するんですけど、演者の体にも文字がかかるように調整して。</p>
+<p><strong>約束</strong>　あれ、最初は見えづらいって言ってたよね。</p>
+<p><strong>synomare</strong>　そう。照明とのバランスが難しくて。でも、完全に読める必要はないって判断しました。</p>
+<p><strong>島民</strong>　読めなくてもいい、は最初は不安だったけどね。</p>
+<p><strong>synomare</strong>　うん。観客がルビを「読む」んじゃなくて、「感じる」ことが大事だと思ったので。文字の形が演者の体に重なって、何かが起きてるっていうことだけ伝われば。</p>
+<hr>
+<p><strong>つらいこと</strong>　お客さんにとっては、目の前の身振りと、投影されたテキストと、別の人の声と、三つが同時に来るわけでしょ。</p>
+<p><strong>synomare</strong>　そうですね。二重、三重の表現に晒される。</p>
+<p><strong>島民</strong>　混乱しないのかな。</p>
+<p><strong>synomare</strong>　混乱するかもしれない。でも、その混乱がこの作品の一部だと思って。誰が何を言ってるのか、どの体がどの声なのか、わからなくなる。</p>
+<p><strong>約束</strong>　私の体が私の声を発してるのか、別の役に従属するルビを発してるのか、観客にはわからない。</p>
+<p><strong>synomare</strong>　そう。その揺らぎが、島がなくなっていく感覚と重なればいいなって。</p>
+<hr>
+<p><strong>誤字</strong>　ぼくはルビを読み間違えてた。わざと。</p>
+<p><strong>synomare</strong>　気づいてましたよ。</p>
+<p><strong>誤字</strong>　え、気づいてた？</p>
+<p><strong>synomare</strong>　うん。でも、直さなかった。投影されてる文字と、誤字くんの声が微妙にずれてる。そのずれが面白いと思ったから。</p>
+<p><strong>誤字</strong>　正しいルビが壁に映ってて、ぼくは間違えて読む。どっちが本当なのかわからなくなる。</p>
+<p><strong>島民</strong>　それは確かに誤字らしいね。</p>
+<p><strong>約束</strong>　多分、何言っても「全部正解」って言いそう、そらくんは。</p>
+<hr>
+<p><strong>つらいこと</strong>　あ、そういえば最初に言ってた反省点の話、聞いてなかったね。</p>
+<p><strong>synomare</strong>　ああ、そうだった。聞きたいですか。</p>
+<p><strong>島民</strong>　聞きたい。</p>
+<p><strong>synomare</strong>　うーん……いくつかあるんですけど。一番大きいのは、稽古序盤で方針をちゃんと示せなかったこと。</p>
+<p><strong>約束</strong>　そうだったかな。</p>
+<p><strong>synomare</strong>　いや、みなさんは優しいから言わないだけで。最初の二週間くらい、僕自身がテキストをどう読んでいいかわかってなくて。それをみなさんに伝えられなくて、結果的に全員で迷子になった。</p>
+<p><strong>島民</strong>　でも、僕らもわかってなかったよ。</p>
+<p><strong>synomare</strong>　そうですか。</p>
+<p><strong>島民</strong>　うん。synomareさんがわかってないのはわかってた。でも、僕らもわかってなかったから、責める気持ちにはならなかった。</p>
+<p><strong>つらいこと</strong>　私も。むしろ、演出家がわかってないってわかって、ちょっと安心したところがある。</p>
+<p><strong>synomare</strong>　安心？</p>
+<p><strong>つらいこと</strong>　うん。自分だけがわかってないんじゃないんだって。みんなわからないなら、わからないまま進めばいいんだって。</p>
+<hr>
+<p><strong>誤字</strong>　ぼくはあの時期、毎日違うこと考えてた。</p>
+<p><strong>synomare</strong>　毎日違うこと。</p>
+<p><strong>誤字</strong>　今日はこう読もうって決めて稽古に来るんだけど、稽古してるうちに「やっぱり違う」ってなって。で、次の日はまた別の読み方で来る。</p>
+<p><strong>島民</strong>　誤字くんは毎回違うこと言ってたよね。</p>
+<p><strong>誤字</strong>　うん。でも、それが許される空気だったから。synomareさんが「正解はない」って言ってくれてたから。</p>
+<p><strong>synomare</strong>　あれは……正直、言い訳だったんですけどね。正解がわからないから、「正解はない」って言ってた。</p>
+<p><strong>誤字</strong>　でも、結果的には正しかったと思う。正解がないから、ぼくは自由に間違えられた。</p>
+<hr>
+<p><strong>約束</strong>　私は……あの二週間、毎日不安だった。</p>
+<p><strong>島民</strong>　約束さん、顔に出てたよ。なんとか入っていけるように促してたつもりではあったけど。</p>
+<p><strong>約束</strong>　……うん。でも、不安なまま来続けて、不安なまま台詞を言って。それを繰り返してたら、ある日急に「あ、これでいいのかも」って思えた瞬間があって。</p>
+<p><strong>synomare</strong>　それはいつ頃ですか。</p>
+<p><strong>約束</strong>　二週目の終わりくらい。みんながそれぞれ違う方向にもがいてるのを見て、私も私のやり方でもがいていいんだって思えた。</p>
+<p><strong>つらいこと</strong>　私も似たようなことがあった。最初は「正解を見つけなきゃ」って焦ってたけど、途中から「見つからなくてもいい」って思えるようになった。</p>
+<hr>
+<p><strong>島民</strong>　思い返すと、あの迷子の時期があったから、後半スムーズに行けたのかもしれない。</p>
+<p><strong>synomare</strong>　そうなのかなぁ。</p>
+<p><strong>島民</strong>　最初に全員で「わからない」を共有したから、その後「わかった」ときに、それも共有できた。最初から僕だけわかってて、他の人がわからなかったら、たぶんもっとギクシャクしてた。</p>
+<p><strong>つらいこと</strong>　確かに。全員同じスタートラインだったから、助け合えた。</p>
+<p><strong>誤字</strong>　ぼくは助けられてばっかりだったけど。</p>
+<p><strong>約束</strong>　そんなことないよ。誤字くんがいつも違うことを言ってくれたから、私も「違っていい」って思えた。</p>
+<hr>
+<p><strong>synomare</strong>　……そう言ってもらえると、少し救われます。でも、演出家としてはもう少しうまくやれたはずで。</p>
+<p><strong>つらいこと</strong>　でも、一緒に迷ってくれたから良かったと思う。上から「こうしろ」って言われるより、一緒に探す方が、この作品には合ってたと思う。</p>
+<p><strong>島民</strong>　うん。synomareさんが迷ってくれたから、僕らも迷えた。</p>
+<p><strong>synomare</strong>　そう言ってもらえると助かるんですけど……。あ、あと、照明のタイミング、もっと早く決めておけばよかった。本番直前までバタバタしちゃって。</p>
+<p><strong>島民</strong>　それはあったね。ゲネプロの時、照明が全然違うタイミングで入って。</p>
+<p><strong>synomare</strong>　あれは本当に申し訳なかった。</p>
+<p><strong>誤字</strong>　でも、本番ではちゃんとなってたよ。</p>
+<p><strong>synomare</strong>　うん。スタッフさんが頑張ってくれて。僕がもっと早く決めてれば、あんなに負担かけなくて済んだのに。</p>
+<p><strong>約束</strong>　次に活かせばいいと思う。</p>
+<p><strong>synomare</strong>　……次があればね。まあ、そういう反省を抱えつつ、でもみなさんと作れてよかったです。</p>
+<hr>
+<h2>余白への格闘——共通の課題</h2>
+<p><strong>synomare</strong>　さっきの余白の話に戻るんですけど、あれって結局、みなさん共通の課題だったんですよね。</p>
+<p><strong>島民</strong>　うん。稽古のたびに話し合ってた。</p>
+<p><strong>つらいこと</strong>　「ここの余白、どうする？」って。</p>
+<p><strong>誤字</strong>　「沈黙？　動き？」って。</p>
+<p><strong>約束</strong>　毎回答えが変わってた。</p>
+<hr>
+<p><strong>synomare</strong>　僕としては、余白への向き合い方がむしろテクストとか、ここのみんなのまとまりに繋がったと思ってます。</p>
+<p><strong>島民</strong>　どういうことですか。</p>
+<p><strong>synomare</strong>　普通の演出だと、「ここは何秒止まって」とか「ここで舞台の右に移動して」とか、具体的に指示を出すじゃないですか。でも、今回はそれをしなかった。できなかった、というか。</p>
+<p><strong>つらいこと</strong>　できなかった、っていうか、しなかったよね。意図的に。</p>
+<p><strong>synomare</strong>　うん。テキストがそれを許さなかったんです。余白に意味を与えた瞬間、余白じゃなくなる。だから、演出として「何もしない」という判断をした。</p>
+<p><strong>約束</strong>　「何もしない」が演出なんだ。</p>
+<p><strong>synomare</strong>　そう。各自の解釈に任せる。それが一番、テキストに誠実な演出だと思った。</p>
+<hr>
+<p><strong>synomare</strong>　あと、チームでの対話が大事だったと思います。毎回の稽古後に、それぞれのテクストの読み方の変化や提案について話し合う時間を作った。</p>
+<p><strong>島民</strong>　あれ、すごく助かりました。</p>
+<p><strong>synomare</strong>　「今日の余白、長すぎた」とか「短すぎた」とか、お互いに言い合って。</p>
+<p><strong>つらいこと</strong>　私、最初は言いづらかったんですけど、途中から言えるようになった。</p>
+<p><strong>synomare</strong>　それが良かったと思います。演出家が一方的に決めるんじゃなくて、チーム全体で作っていく。この作品には、そういう作り方が合ってた。</p>
+<p><strong>誤字</strong>　ぼくは言いすぎたかも。</p>
+<p><strong>synomare</strong>　誤字くんはちょうどよかったですよ。間違いを恐れずに意見を言ってくれた。</p>
+<p><strong>誤字</strong>　間違ってたことも言った。</p>
+<p><strong>synomare</strong>　そう。でも、間違った意見から正しい方向が見えることもあるから。</p>
+<hr>
+<p><strong>synomare</strong>　最終的にはどうなったんですか。</p>
+<p><strong>島民</strong>　最終的には……その日の気分で決めることにした。</p>
+<p><strong>つらいこと</strong>　え、そんな雑な決め方だったっけ？</p>
+<p><strong>島民</strong>　雑っていうか……余白が何かを決めちゃうと、余白じゃなくなる気がして。</p>
+<p><strong>約束</strong>　ああ。</p>
+<p><strong>島民</strong>　要は、余白っていうのは決まってないことを、決まってないまま持ち込む。それが余白だと思った。</p>
+<p><strong>誤字</strong>　余白は余白のままにしておく。</p>
+<p><strong>島民</strong>　そう。</p>
+<p><strong>synomare</strong>　それは戯曲の読み方として、すごく誠実だと思います。演出家として、そういう結論に至れたことが嬉しかった。</p>
+<p><strong>つらいこと</strong>　でも、怖かったよ。毎回違うことをするの。</p>
+<p><strong>約束</strong>　私も怖かった。でも、怖いまま舞台に立つのが、この作品なのかなって途中から思った。</p>
+<p><strong>synomare</strong>　怖いまま舞台に立つ。それがこの作品の本質かもしれないですね。安心を求めない。不確定なまま進む。それが、島がなくなっていくこの作品のテーマとも重なってる。</p>
+<hr>
+<h2>演じていて一番印象に残った瞬間</h2>
+<p><strong>synomare</strong>　次は少し個人的な話かもしれないんですけど、演じていて一番印象に残った瞬間って何ですか。僕は照明ブースから見てて、何度かハッとした瞬間があって。</p>
+<p><strong>島民</strong>　僕は……二日目の本番で、つらいことさんが本当に泣きそうになってたとき。</p>
+<p><strong>つらいこと</strong>　え、あれバレてた？</p>
+<p><strong>島民</strong>　バレてた。目が赤くなってたから。</p>
+<p><strong>つらいこと</strong>　……ごめん。</p>
+<p><strong>島民</strong>　謝らなくていいよ。でも、あのとき、「あ、本当のことが起きてる」って思った。</p>
+<p><strong>synomare</strong>　本当のこと。あれ、僕も照明ブースから見てて、空気が変わったのを感じた。</p>
+<p><strong>島民</strong>　うん。台本通りじゃないことが起きてる。でも、それが悪いことじゃなくて、むしろそれが正しい気がした。僕たちは、台本を完璧に再現するために舞台に立ってるんじゃないんだな、って。その場で何が起きるか、それを受け止めるためにいる。僕が島民として砂場の真ん中に立っているのは、そこに根を張って、何が来ても動かないためなんだ、って思った。島民は、その砂まみれの場所から動かない人。それが僕の役割だったのかなと。</p>
+<hr>
+<p><strong>つらいこと</strong>　私は、千秋楽で約束さんが「泣かないで」って言ったとき。</p>
+<p><strong>約束</strong>　聞こえてなかったって言ってなかった？</p>
+<p><strong>つらいこと</strong>　聞こえてなかった。でも、言ったって後から聞いて、そのことが印象に残ってる。</p>
+<p><strong>約束</strong>　聞こえなかったのに？</p>
+<p><strong>つらいこと</strong>　うん。聞こえなかったけど、言ってくれてたんだって思ったら、なんか……嬉しかった。約束さんらしいと思った。</p>
+<hr>
+<p><strong>誤字</strong>　ぼくは、初日の開演前に、そらくんからメッセージが来てたこと。</p>
+<p><strong>synomare</strong>　何て書いてあったんですか？</p>
+<p><strong>誤字</strong>　「間違えてね」って。</p>
+<p><strong>島民</strong>　（笑）</p>
+<p><strong>誤字</strong>　それだけ。でも、それがすごく嬉しくて。間違えていいんだって。僕、普段からよく間違えるんですよ。名前とか、日付とか、道とか。それで怪られることも多い。でも、この役をやってるときは、間違えることが仕事だから。それがすごく気持ちよかった。間違いの居場所があるっていうのが、こんなに救われることだとは思わなかった。</p>
+<p><strong>約束</strong>　そらくんらしいね。</p>
+<hr>
+<p><strong>約束</strong>　私は……公演が全部終わった今日、みんなでこうやって話してること自体が、一番印象に残るかもしれない。</p>
+<p><strong>synomare</strong>　今この瞬間が？</p>
+<p><strong>約束</strong>　うん。これも約束の一部だから。終わった後も、こうやって集まって話すっていう約束。</p>
+<p><strong>島民</strong>　確かに、これも上演の一部かもしれないね。</p>
+<p><strong>約束</strong>　そうだと思う。</p>
+<hr>
+<h2>再開発告知のページについて</h2>
+<p><strong>synomare</strong>　一番聞きたかったのがこれで。再開発告知のページ。あれ、どうでしたか。</p>
+<p><strong>島民</strong>　……。</p>
+<p><strong>つらいこと</strong>　……。</p>
+<p><strong>誤字</strong>　……。</p>
+<p><strong>約束</strong>　……。</p>
+<p><strong>synomare</strong>　沈黙。</p>
+<p><strong>つらいこと</strong>　怖かった。急に「本物」が来た感じがして。</p>
+<p><strong>島民</strong>　本物。</p>
+<p><strong>つらいこと</strong>　うん。それまでは、砂場とか布の塊とか、曖昧なものに守られてた感じがしてたのに、あのページで急に現実が入ってきた。</p>
+<p><strong>約束</strong>　私は、あのページを読むとき、声が変わった。自分の声じゃなくなった。</p>
+<p><strong>synomare</strong>　どんな声になりましたか。</p>
+<p><strong>約束</strong>　……アナウンスの声。駅とか、役所とかで聞く声。丁寧だけど、こちらのことを見てない声。</p>
+<p><strong>誤字</strong>　ぼくはあのページで間違えられなかった。</p>
+<p><strong>synomare</strong>　間違えられなかった？</p>
+<p><strong>誤字</strong>　うん。他のページでは自然に間違えられるのに、あのページだけ、間違える隙がなかった。文章が完璧すぎて。</p>
+<p><strong>島民</strong>　それが暴力なんだよね。</p>
+<p><strong>誤字</strong>　うん。ぼくの居場所がなかった。</p>
+<hr>
+<p><strong>synomare</strong>　告知文の左上に「泣かないで」って小さく書いてあるんですけど。</p>
+<p><strong>つらいこと</strong>　あれ、最初気づかなかった。</p>
+<p><strong>島民</strong>　僕も。三回目の上演で初めて見た。</p>
+<p><strong>約束</strong>　私は初日から見えてた。でも、声に出していいのかわからなかった。</p>
+<p><strong>synomare</strong>　結局どうしましたか。</p>
+<p><strong>約束</strong>　千秋楽だけ、小さく言った。ほとんど聞こえないくらいの声で。</p>
+<p><strong>つらいこと</strong>　え、言ってたの？</p>
+<p><strong>約束</strong>　うん。</p>
+<p><strong>つらいこと</strong>　聞こえなかった。</p>
+<p><strong>約束</strong>　うん。それでいいと思って。</p>
+<hr>
+<h2>上演マニュアルについて</h2>
+<p><strong>synomare</strong>　最後のページの上演マニュアル。あれはどうでしたか。実際にやってみて。</p>
+<p><strong>島民</strong>　あれ、本当にやったんですよ。僕たち。</p>
+<p><strong>synomare</strong>　え、旅行の計画まで？</p>
+<p><strong>島民</strong>　うん。公演期間中に。</p>
+<p><strong>つらいこと</strong>　稽古の後に、みんなで記憶を引き継いで話して、仮眠とって、起きて、旅行の計画立てて。</p>
+<p><strong>誤字</strong>　温泉に行こうってなった。</p>
+<p><strong>約束</strong>　群馬の温泉。</p>
+<p><strong>synomare</strong>　行ったんですか？</p>
+<p><strong>島民</strong>　まだ。公演終わったから、これから行く予定。</p>
+<p><strong>synomare</strong>　それは……作品の一部として？</p>
+<p><strong>島民</strong>　わからない。でも、マニュアルにそう書いてあったから。</p>
+<p><strong>つらいこと</strong>　「誰かが作ったその計画を代わりに実行してみる」って。</p>
+<p><strong>約束</strong>　誰が作った計画なのか、もうわからなくなってるけど。</p>
+<hr>
+<p><strong>synomare</strong>　マニュアルの13番、「何らかの要因で計画が再現不可能になった時点で上演は終了される」っていうの。これについては？</p>
+<p><strong>島民</strong>　あれは……怖いけど、安心する。</p>
+<p><strong>synomare</strong>　安心？</p>
+<p><strong>島民</strong>　いつか終わるってわかってるから。無限に続くわけじゃないから。</p>
+<p><strong>つらいこと</strong>　私は逆に怖い。いつ終わるかわからないから。温泉旅館がなくなったら終わりなのか、道路が閉鎖されたら終わりなのか。</p>
+<p><strong>誤字</strong>　ぼくがいなくなったら終わりなのか。</p>
+<p><strong>約束</strong>　私たちの誰かが、この約束を忘れたら終わりなのか。</p>
+<p><strong>synomare</strong>　そのどれかかもしれないし、全部かもしれない。</p>
+<p><strong>島民</strong>　でも、終わるまではやる。</p>
+<p><strong>約束</strong>　うん。終わるまではね。</p>
+<hr>
+<h2>まだわかってないこと</h2>
+<p><strong>synomare</strong>　最後に、まだわかってないことを聞きたいんですけど。この作品について、まだ掴めてないこと。</p>
+<p><strong>島民</strong>　……僕が誰なのか、まだわからない。</p>
+<p><strong>synomare</strong>　島民として？</p>
+<p><strong>島民</strong>　うん。島民って、どこの島の民なのか。その島がどこにあったのか。まだあるのか。</p>
+<p><strong>つらいこと</strong>　私は、つらいことを演じてるのか、つらいこと自体なのか、わからない。演じてるならいつか降りられるけど、自体だったら降りられないから。</p>
+<p><strong>誤字</strong>　ぼくは、正しいことを一度も言えてないのが気になってる。間違えることが役の機能だけど、一回くらい正しく言えてもいいのに、って。</p>
+<p><strong>約束</strong>　私は……約束が守られたのかどうか、わからない。守られたような気もするし、破られたような気もする。両方が同時にあるような感じ。</p>
+<p><strong>synomare</strong>　僕もわからないことがあって。そらくんがこのテキストを書いたのに、書いた意図と、みなさんが上演したことが、ずれてるところがあって。でもそのずれが悪いことなのかどうか、わからない。</p>
+<p><strong>島民</strong>　ずれてた？</p>
+<p><strong>synomare</strong>　うん。でも、ずれてる方がよかったのかもしれない。</p>
+<p><strong>島民</strong>　そらくんに聞いたらなんて言うかな。</p>
+<p><strong>synomare</strong>　たぶん「それでいい」って言う。</p>
+<p><strong>つらいこと</strong>　そらくんらしいね。</p>
+<hr>
+<p><strong>つらいこと</strong>　ねえ、そういえば、公演中にあったこと話してなかった。</p>
+<p><strong>synomare</strong>　何ですか。</p>
+<p><strong>つらいこと</strong>　三日目の上演で、途中でお客さんが一人、静かに泣いてたんですよ。</p>
+<p><strong>島民</strong>　あ、いた。前から三列目くらいの。</p>
+<p><strong>つらいこと</strong>　うん。で、私その人のことが気になって、ずっと見てしまって。</p>
+<p><strong>約束</strong>　それで台詞が遅れたんだ。</p>
+<p><strong>つらいこと</strong>　うん。ごめん。でも、その人が泣いてるのを見て、私も泣きそうになって。でも、つらいことは泣かないから、泣けなくて。それがつらかった。</p>
+<p><strong>誤字</strong>　つらいことがつらいって言ってる。</p>
+<p><strong>つらいこと</strong>　うん。</p>
+<p><strong>島民</strong>　それは……正しいのかな。</p>
+<p><strong>つらいこと</strong>　わからない。でも、そうだった。それで思ったんだけど、つらいことって役は、演じてる自分が本当に辛くなったらうまくいかなくなる。それは演じてる私自身の辛さでしかないから。それって一体なんなんだろうって考えさせられた。自分とは違う辛さを引き受けるために、自分自身はすごくコントロールされてないといけないって感じ。</p>
+<hr>
+<p><strong>synomare</strong>　僕からも一つ。千秋楽の終わりに、照明が落ちた後、誰かがずっとそこに立ってたんですよね。</p>
+<p><strong>島民</strong>　え、そうなの？</p>
+<p><strong>synomare</strong>　うん。僕は照明ブースから見てたんですけど、みなさんが</p>
+<hr>
+<p><strong>synomare</strong>　じゃあ、そろそろ終わりましょうか。</p>
+<p><strong>島民</strong>　うん。</p>
+<p><strong>約束</strong>　ねえ、思ったんだけど。</p>
+<p><strong>synomare</strong>　何ですか。</p>
+<p><strong>約束</strong>　私たちがこうやって話してること自体が、一種の博物館なのかもしれない。</p>
+<p><strong>つらいこと</strong>　どういうこと？</p>
+<p><strong>約束</strong>　なくなっていくものを、とりあえず入れておく場所。今日話したことも、いつか忘れられるかもしれないけど、今ここで話したっていうことは残る。</p>
+<p><strong>島民</strong>　この座談会が博物館。</p>
+<p><strong>約束</strong>　うん。小さな博物館。</p>
+<p><strong>誤字</strong>　じゃあ、ぼくたちは展示物？</p>
+<p><strong>約束</strong>　展示物でもあるし、来館者でもあるし、学芸員でもある。全部。</p>
+<p><strong>つらいこと</strong>　それは……なんかいいね。うん。</p>
+<hr>
+<p><strong>つらいこと</strong>　お疲れ様でした。</p>
+<p><strong>誤字</strong>　旅行たのしみ。</p>
+<p><strong>約束</strong>　また会いましょう。</p>
+<p><strong>synomare</strong>　会えたらいいですね。</p>
+<p><strong>島民</strong>　会えるよ。そういう約束だから。</p>
+<hr>
+<p><em>（椅子を立つ音。空き缶を潰す音。誰かが「タクシー呼ぶ？」と言い、別の誰かが「歩いて帰る」と答える。窓の外で電車が通り過ぎる。しばらくして、部屋の明かりが消える。）</em></p>
+<hr>
+<p><em>（翌週、四人は群馬の温泉に向かった。電車とバスを乗り継いで、三時間半。旅館は古くて、畳が少し沈んでいて、夕食にはきのこの鍋が出た。翌朝、山が見えた。誰も写真を撮らなかった。帰りのバスで、誰かが「たのしかった」と言った。）</em></p>
+<hr>
+<p><strong>終</strong></p>
+
+    </article>
+    <aside class="sidebar-right"></aside>
+  </main>
+
+  <footer>
+    <nav class="nav-links">
+      <a href="taidan.html">← 作家・演出家対談</a>
+      <a href="index.html">Top</a>
+    </nav>
+    <small style="color: var(--muted);">&copy; <span id="year"></span> synomare</small>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+
+</html>

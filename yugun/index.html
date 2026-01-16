@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>嶼群（博物館（たち）） — synomare</title>
+  <meta name="description" content="嶼群（博物館（たち））戯曲テキストと関連テクスト">
+  <meta property="og:title" content="嶼群（博物館（たち）） — synomare">
+  <meta property="og:description" content="嶼群（博物館（たち））戯曲テキストと関連テクスト">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="preconnect" href="https://use.typekit.net" crossorigin>
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --fg: #e5e5e5;
+      --muted: #444;
+      --line: #222;
+      --accent: #fff;
+      --font-mincho: "Hina Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+      --font-gothic: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+      font-size: clamp(16px, 1.6vw, 32px);
+    }
+
+    html,
+    body {
+      overflow-x: hidden;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-mincho);
+      -webkit-font-smoothing: antialiased;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      min-height: 100svh;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+      border-bottom: 1px solid var(--muted);
+    }
+
+    a:hover {
+      border-bottom-color: var(--accent);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Header & Footer */
+    header,
+    footer {
+      padding: 0.8rem 1rem;
+      border-color: var(--line);
+      font-family: var(--font-gothic);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      z-index: 100;
+      background: var(--bg);
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+    }
+
+    footer {
+      border-top: 1px solid var(--line);
+      text-align: right;
+    }
+
+    /* Navigation */
+    details.nav {
+      position: relative;
+    }
+
+    details.nav>summary {
+      list-style: none;
+      cursor: pointer;
+      border: 1px solid var(--line);
+      padding: 0.2em 0.8em;
+      border-radius: 0;
+      text-transform: uppercase;
+    }
+
+    details.nav>summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .menu {
+      position: absolute;
+      right: 0;
+      top: 100%;
+      margin-top: -1px;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      padding: 1rem;
+      min-width: 180px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      z-index: 1000;
+    }
+
+    /* Main */
+    main {
+      position: relative;
+      width: 100%;
+      max-width: 100%;
+      padding: 2rem;
+      box-sizing: border-box;
+      display: grid;
+      grid-template-columns: repeat(24, 1fr);
+      grid-auto-rows: minmax(2.5rem, auto);
+      gap: 0;
+      min-height: calc(100vh - 80px);
+    }
+
+    /* Hero Visual */
+    .z-hero {
+      grid-column: 1 / 25;
+      grid-row: 1 / 8;
+      position: relative;
+      overflow: hidden;
+      margin: -2rem -2rem 2rem -2rem;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .z-hero img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 30%;
+      filter: grayscale(0.3) contrast(1.1);
+      opacity: 0.85;
+    }
+
+    .z-hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom,
+          rgba(10, 10, 10, 0.2) 0%,
+          rgba(10, 10, 10, 0.1) 50%,
+          rgba(10, 10, 10, 0.9) 100%);
+      pointer-events: none;
+    }
+
+    /* Typography */
+    .txt-lg {
+      font-size: clamp(3rem, 10vw, 8rem);
+      letter-spacing: -0.06em;
+      line-height: 0.9;
+      font-weight: 400;
+    }
+
+    .txt-md {
+      font-size: 1rem;
+      letter-spacing: -0.02em;
+      line-height: 1.6;
+    }
+
+    .txt-sm {
+      font-size: 0.75rem;
+      letter-spacing: 0.02em;
+      line-height: 1.8;
+    }
+
+    .txt-xs {
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      line-height: 1.6;
+      color: var(--muted);
+      font-family: var(--font-gothic);
+      text-transform: uppercase;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .vertical {
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+    }
+
+    /* Title Zone */
+    .z-title {
+      grid-column: 1 / 16;
+      grid-row: 8 / 12;
+      padding: 0 2rem 2rem 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+
+    .z-title h1 {
+      margin: 0;
+    }
+
+    .z-title .subtitle {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    /* Content Cards */
+    .z-cards {
+      grid-column: 1 / 16;
+      grid-row: 12 / 21;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      background: var(--line);
+      border: 1px solid var(--line);
+    }
+
+    .card {
+      display: block;
+      padding: 2rem;
+      background: rgba(10, 10, 10, 0.9);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      text-decoration: none;
+      border: none;
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      background: rgba(30, 30, 30, 0.95);
+      border-color: transparent;
+    }
+
+    .card .label {
+      display: block;
+      font-size: 0.55rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-family: var(--font-gothic);
+      margin-bottom: 0.5rem;
+    }
+
+    .card h2 {
+      margin: 0 0 0.5rem;
+      font-size: 1.5rem;
+      font-weight: 400;
+      letter-spacing: -0.03em;
+    }
+
+    .card p {
+      margin: 0;
+      font-size: 0.75rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* Vertical Poetry Zone */
+    .z-vert {
+      grid-column: 16 / 25;
+      grid-row: 8 / 21;
+      padding: 1rem;
+      display: flex;
+      justify-content: flex-end;
+      align-items: flex-start;
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .z-vert .vertical {
+      font-size: 0.7rem;
+      line-height: 2.2;
+      white-space: pre;
+      color: var(--muted);
+    }
+
+    /* Credits Zone */
+    .z-credits {
+      grid-column: 16 / 25;
+      grid-row: 17 / 21;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      border-left: 1px solid var(--line);
+    }
+
+    .z-credits dt {
+      font-size: 0.55rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-family: var(--font-gothic);
+      margin-bottom: 0.25rem;
+    }
+
+    .z-credits dd {
+      margin: 0 0 1rem 0;
+      font-size: 0.9rem;
+    }
+
+    /* Noise Overlay */
+    .noise-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.04;
+      mix-blend-mode: overlay;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9998;
+      background: radial-gradient(circle at 50% 50%, transparent 60%, rgba(0, 0, 0, 0.5) 100%);
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      main {
+        display: block;
+        padding: 1.5rem;
+      }
+
+      .z-hero {
+        margin: -1.5rem -1.5rem 1.5rem -1.5rem;
+        height: 50vh;
+      }
+
+      .z-title {
+        margin-bottom: 2rem;
+      }
+
+      .z-title h1 {
+        font-size: clamp(2.5rem, 12vw, 4rem);
+      }
+
+      .z-vert {
+        display: none;
+      }
+
+      .z-cards {
+        margin-bottom: 2rem;
+      }
+
+      .z-credits {
+        border-left: none;
+        border-top: 1px solid var(--line);
+        padding: 1.5rem 0;
+      }
+    }
+
+    html.wf-loading body {
+      opacity: 0;
+    }
+
+    html.wf-active body,
+    html.wf-inactive body {
+      opacity: 1;
+      transition: opacity 0.5s;
+    }
+  </style>
+  <script>
+    (function (d) {
+      var config = { kitId: 'ifg4slm', scriptTimeout: 3000, async: true }, h = d.documentElement, t = setTimeout(function () { h.className = h.className.replace(/\bwf-loading\b/g, "") + " wf-inactive"; }, config.scriptTimeout), tk = d.createElement("script"), f = false, s = d.getElementsByTagName("script")[0], a; h.className += " wf-loading"; tk.src = 'https://use.typekit.net/' + config.kitId + '.js'; tk.async = true; tk.onload = tk.onreadystatechange = function () { a = this.readyState; if (f || a && a != "complete" && a != "loaded") return; f = true; clearTimeout(t); try { Typekit.load(config) } catch (e) { } }; s.parentNode.insertBefore(tk, s)
+    })(document);
+  </script>
+</head>
+
+<body>
+  <header>
+    <a href="../" class="brand" style="border:none">synomare</a>
+    <details class="nav">
+      <summary>MENU</summary>
+      <nav class="menu">
+        <a href="../">HOME</a>
+        <a href="../notes/">NOTES</a>
+        <a href="../links.html">LINKS</a>
+        <a href="../about.html">ABOUT</a>
+        <a href="mailto:synomare@gmail.com">CONTACT</a>
+      </nav>
+    </details>
+  </header>
+
+  <main>
+    <!-- Hero Visual -->
+    <section class="z-hero">
+      <img src="../assets/images/嶼群/main-visual.jpg" alt="嶼群（博物館（たち））メインビジュアル" loading="eager">
+    </section>
+
+    <!-- Title -->
+    <section class="z-title">
+      <h1 class="txt-lg">嶼群<br><span style="font-size: 0.5em; letter-spacing: -0.02em;">（博物館（たち））</span></h1>
+      <p class="subtitle">戯曲テキストと関連テクスト</p>
+    </section>
+
+    <!-- Content Cards -->
+    <section class="z-cards">
+      <a href="../assets/島嶼群テクスト.pdf" target="_blank" class="card">
+        <span class="label">Script / PDF</span>
+        <h2>嶼群（博物館（たち））</h2>
+      </a>
+
+      <a href="zadankai.html" class="card">
+        <span class="label">Discussion</span>
+        <h2>全公演終了後 振り返り座談会</h2>
+        <p>出演者（島民、つらいこと、誤字、約束）と演出・synomareによる座談会。</p>
+      </a>
+
+      <a href="taidan.html" class="card">
+        <span class="label">Interview</span>
+        <h2>作家・演出家対談</h2>
+        <p>テキスト執筆のsoraと演出のsynomareによる対談。</p>
+      </a>
+    </section>
+
+    <!-- Vertical Poetry -->
+    <section class="z-vert">
+      <div class="vertical">
+        下手な呼吸は上手な呼吸がおもしろい。
+
+        　　　　「今から始まるのは
+        　　　　（埋まった血を使い直そうとする努力で、
+        　　　　　　　　　　）ここに昔、花があった（中断）
+        　　　　　）」
+
+        波を閉じる矩形になる。
+        猿らしく思い出す。握る手が御座します。しめる。
+        むすんで ひらけばきっと繰り返すことになる。
+      </div>
+    </section>
+
+    <!-- Credits -->
+    <section class="z-credits">
+      <dl>
+        <dt>Text</dt>
+        <dd>sora</dd>
+        <dt>Direction</dt>
+        <dd>synomare</dd>
+        <dt>Cast</dt>
+        <dd>島民、つらいこと、誤字、約束</dd>
+      </dl>
+    </section>
+
+    <div class="noise-overlay"></div>
+  </main>
+
+  <footer>
+    <small>&copy; <span id="year"></span> synomare. All rights reserved.</small>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+
+</html>

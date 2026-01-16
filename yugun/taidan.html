@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>作家・演出家対談 — 嶼群 — synomare</title>
+  <meta name="description" content="作家・演出家対談">
+  <meta property="og:title" content="作家・演出家対談 — synomare">
+  <meta property="og:type" content="article">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="preconnect" href="https://use.typekit.net" crossorigin>
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --fg: #e5e5e5;
+      --muted: #555;
+      --line: #222;
+      --accent: #fff;
+      --font-mincho: "Hina Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+      --font-gothic: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+      font-size: clamp(15px, 1.4vw, 20px);
+    }
+
+    html, body { overflow-x: hidden; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-mincho);
+      -webkit-font-smoothing: antialiased;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      min-height: 100svh;
+    }
+
+    a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--muted); }
+    a:hover { border-bottom-color: var(--accent); background: rgba(255, 255, 255, 0.08); }
+
+    /* Header & Footer */
+    header, footer {
+      padding: 0.8rem 1rem;
+      font-family: var(--font-gothic);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      z-index: 100;
+      background: var(--bg);
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+    }
+
+    footer {
+      border-top: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Navigation */
+    details.nav { position: relative; }
+    details.nav>summary {
+      list-style: none;
+      cursor: pointer;
+      border: 1px solid var(--line);
+      padding: 0.2em 0.8em;
+      text-transform: uppercase;
+    }
+    details.nav>summary::-webkit-details-marker { display: none; }
+
+    .menu {
+      position: absolute;
+      right: 0;
+      top: 100%;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      padding: 1rem;
+      min-width: 180px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      z-index: 1000;
+    }
+
+    /* Breadcrumb */
+    .breadcrumb {
+      display: flex;
+      gap: 0.5rem;
+      font-size: 0.6rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .breadcrumb a { color: var(--muted); border: none; }
+    .breadcrumb a:hover { color: var(--fg); }
+
+    /* Main */
+    main {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr minmax(auto, 72ch) 1fr;
+      padding: 0;
+    }
+
+    /* Article */
+    article {
+      grid-column: 2;
+      padding: 3rem 2rem 4rem;
+      line-height: 1.9;
+    }
+
+    article h1 {
+      font-size: 2rem;
+      font-weight: 400;
+      letter-spacing: -0.04em;
+      margin: 0 0 0.5rem;
+      line-height: 1.2;
+    }
+
+    article h2 {
+      font-size: 1.3rem;
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      margin: 3rem 0 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--line);
+    }
+
+    article p {
+      margin: 0 0 1.2rem;
+    }
+
+    article p strong {
+      color: var(--accent);
+      font-weight: 400;
+    }
+
+    article hr {
+      border: none;
+      border-top: 1px solid var(--line);
+      margin: 2.5rem 0;
+    }
+
+    article ul {
+      padding-left: 1.2rem;
+      margin: 0 0 1.2rem;
+    }
+
+    article li {
+      margin-bottom: 0.3rem;
+    }
+
+    article em {
+      color: var(--muted);
+      font-style: normal;
+    }
+
+    /* Sidebar decorative element */
+    .sidebar-left {
+      grid-column: 1;
+      border-right: 1px solid var(--line);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sidebar-left::after {
+      content: "対談";
+      position: absolute;
+      top: 3rem;
+      right: 1rem;
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      font-family: var(--font-gothic);
+      text-transform: uppercase;
+    }
+
+    .sidebar-right {
+      grid-column: 3;
+      border-left: 1px solid var(--line);
+    }
+
+    /* Footer Nav */
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .nav-links a { color: var(--muted); border: none; }
+    .nav-links a:hover { color: var(--fg); }
+
+    /* Vignette */
+    body::after {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 9998;
+      background: radial-gradient(circle at 50% 50%, transparent 60%, rgba(0, 0, 0, 0.35) 100%);
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      main {
+        display: block;
+      }
+      article {
+        padding: 2rem 1.5rem 3rem;
+      }
+      article h1 { font-size: 1.6rem; }
+      article h2 { font-size: 1.15rem; }
+      .sidebar-left, .sidebar-right { display: none; }
+    }
+
+    html.wf-loading body { opacity: 0; }
+    html.wf-active body, html.wf-inactive body { opacity: 1; transition: opacity 0.5s; }
+  </style>
+  <script>
+    (function (d) {
+      var config = { kitId: 'ifg4slm', scriptTimeout: 3000, async: true }, h = d.documentElement, t = setTimeout(function () { h.className = h.className.replace(/\bwf-loading\b/g, "") + " wf-inactive"; }, config.scriptTimeout), tk = d.createElement("script"), f = false, s = d.getElementsByTagName("script")[0], a; h.className += " wf-loading"; tk.src = 'https://use.typekit.net/' + config.kitId + '.js'; tk.async = true; tk.onload = tk.onreadystatechange = function () { a = this.readyState; if (f || a && a != "complete" && a != "loaded") return; f = true; clearTimeout(t); try { Typekit.load(config) } catch (e) { } }; s.parentNode.insertBefore(tk, s)
+    })(document);
+  </script>
+</head>
+
+<body>
+  <header>
+    <a href="../" class="brand" style="border:none">synomare</a>
+    <nav class="breadcrumb">
+      <a href="../">Home</a>
+      <span>/</span>
+      <a href="index.html">嶼群</a>
+      <span>/</span>
+      <span style="color:var(--fg)">対談</span>
+    </nav>
+    <details class="nav">
+      <summary>MENU</summary>
+      <nav class="menu">
+        <a href="../">HOME</a>
+        <a href="../notes/">NOTES</a>
+        <a href="../about.html">ABOUT</a>
+      </nav>
+    </details>
+  </header>
+
+  <main>
+    <aside class="sidebar-left"></aside>
+    <article>
+      <h1>嶼群（博物館（たち））　作家・演出家対談</h1>
+<hr>
+<p><strong>出席</strong></p>
+<ul>
+<li>sora（テキスト）</li>
+<li>synomare（演出）</li>
+</ul>
+<hr>
+<p><em>（全公演終了から一週間後。録音。soraはゲネプロと千秋楽を観劇した。）</em></p>
+<hr>
+<p><strong>synomare</strong>　演者のみんなとの座談会もやったんですよ。</p>
+<p><strong>sora</strong>　どうだった？</p>
+<p><strong>synomare</strong>　いや、すごく良かった。みんな緊張ほぐれて、稽古中は言えなかったことも言ってくれて。誤字くんとか、「毎回違うこと考えてた」って言ってて、それ正直初めて聞いたし。</p>
+<p><strong>sora</strong>　誤字くん、本番も毎回違ったらしいね。</p>
+<p><strong>synomare</strong>　そう。「間違えやすい状況を作った方がいい」って。目を閉じて台詞を思い出そうとしてたんだって。だから間違える、と。</p>
+<p><strong>sora</strong>　なるほどね。</p>
+<p><strong>synomare</strong>　でも今日はテキストの話がしたくて。演者との話は座談会で一区切りついたから、こっちはsoraくんと話さないと。まあ酒飲みながら。</p>
+<p><strong>sora</strong>　いいね。もう開けてるの？</p>
+<p><strong>synomare</strong>　開けてる。乾杯。</p>
+<p><strong>sora</strong>　乾杯。</p>
+<hr>
+<h2>紙面と舞台空間</h2>
+<p><strong>synomare</strong>　最初に聞きたいのは、紙面の話なんだけど。</p>
+<p><strong>sora</strong>　うん。</p>
+<p><strong>synomare</strong>　このテキスト、紙面そのものが舞台になってるよね。最初に読んだとき、正直どうしていいかわからなくて。普通の戯曲みたいに「誰が何を言う」っていう縦の流れじゃなくて、横に広がってるというか、同時に複数のことが起きてるというか。</p>
+<p><strong>sora</strong>　そう書いた。文字が散らばってる。左右に分かれてたり、上下で対話してたり。読む順序が決まってない。紙面を平面じゃなくて、三次元の空間というか、まさに上演されている舞台そのものとして扱いたかった。</p>
+<p><strong>synomare</strong>　それはわかる。わかるんだけど、演出としては「で、どうすんの」ってなるわけ。（笑）</p>
+<p><strong>sora</strong>　（笑）まあね。</p>
+<p><strong>synomare</strong>　稽古の最初の二週間、本当に迷子だった。演者のみんなにも申し訳なかったんだけど、僕自身がテキストの読み方がわからなくて。紙面の上で同時に存在してるものを、時間軸の中にどう配置するかっていう問題。</p>
+<p><strong>sora</strong>　それはテクストを書いてるときにはコントロールできない部分で、上演に委ねるしかなかった。紙面では読む人が自分のペースで視線を動かせる。どこを先に見るか、どこに戻るか、全部読む人が決められる。でも舞台では、演者が声を出した順番でしか聞こえない。</p>
+<p><strong>synomare</strong>　そう。その制約がきつかった。でも途中から、制約じゃなくて可能性なんだって思えるようになって。</p>
+<p><strong>sora</strong>　どういう意味？</p>
+<p><strong>synomare</strong>　えーと、たとえばさ、紙面で左にある声と右にある声があるじゃん。読者は両方同時に見える。でも舞台では、どっちかを先に言わないといけない。最初はそれを「失われるもの」として捉えてた。同時性が失われる、って。でも途中から、「時間差で言った方が、かえって同時性が伝わるかも」って思うようになって。</p>
+<p><strong>sora</strong>　あー、それは千秋楽で感じた。並列してる二つの声が、僕の中では完全に同時に聞こえるイメージだったんだけど、舞台では少しずらしてたよね。</p>
+<p><strong>synomare</strong>　そう。島民くんと約束さんに同時に喋ってもらったの、初日だけなんだよ。</p>
+<p><strong>sora</strong>　初日だけ？</p>
+<p><strong>synomare</strong>　うん。初日に同時に喋ったら、聞き取れなくなっちゃって。二人の声が混ざって、どっちも意味がわからなくなった。それで二日目からすっごい微妙にずらした。エコーみたいに。</p>
+<p><strong>sora</strong>　紙面では「同時性」が空間で表現されてる。舞台では「同時性」が時間のずれで表現される。別のものになる。みたいなことかな。</p>
+<p><strong>synomare</strong>　でもね、そっちの方が「同時」として伝わってたと思う。完全に重なると一つの声に聞こえちゃうから、そもそも「同時」という概念がなくなっちゃう。ずれてる方が「二つある」ってわかる。</p>
+<p><strong>sora</strong>　テクストが持ってたはずの構造を、違うやり方で実現してた。</p>
+<p><strong>synomare</strong>　そう言ってくれると嬉しいけど、正直、あれは苦肉の策だったんだよね。理想は同時に言っても全部聴こえることだったから。</p>
+<p><strong>sora</strong>　でも、その「苦肉の策」が結果的に良かったんでしょ。</p>
+<p><strong>synomare</strong>　うん……まあね。でも僕としては、最初からそこまで見通せてなかったっていう反省があって。</p>
+<p><strong>sora</strong>　見通せてないのはお互い様だよ。僕も書いてるとき、上演で何が起きるかなんて想像できてなかったし。そういう手放す感覚にたどり着くのは大事だと思う。</p>
+<hr>
+<p><strong>synomare</strong>　あと、紙面の配置を舞台に翻訳するとき、右は右、上は上手、下は下手って対応させたんだけど、それでいいのか最後まで自信なくて。</p>
+<p><strong>sora</strong>　ゲネのとき見てて最初にそこは気づいたかな。左にある声が左から聞こえてて、自分もテクスト見ながらだったけど面白かった。まさに紙面が上演されているんだって思えて。</p>
+<p><strong>synomare</strong>　うん。でも、紙面は平面で、舞台は立体というか、空間じゃん。完全な翻訳は無理。</p>
+<p><strong>sora</strong>　無理だよね。</p>
+<p><strong>synomare</strong>　だから、ある段階で「翻訳じゃなくて、別物を作るんだ」って割り切った。紙面のテクストと、舞台の上演は、別の作品。同じ素材を使ってるけど、成果物は違う。もちろん取りこぼすものもたくさんあるだろうけど、そこも含めて演者のみんなと受け取る、そこに責任みたいなものも生まれるかなと思った。もちろん全てのテクストに対してそうでしかあり得ないんだけど、特に今回は強く感じた。</p>
+<p><strong>sora</strong>　僕も、こういう厄介なものを、言ってみれば任せるように手渡してしまう以上、足場としてどれだけ過剰なものにできるのか、どこからがやり過ぎなのか、悩んでたね。</p>
+<p><strong>synomare</strong>　そらくんは、上演を見て「違う」って思ったとこない？　</p>
+<p><strong>sora</strong>　ん〜……違うとは思ったけど、「間違ってる」とかは思わなかった。むしろ、僕が想像してなかった可能性が開いてるって感じた。</p>
+<p><strong>synomare</strong>　具体的には？</p>
+<p><strong>sora</strong>　さっきの時間差の話もそうだし、余白の使い方とか。千秋楽のとき、「埋められていく」っていう台詞の後に誤字くんがすごく長い沈黙を入れて、観客が息を詰めてるのがわかった。その沈黙の長さは僕が書いたものじゃない。誤字くんが作った時間。でも、テクストの意味を増幅してた。あそことか、やっぱり肉体がただそこにあって、それだけでも間が保たれていて。その力強さを感じた。誤字くんの表情、息遣いと、すごく細かな腕の震えとか、表情とか、そういうものが単にそこにあるだけで、すごく切迫した場が生まれていた。</p>
+<p><strong>synomare</strong>　あそこ良かったよね。凄みがあった。</p>
+<p><strong>sora</strong>　あと、誤字くんが余白のところで寝転がったの、あれ面白かったね。彼のチャーミングな感じも知ってたから、それ込みで印象的な場面だった。</p>
+<p><strong>synomare</strong>　ああ、あれね。あれ、稽古中にとっさにやったんだよ。最初は余白を完全な沈黙として扱おうとしてたんだけど、それだと舞台が止まってしまって。で、誤字くんが急に砂場の中に寝転がって。</p>
+<p><strong>sora</strong>　砂場に？</p>
+<p><strong>synomare</strong>　うん、舞台に砂場を作ってあって、その中に。それで「沈黙って身体が脱力する時間でもあるのか」って気づいて。</p>
+<p><strong>sora</strong>　なるほど。</p>
+<p><strong>synomare</strong>　そこから余白の扱いが変わった。各自が自由に身体を使っていい、っていう方針に。</p>
+<hr>
+<p><strong>sora</strong>　翻訳って、同じものを別の言語で言い直すことじゃないよね。</p>
+<p><strong>synomare</strong>　うん。</p>
+<p><strong>sora</strong>　別のものになることを受け入れて、それでも何かが残ることを信じる行為だと思う。何が残ったかは、僕には言えない。でも観た人の中には何か残ってるはずで、それはもう僕のコントロールを超えてる。</p>
+<p><strong>synomare</strong>　僕もコントロールしきれてないし。</p>
+<p><strong>sora</strong>　テクストを書いた時点で、僕の手を離れてる。上演されて、観られて、さらに離れていく。その距離が開いていくことを、悪いこととは思ってない。</p>
+<p><strong>synomare</strong>　どこまで行くんだろうね、この作品。</p>
+<p><strong>sora</strong>　わからない。そういえば演者のみんなで旅行行ったんでしょ。</p>
+<p><strong>synomare</strong>　あ、聞いた？　まあ、その話は後でしよう。</p>
+<hr>
+<h2>具体詩と上演</h2>
+<p><strong>synomare</strong>　視覚詩の話をしたい。このテキストを読むとき、やっぱり新国誠一を思い出した。僕も『0音』読んでみたんだけど。</p>
+<p><strong>sora</strong>　あ、読んだんだ。</p>
+<p><strong>synomare</strong>　うん、このテキストもらってから。前半に「象形詩」、後半に「象音詩」があって。で、象形詩の方に「作品を読む場合は音読すること」って但し書きがあるじゃん。あれ面白いよね。</p>
+<p><strong>sora</strong>　そうそう。あれはずっと頭にあった。象形詩なのに音読しろ、っていうのは矛盾してるようにも見えるけど。</p>
+<p><strong>synomare</strong>　そこがすごい気になった。</p>
+<p><strong>sora</strong>　象形詩っていうのは基本的には視覚的なもので、文字の形とか配置とかで意味を作る。「見る詩」だよね。でも新国は、それを「音読しろ」って言った。</p>
+<p><strong>synomare</strong>　読んでみた？　音読。</p>
+<p><strong>sora</strong>　やった。すごく変な体験だった。</p>
+<p><strong>synomare</strong>　僕もやってみたんだけど、どこで息継ぎするかわからなくて。</p>
+<p><strong>sora</strong>　そう、それなんだよ。楽譜みたいなんだけど、楽譜と違って正解がない。自分で呼吸を作るしかない。</p>
+<p><strong>synomare</strong>　僕は三回くらい読み直して、毎回違う感じになった。</p>
+<p><strong>sora</strong>　それでいいんだと思う。読む人が自分で呼吸を作って、その呼吸が詩の身体性になるって感じ。</p>
+<p><strong>synomare</strong>　後半の象音詩はどう違う？</p>
+<p><strong>sora</strong>　象音詩は「聴く詩」で、ひらがなやカタカナを使って音にフォーカスしてる。</p>
+<p><strong>synomare</strong>　あっちには「音読しろ」って書いてないよね。</p>
+<p><strong>sora</strong>　そう。書いてない。象音詩はそもそも音を前提に書かれてるから、読めば自然に声になる。でも象形詩は、放っておくと目だけで消費される。だから「音読しろ」って言ってる。</p>
+<p><strong>synomare</strong>　視覚詩が声を必要とする。</p>
+<p><strong>sora</strong>　必要とするっていうか……声なしでも成立はするけど、声を通すと別の層が開くって感じかな。</p>
+<p><strong>synomare</strong>　このテキストもそうだよね。余白の位置とか、改行の仕方とか。</p>
+<p><strong>sora</strong>　意識してた。間隔を作って、身動きを取るための空間を差し込んで、リズムを規定する。</p>
+<p><strong>synomare</strong>　上演が組み上がってきてから、やっとこれが戯曲として書かれてた必然みたいなものが掴めた気がした。最初はわからなかったんだけど。</p>
+<p><strong>sora</strong>　最初はわからなくていいと思ってた。というか、僕も書きながら発見してる部分があって。</p>
+<p><strong>synomare</strong>　書きながら発見？</p>
+<p><strong>sora</strong>　うん。ここに置かれたこの一語に、いろんな使い方があり得ますよ、っていう可能性を並べてる感覚。石とか木の枝みたいに、言葉をオブジェクトとして配置する。そこから読む人が選ぶ。演じる人が選ぶ。</p>
+<p><strong>synomare</strong>　選んだ結果が、その人の呼吸になる。</p>
+<p><strong>sora</strong>　そう。</p>
+<hr>
+<p><strong>synomare</strong>　新国の具体詩って、国際的な運動と繋がってたよね。</p>
+<p><strong>sora</strong>　面白いのは、繋がる前に、別々の場所で同時多発的に始まってたこと。1953年にスイスのオイゲン・ゴムリンガーが最初の「コンステレーション」を発表した。同じ年にブラジルのサンパウロでノイガンドレス・グループ——アウグスト・デ・カンポス、アロルド・デ・カンポス、デシオ・ピグナタリ——が活動を始めてた。新国も1950年代前半から独自に実験してた。お互いの存在を知らないまま。</p>
+<p><strong>synomare</strong>　なんで同時に起きたんだろ。</p>
+<p><strong>sora</strong>　たぶん、言語に対する同じ危機意識があった。戦後の世界で、従来の詩の形式がもう機能しないっていう感覚。</p>
+<p><strong>synomare</strong>　ごめん、ちょっと待って。僕、その辺の歴史あんまり詳しくなくて。ゴムリンガーって何した人？</p>
+<p><strong>sora</strong>　1954年のマニフェスト「線からコンステレーションへ」で、現代の言語が「形式的な単純化」に向かってる、って書いた人。見出しや広告スローガンみたいな、集約された視覚的メッセージに向かってる、って。詩もそれに対応しないと時代から取り残されると。</p>
+<p><strong>synomare</strong>　へえ。でもそれって、詩を広告みたいにするってこと？</p>
+<p><strong>sora</strong>　広告みたいに、じゃなくて、広告が持ってる視覚的な強さを詩に取り込む、って感じかな。言葉を還元していく。文字に、音節に、音素に。余計なものを削ぎ落とす。</p>
+<p><strong>synomare</strong>　還元か。</p>
+<p><strong>sora</strong>　ゴムリンガーは「コンステレーション」って呼んだ。星々が集まって星座を作るように、言葉が集まって意味の塊を作る。行っていう概念を放棄して、空間を構造的に使う。</p>
+<p><strong>synomare</strong>　……正直、聞いてて「それ、観客に伝わるの？」って思った。</p>
+<p><strong>sora</strong>　（笑）思うよね。</p>
+<p><strong>synomare</strong>　理論としてはわかるんだけど、舞台に立つ側からすると、「で、何すればいいの」ってなる。</p>
+<p><strong>sora</strong>　それはもっともだと思う。具体詩って、読者に対してはオープンなんだけど、上演者に対してはすごく不親切。</p>
+<p><strong>synomare</strong>　不親切。まさにそれ。</p>
+<p><strong>sora</strong>　僕もそこは自覚してて……だから、ある意味で今回の上演は実験だった。こういうテキストを舞台に持っていくと何が起きるか。</p>
+<p><strong>synomare</strong>　実験台にされた感はある。（笑）</p>
+<p><strong>sora</strong>　（笑）ごめん。</p>
+<p><strong>synomare</strong>　でも、その不親切さがあるから「唯一の正解」みたいなものに向かわなくて済んだってところもある。正解がないから、自分たちで作るしかない。</p>
+<p><strong>sora</strong>　そう言ってもらえると助かる。</p>
+<p><strong>synomare</strong>　ただ、それは僕とsoraくんの間に信頼があるからで、誰にでも通じるわけじゃないし。普通は「なぜこんなわけのわからないものを読まされているんだ」ってなるってのも現実かなとは思う。</p>
+<p><strong>sora</strong>　それはわかる。よくデザインの話で「星座」って言葉が出てくるじゃん。</p>
+<p><strong>synomare</strong>　星座？</p>
+<p><strong>sora</strong>　星座は、見ている人が光を結んでできる。それぞれの星は、とてつもなくかけ離れてる。距離があるからこそ余白が生まれて、その間を結ぶっていう営みが可能になる。</p>
+<p><strong>synomare</strong>　今回の役割分担もそういうこと？</p>
+<p><strong>sora</strong>　うん。作家と演出を分けて、ほとんど任せる形にしたのは、そういう意図があった。</p>
+<p><strong>synomare</strong>　こっちも距離があるから自由にやれた、っていうのはある。近すぎると、書いた人の意図を汲み取ろうとしすぎて窮屈になる。</p>
+<p><strong>sora</strong>　それと、こんな形式で書いて受け入れてもらえる場ってなかなかないから。できる間にやっておきたかった。</p>
+<hr>
+<p><strong>synomare</strong>　歴史の話に戻ると、視覚詩の系譜としてはどこから来てるの？</p>
+<p><strong>sora</strong>　みんなマラルメを起点にしてる。1897年の「賽の一振り」。あれが紙面の余白と活字を詩の構成要素にした最初の作品。</p>
+<p><strong>synomare</strong>　マラルメは知ってる。</p>
+<p><strong>sora</strong>　そこからアポリネールのカリグラム、パウンド、ジョイス、カミングスを経て具体詩に至る系譜がある。でも新国はその系譜とは別に始まってて、後から合流した。</p>
+<p><strong>synomare</strong>　日本独自の文脈もあったってこと？</p>
+<p><strong>sora</strong>　うん。漢字っていう視覚的な文字体系があるから、視覚詩への道が最初から開かれてたのかもしれない。</p>
+<p><strong>synomare</strong>　漢字はそもそも象形文字だしね。</p>
+<p><strong>sora</strong>　そう。でも「象形文字」って言い方は、実は単純化しすぎてて——</p>
+<p><strong>synomare</strong>　あ、ちょっと待って。これ飲み物追加していい？</p>
+<p><strong>sora</strong>　いいよ。</p>
+<p><strong>synomare</strong>　（店員に注文）……ごめん、続けて。</p>
+<p><strong>sora</strong>　いや、なんだっけ。</p>
+<p><strong>synomare</strong>　象形文字が単純化しすぎ、って話。</p>
+<p><strong>sora</strong>　ああ、そう。中国の文字学には「文」と「字」っていう区別があって。許慎っていう後漢の学者が『説文解字』っていう字書を書いた。「文を説き、字を解す」。「文」と「字」を別のものとして扱ってる。</p>
+<p><strong>synomare</strong>　どう違うの？</p>
+<p><strong>sora</strong>　「文」は絵に近い。見たままを描く。「山」とか「川」とか。「字」は複合文字。複数の要素が組み合わさってできる。「好」は「女」と「子」が組み合わさってる。</p>
+<p><strong>synomare</strong>　ふうん。稽古のとき、演者たちがそれぞれテキストを見て「これは絵っぽい」とか「これは情報っぽい」って言ってたの思い出した。感覚的には掴んでたのかも。</p>
+<p><strong>sora</strong>　そうだと思う。前半の詩的な部分は「文」に近い。形や配置、面として捉えた紙面が意味を生む。後半の告知文は「字」に近い。言語的な意味が先にあって、形や配置は二次的。</p>
+<p><strong>synomare</strong>　つらいことさんが「告知文のところは声が変わる」って言ってたのも、そういうことか。</p>
+<p><strong>sora</strong>　説明しても混乱するだけかなって。むしろ、説明しなくてもテクストに触れる中で伝わっていくって思ってた。</p>
+<p><strong>synomare</strong>　結果的にはみんなも同じところを感じてたと思うよ。つらいことさんとか、「告知文のところは声が変わる」って言ってたし。</p>
+<p><strong>sora</strong>　それは嬉しいね。</p>
+<hr>
+<p><strong>synomare</strong>　漢字って、時代によって形が変わってきたよね。</p>
+<p><strong>sora</strong>　劇的に変わってる。甲骨文から楷書まで。</p>
+<p><strong>synomare</strong>　甲骨文って見たことある？　写真で。</p>
+<p><strong>sora</strong>　ある。亀の甲羅とか獣の骨に刻んであるやつ。まだ絵に近い。「山」がほんとに山の形してる。</p>
+<p><strong>synomare</strong>　「文」の状態。</p>
+<p><strong>sora</strong>　そう。で、そこから千年以上かけて、だんだん抽象化されていく。政治的な標準化もあって。</p>
+<p><strong>synomare</strong>　始皇帝？</p>
+<p><strong>sora</strong>　そうそう。文字を統一したのも始皇帝。小篆っていう書体を作って、地域差をなくした。</p>
+<p><strong>synomare</strong>　効率化。</p>
+<p><strong>sora</strong>　うん。で、役人がもっと早く書けるように隷書ができて、印刷のために楷書ができて。どんどん絵画的な面白さが消えていく。</p>
+<p><strong>synomare</strong>　でも完全には消えてない。</p>
+<p><strong>sora</strong>　消えてない。「山」はまだ山っぽいし、「川」は川っぽい。その残響が、新国みたいな詩人が使える余地を残してる。</p>
+<p><strong>synomare</strong>　アルファベットだとそうはいかない。</p>
+<p><strong>sora</strong>　「A」が牛の頭に由来してるって言うじゃん。</p>
+<p><strong>synomare</strong>　ああ、聞いたことある。でも実感はない。</p>
+<p><strong>sora</strong>　そう。「A」見て牛思い浮かべる人いないでしょ。形と意味が完全に切れてる。漢字は、どんなに抽象化されても、微かな糸が残ってる。その糸を引っ張って強調するのが、視覚詩。</p>
+<hr>
+<p><strong>synomare</strong>　日本語だと、漢字だけじゃなくて複数の文字体系があるよね。</p>
+<p><strong>sora</strong>　そこが面白いところ。漢字、ひらがな、カタカナ、ローマ字。全部が混在してる。しかも、同じ言葉を複数の書き方で書ける。「ねこ」「ネコ」「猫」「neko」。意味は同じでも、視覚的な印象が違う。</p>
+<p><strong>synomare</strong>　選択肢がある。</p>
+<p><strong>sora</strong>　そう。書き手が選ぶ。どの文字体系を使うかで、読者に与える印象が変わる。「猫」は落ち着いた印象、「ネコ」は軽い印象、「ねこ」は柔らかい印象。これは他の言語にはない特徴。英語で「cat」を書くのに選択肢はない。でも日本語は選べる。その選択自体が意味を持つ。</p>
+<p><strong>synomare</strong>　このテキストでもそれを使ってる？</p>
+<p><strong>sora</strong>　使ってる。意識的に。たとえば「島」って書くところと「しま」って書くところがある。漢字で書くと、視覚的に重くなる。土地としての物質性が出る。ひらがなで書くと、音として軽くなる。概念としての抽象性が出る。同じ言葉なのに、文字体系を変えるだけでニュアンスが変わる。</p>
+<hr>
+<p><strong>sora</strong>　もっと言うと、日本語で漢字を読むっていう行為自体に、すでに複数の層がある。</p>
+<p><strong>synomare</strong>　層？</p>
+<p><strong>sora</strong>　漢字を読むとき、僕らは無意識に階層的な処理をしてる。たとえば「海」っていう字を見る。まず視覚的に形を認識する。次にその形が「うみ」っていう音に対応することを思い出す。さらに「うみ」っていう音が「水がたくさんある場所」っていう意味と結びつく。視覚→音→意味の三段階。</p>
+<p><strong>synomare</strong>　アルファベットだと二段階？</p>
+<p><strong>sora</strong>　形→音→意味っていう流れは同じだけど、アルファベットは形と音の対応が規則的。「c-a-t」を見たら「キャット」って読む。ルールに従うだけ。でも漢字は、形から音への変換がもっと複雑。同じ「生」でも「いきる」「うまれる」「なま」「せい」「しょう」——文脈によって読みが変わる。</p>
+<p><strong>synomare</strong>　コンピュータみたいだよね。</p>
+<p><strong>sora</strong>　そう、それは面白い比喩だね。コンピュータでテキストを書くとき、ローマ字入力するでしょ。「umi」って打つと「うみ」に変換されて、さらに「海」に変換される。音素レベル→形態素レベル→語彙レベル。人間が読むときはこの逆で、語彙レベル→形態素レベル→音素レベル。複数の階層を行ったり来たりしてる。</p>
+<p><strong>synomare</strong>　上演もそうだよね。テキストから声へ、声から身体へ、身体から観客へ。どこかで「ずれ」が起きる。</p>
+<p><strong>sora</strong>　そうだと思う。で、そのどこかで意図しない変換が起きる。それが面白さになる。変換の階層のどこかで「ずれ」を起こして、それがテキストの意図と共鳴していくなら、むしろそれが逆説的に、正しく伝わっているということなのかもしれない。さらっと理解されると、なんかこっちとしてはつまんない（笑）</p>
+<p><strong>synomare</strong>　誤字くんの寝転がりとか、まさにそれだね。テキストに書いてあるわけじゃないのに、テキストの意味を増幅してた。</p>
+<hr>
+<p><strong>synomare</strong>　ルビもそういう話？</p>
+<p><strong>sora</strong>　ルビは階層を可視化する装置だと思う。</p>
+<p><strong>synomare</strong>　「海」に「きおく」ってルビ振ってあるところあるじゃん。</p>
+<p><strong>sora</strong>　ある。</p>
+<p><strong>synomare</strong>　あれ、稽古で揉めたんだよ。「うみ」って読むか「きおく」って読むか。</p>
+<p><strong>sora</strong>　どうしたの？</p>
+<p><strong>synomare</strong>　最初「うみ」って読んで、すぐ「きおく」って言い直す、みたいなことをやってみた。でもなんか違くて。</p>
+<p><strong>sora</strong>　紙面では両方同時に見えるんだよね。「海」と「きおく」が重なってる。でも声にすると、どっちかを先に言わないといけない。</p>
+<p><strong>synomare</strong>　そう。その選択が難しかった。</p>
+<p><strong>sora</strong>　量子力学みたいなもんだと思う。観測するまで状態が確定しない。紙面上では両方が同時に存在してる。でも声に出す瞬間に、どっちかに崩れる。</p>
+<p><strong>synomare</strong>　重ね合わせが崩れる。</p>
+<p><strong>sora</strong>　でも、崩れることで新しい意味が生まれる。「海」って言った後に「記憶」って言われると、「海」の意味が遡って変わる。</p>
+<p><strong>synomare</strong>　それが上演の仕事の一つ。</p>
+<p><strong>sora</strong>　うん。紙面にはない時間の要素が入り込んで、別の可能性が開く。</p>
+<hr>
+<p><strong>synomare</strong>　漢字の話に戻ると、このテキストで特に意識した使い方ってある？</p>
+<p><strong>sora</strong>　「埋」っていう字。埋め立てる、埋まる、埋没する。テキストの中で何度も出てくる。この字は「土」と「里」でできてる。土の中に里がある。村が土に沈んでる。形が意味を補強してる。開発で埋め立てられる土地、記憶の中に埋まっていく過去。字の構造がテーマと響き合ってる。</p>
+<p><strong>synomare</strong>　それは意識して選んだ？</p>
+<p><strong>sora</strong>　半分意識、半分無意識。書いてるときに「埋」っていう字の形を見て、これだ、って思った。土の中の里。消えていく集落。意味が先にあって字を選んだんじゃなくて、字の形を見て意味が広がっていった。「文」的な発想かもしれない。形から意味へ。</p>
+<p><strong>synomare</strong>　楷書になっても「文」的な発想は可能。</p>
+<p><strong>sora</strong>　可能だと思う。完全に「字」になりきってない。形と意味の糸がまだ残ってる。その糸を意識的に引っ張ることで、言葉に別の奥行きが出る。具体詩がやろうとしてたのも、たぶんそれ。言葉の物質性に注目することで、意味の手前にある層を露出させる。</p>
+<hr>
+<h2>島と開発</h2>
+<p><strong>synomare</strong>　「埋」の話で思ったんだけど、このテキストって、視覚詩の形式的な話だけじゃなくて、もっと直接的に政治的な話でもあるよね。</p>
+<p><strong>sora</strong>　うん。というか、切り離せない。</p>
+<p><strong>synomare</strong>　告知文が出てくる。「再開発事業に関する正式告知」。あれ、読んでて息が詰まった。</p>
+<p><strong>sora</strong>　あれは本物の告知文を参考にした。実際に自治体が出してるやつ。言葉遣いをそのまま真似た。形式的には丁寧なんだけど、実質的には「もう決まったから従え」って言ってる。対話してるふりをして対話を閉じてるようなもの。</p>
+<p><strong>synomare</strong>　「反対意見については一定の考慮を行ったものの」みたいな一文が、一度に立ち上げるコンテクストの大きさをどう意識させるか、みたいなことで迷った。</p>
+<p><strong>sora</strong>　このテキストのタイトルは「嶼群」。小さな島々っていう意味。で、島っていうのは——</p>
+<p><strong>synomare</strong>　開発で消えていく場所でもある。</p>
+<p><strong>sora</strong>　うん。埋め立てられる土地。それは色んなものを折りたたんだモチーフでもあるけど、まず第一にはそういう現代的なイメージ。高層ビルが建って、元の風景が消える。住んでた人が追い出される。記憶が上書きされる。博物館に入れられる。生きてた場所が展示物になる。</p>
+<hr>
+<p><strong>synomare</strong>　演者の約束さんが、「墓場探しにいってもよかったけれど」っていう台詞について話してた。</p>
+<p><strong>sora</strong>　あれは——実際に消えてしまった場所のことを考えながら書いた。具体的にどことは言わないけど、ダムに沈んだ村落、再開発で変わり果てた場所、そういう場所ってたくさんある。元の住民がどこへ行ったかわからない場所。忘れられた場所。</p>
+<p><strong>synomare</strong>　「私ばかり死ねなかった」っていう台詞もある。</p>
+<p><strong>sora</strong>　生き残ってしまった人の声。場所がなくなって、でも自分はまだいる。その居心地の悪さというか、罪悪感みたいなもの。</p>
+<p><strong>synomare</strong>　それは単なるフィクションじゃない。</p>
+<p><strong>sora</strong>　フィクションじゃない。現実に起きてること。都市開発だけじゃなくて、もっと広い話——気候変動で沈む島とか、災害で帰れなくなった場所とか。土地の記憶を失った経験をした人たちが、今この瞬間もいる。</p>
+<hr>
+<p><strong>synomare</strong>　書いてるとき、そういう問題意識がずっとあった？</p>
+<p><strong>sora</strong>　あった。というか、書き始めたとき、パリ協定の条文を読んだりした。</p>
+<p><strong>synomare</strong>　条文を読んだ？</p>
+<p><strong>sora</strong>　うん。すごく変な気持ちになった。</p>
+<p><strong>synomare</strong>　どういう風に？</p>
+<p><strong>sora</strong>　あれは——地球の未来についての戯曲なんだよ。各国が演者で、条文が台本で、この気温そのものが上演。でも、その通り上演されるかどうかわからない。書かれてるけど、実行されるかわからない。約束だけが先走ってる。誰かが責任を持つわけでもない。強いて言えば、それは未来の世代に約束を投げかけたようなものにしかなれない。</p>
+<p><strong>synomare</strong>　約束が上演を待ってる。</p>
+<p><strong>sora</strong>　そう。でもその後、上演は常に遅れていく。延期される。「来年からやります」「次でやります」。書かれた言葉と、実行される行為の間に、埋められない溝がある。それって——</p>
+<p><strong>synomare</strong>　ある種、このテキストと同じ構造。</p>
+<p><strong>sora</strong>　うん。テキストがあって、上演がある。でも、上演はテキストをそのまま実現しない。楔とか杭みたいなものでしかない。ずれが生じる。変換が起きる。だから舞台上での即興みたいなこともあり得る。何かが失われて、何かが加わる。条文があって、各国の政策がある。でも、政策は条文をそのまま実現しない。翻訳が起きる。苦肉の策が起きる。</p>
+<hr>
+<p><strong>synomare</strong>　……それを考えながら書いてたんだ。</p>
+<p><strong>sora</strong>　考えてた。国際条約っていう巨大な戯曲があって、それを上演しようとしてる人たちがいる。環境活動家とか、デモをする若者とか。彼らは「条文通りにやれ」って言ってる。でも、上演する側——政府とか企業とか——は「現実的には無理だ」って言う。理想と現実の間で、苦肉の策が積み重なっていく。その中でしか変わらないこと。それらの板挟み。それがテクストのリテラルな上演の不可能さと、それでも上演するということに通じる。</p>
+<p><strong>synomare</strong>　今回のテキストで、告知文が来て全部が断ち切られる構造って、そういうことなのかな。</p>
+<p><strong>sora</strong>　うん。詩的な言葉——記憶とか約束とか——があって、その世界が少しずつ形作られていく。でも、突然、告知文が来る。開発が始まります。それはそこまで尊い約束や倫理として守られてきたものを塗りつぶして、経済性とか合理性みたいなもので覆い隠す。対話の余地はない。全部が断ち切られる。</p>
+<p><strong>synomare</strong>　抵抗できない。</p>
+<p><strong>sora</strong>　抵抗しようとしても、法的手続きが、個々人の生活とはかけ離れた場所でもう完了してしまう。異議を受ける余地がない。丁寧だけど、暴力的じゃない。その無力感みたいなものに、なんとか抗うための、生の身振りの実験をするためにはどうするのかって考えたかった。</p>
+<hr>
+<p><strong>synomare</strong>　そうして最後にマニュアル、正確にはマニュアル化された戯曲が来る。</p>
+<p><strong>sora</strong>　そう。全部断ち切られた後に、「じゃあ何ができるか」っていう手引きが来る。円を描くように歩く。記憶を話す。忘却を否定しない。見知った人と、ここではないどこかへ行く計画を立てる。——それらは欺瞞なのかもしれない。でも、生きながら、制度に対抗する別の時間を手作りしていくしかない。</p>
+<p><strong>synomare</strong>　制度の時間と、記憶の時間。</p>
+<p><strong>sora</strong>　制度は直線的。計画があって、実行があって、完了する。数値目標があって、達成か未達成かが判定される。でも、記憶はそうじゃない。円環的。繰り返す。変形する。完了しない。マニュアルは、その円環的な時間を提案してる。</p>
+<p><strong>synomare</strong>　「何らかの要因で計画が再現不可能になった時点で上演は終了される」。</p>
+<p><strong>sora</strong>　あれが、このテキストの最後。上演の終わりを決めるのは、テキストじゃなくて、世界の変化。道路が閉鎖されたら終わり。行きたい場所がなくなったら終わり。環境や情勢が変わって旅行できなくなったら終わり。目標が達成されなくても、それを達成するための条件自体が消えてしまったら、ゲームオーバー。僕たちは小さいよね。でも、その小ささは重たい。</p>
+<hr>
+<p><strong>synomare</strong>　島が沈んだら、島を守る約束も意味がなくなる。</p>
+<p><strong>sora</strong>　うん。太平洋の島嶼国——ツバルとかキリバスとか——の話を考えていた。国土が海に沈んでいく。でも、国際社会は間に合うように動かない。条文はある。約束はある。でも、実行が遅れてる間に、本当に島が消える。</p>
+<p><strong>synomare</strong>　「嶼群」っていうタイトルが——</p>
+<p><strong>sora</strong>　そう。この作品は、消えていく島々の話。消える前に博物館に入れられる島の話。記憶として保存される島の話。でも、博物館に入った時点で、もう生きてない。展示物になってる。</p>
+<p><strong>synomare</strong>　「博物館（たち）」。</p>
+<p><strong>sora</strong>　複数形で書いた。一つの博物館じゃなくて、たくさんの博物館。一つの島じゃなくて、たくさんの島。無数の小さなものが、無数の小さな箱に入れられていく。そのイメージ。</p>
+<hr>
+<p><strong>synomare</strong>　アジア的な文字の話と、島の話が繋がってくる。</p>
+<p><strong>sora</strong>　繋がってると思う。漢字っていう表意文字は、アルファベットとは違う世界認識を持ってる。線形じゃなくて、空間的。一文字の中に意味が凝縮してる。島も同じ。小さいけど、その中に一つの世界がある。大陸から切り離されてる。独自の生態系がある。独自の文化がある。</p>
+<p><strong>synomare</strong>　でも、開発は——</p>
+<p><strong>sora</strong>　開発は、それを均質化する。島を大陸に繋げる。橋を架ける。埋め立てる。漢字をローマ字に変換する。翻訳する。効率化する。グローバルな標準に合わせる。その過程で、固有性が失われていく。</p>
+<p><strong>synomare</strong>　抵抗としてのテキスト。</p>
+<p><strong>sora</strong>　抵抗——と言いたいけど、そんなに単純じゃない。テキストを書いたって、開発は止まらない。戯曲を書いたって、世界の未来が動くわけじゃない。でも——</p>
+<p><strong>synomare</strong>　でも？</p>
+<p><strong>sora</strong>　何もしないよりはいい。と思いたい。少なくとも、消えていくものを見ないふりはしたくない。博物館でもいい。記録でもいい。誰かが覚えていること。それ自体に意味があると——思いたいし、思う。</p>
+<hr>
+<p><strong>synomare</strong>　具体詩には三つのタイプがあるって聞いたことがある。</p>
+<p><strong>sora</strong>　視覚的、音声的、動的。</p>
+<p><strong>synomare</strong>　動的っていうのは？</p>
+<p><strong>sora</strong>　ページをめくることで変化していく詩。キネティック・ブックとか。</p>
+<p><strong>synomare</strong>　このテキストは？</p>
+<p><strong>sora</strong>　全部だと思う。紙面で見ると視覚的。声に出すと音声的。上演すると動的になる。</p>
+<p><strong>synomare</strong>　メディアによって重心が変わる。</p>
+<p><strong>sora</strong>　そう。紙面だと視覚が強くて、上演すると音声と動きが強くなる。どっちが正しいってわけじゃない。</p>
+<hr>
+<p><strong>synomare</strong>　『0音』っていうタイトルも面白いよね。</p>
+<p><strong>sora</strong>　ゼロの音。音がないこと。</p>
+<p><strong>synomare</strong>　沈黙を詩にする。</p>
+<p><strong>sora</strong>　そう。でも沈黙を演じるって難しいでしょ。舞台で黙ってると、観客が「止まった？」って思う。</p>
+<p><strong>synomare</strong>　実際、稽古でそういうこと起きた。余白のとこで完全に止まったら、みんなが「終わり？」って顔してて。島民くんなんか、「何もしないってことをする、っていうのが逆に一番難しい」って言ってた。</p>
+<p><strong>sora</strong>　島民くん、千秋楽では余白のところをどうしてた？</p>
+<p><strong>synomare</strong>　立ったまま、すごくゆっくり視線だけ動かしてた。顔は動かさないで、目だけ。観客を見てるのか、どこか遠くを見てるのかわからない感じで。</p>
+<p><strong>sora</strong>　それいいね。視線だけで「間」を作ってた。</p>
+<p><strong>synomare</strong>　そう。声は出てないけど、呼吸はしてる。目は動いてる。その気配が聞こえる。</p>
+<p><strong>sora</strong>　それが「ゼロの音」なんだと思う。発声してないけど、存在としてはある。</p>
+<hr>
+<p><strong>synomare</strong>　新国の『0音』って、前半と後半で構造が違うって話だったよね。</p>
+<p><strong>sora</strong>　そう。前半の「象形詩」では、文字が音から離れて純粋な形になる。後半の「象音詩」では、音が文字から離れて純粋な響きになる。分離と再結合を一冊の中でやってる。</p>
+<p><strong>synomare</strong>　このテキストも似た構造？</p>
+<p><strong>sora</strong>　やろうとしてた。前半は詩的で、断片的で、意味が不明瞭。文字が形として浮かんでる。</p>
+<p><strong>synomare</strong>　後半に行くにつれて変わる。</p>
+<p><strong>sora</strong>　うん。告知文は完全に意味の言葉。形じゃなくて、内容だけがある。詩の言葉と制度の言葉、形の言葉と意味の言葉。それが衝突するところに、このテキストの核がある。</p>
+<p><strong>synomare</strong>　衝突させること自体が表現。</p>
+<p><strong>sora</strong>　うん。どっちかが正しいって言いたいわけじゃない。詩が正しくて制度が間違ってる、とは言えない。制度の言葉も、必要だから存在してる。ただ、両方を並べることで、それぞれの限界が見える。詩だけでは世界は回らない。制度だけでは人は生きられない。その間で何ができるか。テクストはその問いを投げるだけで、答えは出さない。</p>
+<hr>
+<p><strong>synomare</strong>　具体詩って、意味の問題をどう扱ってるの？</p>
+<p><strong>sora</strong>　そこが一番難しいところ。ゴムリンガーは意味のコミュニケーション圏内に留まるべきだって考えてた。言葉は言葉として機能する。でも他の詩人たち——フランスのアンリ・ショパンとか——は意味を完全に放棄して、純粋な音素とか視覚的なノイズだけで詩を作ろうとした。その間にいろんなグラデーションがある。ノイガンドレスの立場は、言葉を意味から解放しつつも、非言語的なコミュニケーションの可能性を探る、っていう感じ。言葉以外のもの——視覚的な配置とか——が意味を担う。</p>
+<p><strong>synomare</strong>　このテキストはどっち寄り？</p>
+<p><strong>sora</strong>　意味は手放してない。登場人物がいて、状況があって、何かが語られてる。完全に抽象化はしてない。でも、意味が一義的に確定しないようには書いてる。読む人によって違う意味が立ち上がる。それは具体詩的な開放性だと思う。読者が詩を完成させる。テクストは可能性を並べるだけ。</p>
+<hr>
+<h2>執筆について</h2>
+<p><strong>synomare</strong>　そういえば、このテキスト、いつ書いたの？</p>
+<p><strong>sora</strong>　去年の秋から冬にかけて。二ヶ月くらいかな。</p>
+<p><strong>synomare</strong>　二ヶ月。</p>
+<p><strong>sora</strong>　毎日書いてたわけじゃないけど。断続的に。元になるテクストが書きっぱなしで使ってなかったから、それを直しながら最初の一週間で冒頭から中盤あたりまでがバーっと出てきて、そこから二週間くらい止まって、また一週間で最後まで書いて、そこから一ヶ月くらいかけて改稿した。</p>
+<p><strong>synomare</strong>　止まったのはどういう理由？</p>
+<p><strong>sora</strong>　告知文をどう入れるか決められなくて。最初は告知文を入れるつもりなかったんだよ。</p>
+<p><strong>synomare</strong>　え、そうなの？</p>
+<p><strong>sora</strong>　うん。最初は純粋に詩的なテキストだった。島と記憶と博物館っていうモチーフだけで。でも途中で、これだけじゃ足りないって思い始めて。外側からの力がないと、閉じた世界になっちゃう。</p>
+<p><strong>synomare</strong>　それで告知文を入れた。</p>
+<p><strong>sora</strong>　うん。でも、入れ方がわからなくて。唐突に入れると浮くし、自然に繋げると告知文の異質性が消える。どっちもダメで。二週間くらい、そこで止まってた。</p>
+<p><strong>synomare</strong>　どうやって解決したの？</p>
+<p><strong>sora</strong>　解決したというか……諦めた。唐突に入れるしかない、って。だって、実際の告知文って唐突に来るものでしょ。突然ポストに入ってる。突然メールが来る。自然な流れなんてない。その唐突さを再現しようと思って。</p>
+<hr>
+<p><strong>synomare</strong>　書いてた場所は？</p>
+<p><strong>sora</strong>　自分の部屋と、あと喫茶店。</p>
+<p><strong>synomare</strong>　喫茶店で書くタイプなんだ。</p>
+<p><strong>sora</strong>　うるさい方が集中できるときがあって。冒頭の水のイメージのあたりは、渋谷の地下の喫茶店で書いた。人がたくさんいて、声が聞こえてるんだけど何言ってるかわからない。その状態で書いてたら、文字が浮遊してる感じになった。</p>
+<p><strong>synomare</strong>　場所が影響する。</p>
+<p><strong>sora</strong>　すると思う。告知文は自分の部屋で書いた。静かなところで、ちゃんと座って、正座に近い姿勢で。ああいう形式的な言葉は、形式的な姿勢で書かないと出てこない。</p>
+<p><strong>synomare</strong>　（笑）そこまで意識してるんだ。</p>
+<p><strong>sora</strong>　してる。身体の状態が言葉に影響するから。寝転がって書いた部分もあるし、歩きながら音声入力した部分もある。冒頭の「下手な呼吸」のところは、実際に息を止めながら書いた。</p>
+<hr>
+<p><strong>synomare</strong>　改稿は何回くらいした？</p>
+<p><strong>sora</strong>　数えてないけど、たぶん五稿くらい。大きく変わったのは三回。最初は冒頭がもっと長くて、説明的だった。二稿目で三分の一くらい削った。三稿目で告知文を入れた。四稿目でマニュアルを入れた。五稿目で細かい調整。</p>
+<p><strong>synomare</strong>　マニュアルも後から入れたんだ。</p>
+<p><strong>sora</strong>　うん。最初は告知文で終わるつもりだった。でも、それだと終わり方が暴力的すぎて。告知文に潰されて終わる、っていう構造になっちゃう。それは嫌だった。</p>
+<p><strong>synomare</strong>　嫌だった？</p>
+<p><strong>sora</strong>　うん。告知文が来ても、終わらない何かが欲しかった。マニュアルはそのために入れた。告知が来て全部壊されても、この手引きに従えば、何か続けられる。続け方を書いておく。「こうすればいい」っていう指示じゃなくて、「こういう可能性がある」っていう提示。</p>
+<hr>
+<p><strong>synomare</strong>　没になった案ってある？</p>
+<p><strong>sora</strong>　いくつかある。最初は登場人物にもっと固有の背景を与えようとしてた。島民は何歳で、どこで生まれて、っていう。</p>
+<p><strong>synomare</strong>　それを削った。</p>
+<p><strong>sora</strong>　削った。固有性を与えると、その人の物語になっちゃう。僕が書きたかったのは、特定の誰かの話じゃなくて、誰でもあり得る話。だから名前も抽象的にした。「島民」「つらいこと」「誤字」「約束」。役割だけで、人格がない。</p>
+<p><strong>synomare</strong>　演者たちは大変だったと思う。</p>
+<p><strong>sora</strong>　だと思う。人格がない役を演じるって、何を拠り所にすればいいかわからないから。でも、それは意図的でもあって、信頼があったから僕も踏み切ったと思う。</p>
+<p><strong>synomare</strong>　意図的に難しくしたって感じ？</p>
+<p><strong>sora</strong>　難しくしたっていうか……サポートを削ったって感じかな。この人はこういう人で、こういう過去があって、だからこう振る舞う。でも、このテキストはそれを与えない。そこにみんなが何を注ぐんだろうって楽しみだった。</p>
+<hr>
+<h2>図形楽譜との出会い</h2>
+<p><strong>synomare</strong>　視覚詩に興味を持ったきっかけって何？</p>
+<p><strong>sora</strong>　高校のとき合唱やってて。</p>
+<p><strong>synomare</strong>　え、合唱？</p>
+<p><strong>sora</strong>　うん。三年間。で、合唱って楽譜を読むじゃん。楽譜って、音を視覚的に表現したものでしょ。そこで初めて、音と視覚の関係を意識し始めた。</p>
+<p><strong>synomare</strong>　合唱から詩へ。</p>
+<p><strong>sora</strong>　直接繋がったわけじゃないけど、きっかけにはなった。二年生のとき、コンクールで別の高校がマリー・シェーファーの「Miniwanka」っていう曲をやってて。</p>
+<p><strong>synomare</strong>　シェーファー。サウンドスケープの人だ。</p>
+<p><strong>sora</strong>　そう。「Miniwanka」は先住民の言葉で「水の動き」っていう意味で、水に関する言葉を集めたテキストを合唱曲にしてる。</p>
+<p><strong>synomare</strong>　水のイメージ。</p>
+<p><strong>sora</strong>　そう。で、その演奏がすごく変で。普通の合唱と全然違う。後で楽譜を見せてもらったら、普通の五線譜じゃなくて、図形楽譜っていうか、グラフィック・スコアになってる部分があった。線が波打ってたり、点が散らばってたり、文字が傾いてたり。</p>
+<p><strong>synomare</strong>　それを見て何を思った？</p>
+<p><strong>sora</strong>　最初は「どうやって歌うの」って思った。読み方がわからない。それは純粋に音や声だけじゃなくて、それが伝える映像的なイメージとか、身振りとか、そういう部分まで伝えうるんだって気づいて衝撃を受けたね。</p>
+<p><strong>synomare</strong>　このテキストと同じ発想だ。</p>
+<p><strong>sora</strong>　僕はかなり影響を受けてるかもね。言葉も同じことができるんじゃないか、って思った。言葉を視覚的に配置することで、読み方の固定を解除する。どこから読んでもいい。どう読んでもいい。読む人が選ぶ。だから開く紙面の使い方があるのかな、と。</p>
+<hr>
+<p><strong>synomare</strong>　水のイメージが最初から。</p>
+<p><strong>sora</strong>　たぶんそう。「Miniwanka」が水の曲で、このテキストも水から始まる。偶然かもしれないけど、繋がってる気がする。</p>
+<p><strong>synomare</strong>　高校のときにそういうの経験してたんだ。</p>
+<p><strong>sora</strong>　うん。合唱を辞めてからは、音楽と離れて言葉だけになったけど、視覚と聴覚の関係っていう問題意識はずっとあった。文字をどう配置すれば、読む人の呼吸が変わるか。余白をどう使えば、沈黙まで聞こえるようになるか。</p>
+<p><strong>synomare</strong>　シェーファーが合唱曲も書いてたのは知らなかった。サウンドスケープのイメージしかなくて。</p>
+<p><strong>sora</strong>　YouTubeにいくつか演奏があるよ。楽譜も見れるから、見てみて。</p>
+<hr>
+<h2>現代における意味と非意味</h2>
+<p><strong>synomare</strong>　今の時代に、具体詩的な問題意識ってどう受け継がれてるんだろ。</p>
+<p><strong>sora</strong>　いろんなところで。意識的にも無意識的にも。</p>
+<p><strong>synomare</strong>　たとえば？</p>
+<p><strong>sora</strong>　身近なとこだとボカロとか。原口沙輔聴く？</p>
+<p><strong>synomare</strong>　聴く聴く。「人マニア」とか。</p>
+<p><strong>sora</strong>　あれって、意味があるようでないような境界線上にあるよね。言葉として成立してるけど、意味が一義的に確定しない。</p>
+<p><strong>synomare</strong>　MVもそう。2次元と3次元が入り混じる映像。グリッチ的なサウンドデザイン。</p>
+<p><strong>sora</strong>　崩壊寸前で踏みとどまる感じ。意味と非意味の境界線で遊んでる。言葉の意味よりも、音としての響きとか、視覚としてのMVが前面に出てる。</p>
+<p><strong>synomare</strong>　それって具体詩的？</p>
+<p><strong>sora</strong>　かなり近いと思う。でも、まったく意味がないわけじゃない。聴く人によって違う意味が立ち上がる。その開放性が、具体詩が目指してたものと重なるかもね。</p>
+<hr>
+<p><strong>synomare</strong>　リリックビデオも最近すごいよね。文字が画面を駆け巡る。</p>
+<p><strong>sora</strong>　キネティック・タイポグラフィ。あれは具体詩の最新の発展だと思ってる。</p>
+<p><strong>synomare</strong>　日本だとニコニコ動画で独自に発展した。</p>
+<p><strong>sora</strong>　ボカロの歌詞、つまり機械音声の発声を、さらにそれ自体グラフィカルな文字でスクリーンに表示する。考えてみると、すごい面白いことをやってる。合成音声が聴き取りにくいから歌詞を出す、みたいなことじゃなくて。肉体と結びついていない発声だからこそ、歌詞の視覚的表現に対する躊躇みたいなものがないのかもしれない。</p>
+<p><strong>synomare</strong>　文字のサイズとか速度とか色とかが、全部表現になる。</p>
+<p><strong>sora</strong>　そう。同じ「愛してる」でも、小さくフェードインするのと画面いっぱいに爆発するのでは意味が違う。発話の強度を視覚化してる。それは遠く具体詩がやってたことと同じ。だから僕は、ああいう動画文化こそ、詩の現代における舞台だと思ってる。</p>
+<hr>
+<p><strong>synomare</strong>　逆方向の動きもあるよね。絵文字とか。</p>
+<p><strong>sora</strong>　絵文字はセマシオグラフィの方向。意味を直接示す視覚記号。😂 を見て、何て読むかはわからないけど、意味はわかる。</p>
+<p><strong>synomare</strong>　ヘプタポッドBだ。</p>
+<p><strong>sora</strong>　まさに。人類が作った最もセマシオグラフィックな書記体系かもしれない。</p>
+<p><strong>synomare</strong>　じゃあ、アセミック・ライティングは？最近その話をしてたけど、どういうことなの。</p>
+<p><strong>sora</strong>　あれは完全に逆。文字のように見えるけど、読めない。どの言語でもない。意味がない。</p>
+<p><strong>synomare</strong>　でも、意味がないものを見ても「読もうとする」よね。</p>
+<p><strong>sora</strong>　そう。人間は意味を探してしまう。その認知的な期待が裏切られることで、別の層が開く。言葉以前の何かに触れる。</p>
+<hr>
+<p><strong>synomare</strong>　このテキストにもアセミック的な要素はある？</p>
+<p><strong>sora</strong>　部分的には。余白とか、意味が薄れていく箇所。でも、完全にアセミックにはなってない。意味の手前で踏みとどまってる。</p>
+<p><strong>synomare</strong>　舞台で上演することを考えると。</p>
+<p><strong>sora</strong>　うん。完全な非意味は難しい。観客は何かを理解しようとするから。</p>
+<p><strong>synomare</strong>　誤字くんのミスとかもそうかも。グリッチ的というか。</p>
+<p><strong>sora</strong>　（笑）そうかもね。意図されてない。でも、それがテキストと共鳴した。偶然の産物に意味を見出す。作者の意図を超えた何かが現れる。</p>
+<hr>
+<p><strong>synomare</strong>　こうやって見ると、意味と非意味のスペクトラムがあって、みんなその間を行き来してるんだね。</p>
+<p><strong>sora</strong>　うん。完全な意味も、完全な非意味も、人間には不可能なんだと思う。言葉を使う限り、意味の痕跡が残る。でも、意味を完全に固定することもできない。常にずれがある。揺らぎがある。</p>
+<p><strong>synomare</strong>　その揺らぎが表現の余地になる。</p>
+<p><strong>sora</strong>　そう。もし意味が完全に固定されてたら、詩は要らない。報告書で十分。でも、揺らぎがあるから、それを増幅したり、露出させたりできる。まさにそういう形式をとったしね。</p>
+<p><strong>synomare</strong>　なるほど、そういう整理でいいのか。</p>
+<p><strong>sora</strong>　揺らぎを意識的に配置してる。どこで揺らぐか、どこで安定するか。で、上演に移されたとき、揺らぎの位置が変わる。紙面とは違う場所で揺らぐ。でも、揺らぎ自体はなくならない。むしろ増える。演者も観客も、それぞれの揺らぎを持ち込むから。</p>
+<hr>
+<h2>文字と声の関係</h2>
+<p><strong>synomare</strong>　さっき文字と音の話が出たけど、もう少し聞きたい。</p>
+<p><strong>sora</strong>　どういう角度で？</p>
+<p><strong>synomare</strong>　声が先なのか、文字が先なのか、みたいな。</p>
+<p><strong>sora</strong>　普通は声が先だって思われてるよね。声で喋って、それを記録するのが文字。文字は声の写し。声が本物で、文字は副産物。</p>
+<p><strong>synomare</strong>　でも、このテキストはそうじゃない。</p>
+<p><strong>sora</strong>　そう。紙面の配置とか、余白とか、ルビとか、声に出しても伝わらないものがたくさんある。むしろ、文字の方が先にあって、声はその一部しか伝えられない。</p>
+<p><strong>synomare</strong>　でも上演は声を使う。</p>
+<p><strong>sora</strong>　使う。でも声だけじゃない。身体がある。空間がある。上演は声を使うけど、声に還元されない。</p>
+<p><strong>synomare</strong>　テキストの視覚的な層を、舞台空間っていう別の視覚的な層に翻訳してる。</p>
+<p><strong>sora</strong>　そう。紙から舞台へ。どっちも「書くこと」の一種だと思う。声は通過点であって、終着点じゃない。</p>
+<p><strong>synomare</strong>　面白いな。普通の戯曲だと、文字は声になるためにある。でもこのテキストは、文字が文字として残り続ける。</p>
+<p><strong>sora</strong>　残る。声になっても、消えない。観客の中で、また文字に戻っていく。そういう往復がある。</p>
+<hr>
+<p><strong>synomare</strong>　テッド・チャンの「あなたの人生の物語」を思い出した。</p>
+<p><strong>sora</strong>　読んだ。ヘプタポッドの言語。</p>
+<p><strong>synomare</strong>　音声と独立した視覚的文字。形が直接意味になる。</p>
+<p><strong>sora</strong>　セマシオグラフィックっていうやつ。人間には多分無理だけど、具体詩はそっちに近づこうとしたのかもしれない。でも結局、新国も「音読しろ」って言ってたから。声との繋がりは手放せなかった。</p>
+<p><strong>synomare</strong>　ヘプタポッドは時間も同時に見てるよね。未来を「予知」じゃなくて「すでに知っている」。</p>
+<p><strong>sora</strong>　演者も似てるかも。台本読んでるから結末知ってる。でも観客には知らないふりをする。</p>
+<p><strong>synomare</strong>　「知っているけど知らないふり」。</p>
+<p><strong>sora</strong>　うん。全体を把握した上で、時間の流れに身を委ねる。そういう認知。</p>
+<p><strong>synomare</strong>　soraくんは書くとき、結末知ってた？</p>
+<p><strong>sora</strong>　半分。大まかな構造は見えてたけど、細部は書きながら発見した。</p>
+<hr>
+<h2>モーラと「間」</h2>
+<p><strong>synomare</strong>　日本語の特殊性ってある？</p>
+<p><strong>sora</strong>　モーラの話をしていい？</p>
+<p><strong>synomare</strong>　お願い。</p>
+<p><strong>sora</strong>　日本語は音節言語じゃなくてモーラ言語。英語とかフランス語は音節でリズムを刻む。日本語はモーラ——拍で刻む。「日本語」は三音節だけど、五モーラ。「に・ほ・ん・ご」って四つに分けたくなるけど、「ん」も一拍。</p>
+<p><strong>synomare</strong>　それが書記とどう関係する？</p>
+<p><strong>sora</strong>　仮名文字は、モーラを書いてる。一文字が一拍。「すき」は二文字二拍。でも、実際の発話では「す」の母音が落ちることがある。「ski」みたいに発音される。書かれてるけど、発音されない。</p>
+<p><strong>synomare</strong>　ずれがある。</p>
+<p><strong>sora</strong>　そう。書かれてるけど発音されない。でも、拍としては存在してる。その「間」が、仮名文字の持つ独特の機能。意味は先送りされて、遅延する。仮名文字は、その遅延を視覚化してる。</p>
+<p><strong>synomare</strong>　俳句とか和歌のことを考えると納得できるかも。</p>
+<p><strong>sora</strong>　まさにそれ。五七五、五七五七七。あれはモーラを数えてる。音節じゃない。だから、すごく短い情報量で深い意味を表現できる。言葉と言葉の間に沈黙がある。その沈黙が、意味を膨らませる。</p>
+<p><strong>synomare</strong>　能もそうだよね。あの異様にゆっくりした時間感覚。舞台やってると、あの「間」の使い方は意識する。</p>
+<p><strong>sora</strong>　言われてみると、仮名文字が持つ「間」の機能が、舞台芸術の身体表現に転化してるのかもしれない。言語のリズムと身体のリズムが繋がってる。</p>
+<p><strong>synomare</strong>　このテキストでも、「間」を意識してた？</p>
+<p><strong>sora</strong>　意識してた。余白がそれ。言葉と言葉の間に、時間を注ぎ込む。その時間は決まってない。読む人が決める。でも、「間がある」っていう事実は実は書かれてる。</p>
+<hr>
+<p><strong>sora</strong>　面白いのは、ひらがなで書かれた文章は、漢字交じりより読むのが遅くなること。</p>
+<p><strong>synomare</strong>　なんで？</p>
+<p><strong>sora</strong>　モーラのピッチ自体は速い。約10ヘルツ。音節言語の倍速で処理してる。でも、仮名文字だけで書くと、視覚的な処理が遅くなる。漢字は形が違うから、パターン認識で一気に読める。でも仮名は形が似てるから、一文字ずつ追わないといけない。</p>
+<p><strong>synomare</strong>　逆説的。</p>
+<p><strong>sora</strong>　逆説的。モーラのピッチは速いのに、仮名文字自体が言語を「引き延ばす」。遅延させる。まさに差延。書かれたものが、速度を落とす。声に出せば早く言えるのに、読むと遅くなる。</p>
+<p><strong>synomare</strong>　このテキストはひらがな多め？</p>
+<p><strong>sora</strong>　意識的に多くしてる部分がある。オノマトペみたいな、音とか感覚に近いものを置きたい時に使うことも多かったかな。</p>
+<p><strong>synomare</strong>　確かに、演者も遅く読んでた。</p>
+<p><strong>sora</strong>　うん。逆に、告知文は漢字が多い。「当該地域における開発計画」とか。読もうと思えば一瞬で読める。情報を効率的に処理させる。その速度差が、詩と制度の対比になってる。</p>
+<p><strong>synomare</strong>　それ、意図的に計算してた？</p>
+<p><strong>sora</strong>　半分は意図的、半分は感覚。書いてて「ここは遅くしたい」って思ったら、自然とひらがなになってた。後から見返したら、規則的になってて、ああこういうことかって思った。</p>
+<hr>
+<h2>テキストと上演の関係</h2>
+<p><strong>synomare</strong>　上演って、テキストに何かを付け加えてるのか、テキストにあるものを引き出してるのか、いつも考えるんだけど。</p>
+<p><strong>sora</strong>　どっちだと思う？</p>
+<p><strong>synomare</strong>　僕の経験だと、最初は「引き出す」つもりで始まるんだけど、いつの間にか「付け加えてる」んだよね。演者と稽古してると、テキストになかったものが生まれてくる。誤字くんが寝転がったのとか、まさにそう。</p>
+<p><strong>sora</strong>　うん。僕もそう思う。テキストだけだと、不完全なんだよ。上演されることで、やっとテキストになる。でも上演も、テキストなしじゃ起きない。</p>
+<p><strong>synomare</strong>　どっちが先でもない、ってことか。普通は戯曲が先にあって、上演が後って思われがちだけど。</p>
+<p><strong>sora</strong>　そうじゃない。上演がなきゃテキストは欠けてる。でも上演もテキストなしじゃ成立しない。互いが互いを必要としてる。</p>
+<p><strong>synomare</strong>　今回はそれをすごく感じた。テキストを読んでるだけじゃ見えなかったものが、演者が立った瞬間に見えてきた。</p>
+<hr>
+<p><strong>synomare</strong>　このテキストは、いろんなものが混ざってるよね。詩と告知文と、マニュアルと。</p>
+<p><strong>sora</strong>　接木みたいな感覚だった。別の場所で育ったテキストを、持ってきて繋げる。告知文は制度の言葉。マニュアルは取扱説明書の言葉。それを詩的な言葉に接木する。</p>
+<p><strong>synomare</strong>　異質なものが一つの幹に。</p>
+<p><strong>sora</strong>　そう。元の根から離れて、新しい場所で育つ。変形するけど、完全に別物にはならない。上演もそう。テキストを舞台に接木する。</p>
+<hr>
+<p><strong>synomare</strong>　新国は実際に自分で朗読もしてたって聞いた。</p>
+<p><strong>sora</strong>　録音残ってるよ。聴いたことある？</p>
+<p><strong>synomare</strong>　ない。どんな感じ？</p>
+<p><strong>sora</strong>　独特の読み方で、普通の朗読とは違う。文字の形を声にしてる感じがある。抑揚が変で、間の取り方がおかしい。</p>
+<p><strong>synomare</strong>　おかしい？</p>
+<p><strong>sora</strong>　意味を追う読み方じゃないんだよ。普通の朗読は意味の流れに沿って読む。でも新国のは、形に沿って読んでる。だから意味的には変な間になる。でも、紙面を見ながら聴くと納得する。ああ、こう読むのか、って。</p>
+<p><strong>synomare</strong>　今回の演者たちも、最初は意味を追って読んでたけど、途中からそうじゃなくなった。</p>
+<p><strong>sora</strong>　どう変わった？</p>
+<p><strong>synomare</strong>　約束さんが「文字の形を見ながら読むようになった」って言ってた。意味より先に、配置を見る。ここに置かれてるから、こういう声を出す、って。</p>
+<p><strong>sora</strong>　それはまさに新国的だね。ゴムリンガーも自分の詩を朗読した録音が残ってる。具体詩人たちは、視覚的な詩であっても声を捨てなかった。</p>
+<p><strong>synomare</strong>　作者の朗読が正解なの？</p>
+<p><strong>sora</strong>　正解ではない。一つの解釈。でも、参照点にはなる。</p>
+<p><strong>synomare</strong>　僕らの上演も、一つの解釈。</p>
+<p><strong>sora</strong>　そう。正解じゃない。次に誰かがこのテキストを上演するとき、今回の上演を参照するかもしれないし、しないかもしれない。それはその人が決めること。テクストは開いたまま。どの上演も、テクストを閉じることはできない。</p>
+<hr>
+<h2>余白の譜面</h2>
+<p><strong>synomare</strong>　余白の話をしたい。ページの半分以上が白いところがある。あれ、演出的には最後まで悩んだ。</p>
+<p><strong>sora</strong>　どう悩んだの？</p>
+<p><strong>synomare</strong>　余白を見たときに、これが発話への指示なのか、身体への指示なのか、わからなくて。沈黙しろってことなのか、動けってことなのか。</p>
+<p><strong>sora</strong>　指示じゃない。時間。余白は、言葉が発されていない時間。読む人がそこを通過するのに、時間がかかる。でも、余白をどのくらいの時間で読むかは、読む人次第。だから余白の長さは決まってない。読む人が決める。</p>
+<p><strong>synomare</strong>　それはsoraくんの立場としてはわかるんだけど、僕は上演しなきゃいけなかったから。「読む人が決める」じゃ困るわけ。（笑）</p>
+<p><strong>sora</strong>　（笑）まあね。</p>
+<p><strong>synomare</strong>　だから最初の稽古で、三つの選択肢を出したの。一つ目は、余白を完全な沈黙として扱う。二つ目は、余白を動きの指示として扱う。三つ目は、余白を各自の自由時間として扱う。</p>
+<p><strong>sora</strong>　どれにしたの？</p>
+<p><strong>synomare</strong>　最初は一つ目、完全な沈黙で試したんだけど、舞台が止まってしまって。観客が「止まった？」って思うくらいの静止になっちゃった。</p>
+<p><strong>sora</strong>　それはまずい。</p>
+<p><strong>synomare</strong>　うん。で、二つ目の動きとして扱うっていうのを試したら、今度は何をしていいかわからなくて。つらいことさんが「動こうとしても体が動かない」って言ってて、約束さんは「ゆっくり歩いてた」って言ってて、バラバラで。</p>
+<p><strong>sora</strong>　でも、バラバラでいいんじゃない？</p>
+<p><strong>synomare</strong>　……え？</p>
+<p><strong>sora</strong>　余白の使い方が各自違うって、むしろ正解に近いと思う。余白は「ここに何もない」っていう状態だから。何をしてもいいし、何もしなくてもいい。統一する必要なくない？</p>
+<p><strong>synomare</strong>　いや、演出としてはある程度統一したいというか……でも結局、統一できなかったんだよね。</p>
+<p><strong>sora</strong>　それでいいんだよ。</p>
+<p><strong>synomare</strong>　うーん、soraくんはそう言うけど、僕としては反省点で。稽古の序盤で方針をちゃんと示せなかったこと。</p>
+<p><strong>sora</strong>　でも、結果として各自が自分の余白を見つけたんでしょ。</p>
+<p><strong>synomare</strong>　……まあね。誤字くんが砂場に寝転がったとき、「ああ、これでいいんだ」って思ったのは確か。</p>
+<hr>
+<p><strong>synomare</strong>　で、もう一つ試したのが、余白の面積を計算して秒数に換算するっていう。</p>
+<p><strong>sora</strong>　（笑）それは無理でしょ。</p>
+<p><strong>synomare</strong>　無理だった。四分の一ページの余白が4秒なのか8秒なのか、根拠がない。余白が上にあるのか下にあるのかで意味が違うかもしれないって話もして、上は「これから言う前の間」、下は「言った後の余韻」、みたいな。</p>
+<p><strong>sora</strong>　それは面白いかも。</p>
+<p><strong>synomare</strong>　でも、それもルールとしては定着しなくて。結局、各自が「終わった」と思うまで待つ、っていう方針に落ち着いた。</p>
+<p><strong>sora</strong>　それで毎回違う長さになってた。見てて面白かった。ゲネと千秋楽で、同じ余白なのに長さが違う。でも、どっちも正しく見えた。</p>
+<p><strong>synomare</strong>　テキストがどっちも許容してる。</p>
+<p><strong>sora</strong>　許容してるというか、テクストはそもそも何も言ってない。だから何をしても違反にならない。でも同時に、何をしても完璧な実現にはならない。テクストは永遠に開いたまま。</p>
+<p><strong>synomare</strong>　それってさ、書く側としては気楽じゃない？　何書いても「正解はない」って言えるんだから。</p>
+<p><strong>sora</strong>　気楽じゃないよ。開いたまま書くのって、閉じて書くより難しい。閉じると読者を誘導できる。開くと、どこに行くかわからない。</p>
+<p><strong>synomare</strong>　……なるほど。</p>
+<p><strong>sora</strong>　でも、開いたものを上演するsynomareの方が大変だったと思う。僕は書いて手放すだけだから。</p>
+<p><strong>synomare</strong>　いや、書く方が大変でしょ。</p>
+<p><strong>sora</strong>　（笑）お互い譲り合うのやめよう。</p>
+<hr>
+<h2>ルビの層</h2>
+<p><strong>synomare</strong>　ルビの話もしたい。「海」に「記憶」ってルビが振ってある。あれ、演出的にはかなり悩んで。</p>
+<p><strong>sora</strong>　どう悩んだ？</p>
+<p><strong>synomare</strong>　まず、本文を読むのかルビを読むのか。普通の戯曲だと、ルビは読み方の指示だから、ルビ通りに読めばいい。でも、このテキストのルビは読み方の指示じゃなくて、意味の重ね合わせでしょ。</p>
+<p><strong>sora</strong>　どっちも本体。どっちも注釈。同時に。「海」を読みながら「記憶」を読む。一つの声が二つに分裂してる。でも紙面では、両方が同時に目に入る。視線を動かさなくても、本文とルビが一度に見える。</p>
+<p><strong>synomare</strong>　舞台では無理だよね、それ。</p>
+<p><strong>sora</strong>　無理。舞台では、本文の後にルビが来る。時間差が生まれる。でも、その時間差には時間差の良さがある。「海」って言った後に「記憶」って言われると、「海」が「記憶」だったことに後から気づく。意味が遡及的に書き換わる。これは紙面では起きない。舞台でしか起きない。</p>
+<p><strong>synomare</strong>　稽古でいくつか選択肢を試したんだよ。本文だけ読む、ルビだけ読む、本文の後にルビ、ルビの後に本文、同時に読む、本文を誰かが読んでルビを別の人が囁く……。</p>
+<p><strong>sora</strong>　全部試したの？</p>
+<p><strong>synomare</strong>　うん。で、一番面白かったのが、本文を誰かが読んでルビを別の人が囁くっていうやつ。つらいことさんが「海」って言ってるところに、誤字くんが「記憶」って囁く。</p>
+<p><strong>sora</strong>　それ、観客に聞こえた？</p>
+<p><strong>synomare</strong>　微妙だった。聞こえるか聞こえないかギリギリで。でも、つらいことさんは「違和感があった」って言ってて。</p>
+<p><strong>sora</strong>　どういう違和感？</p>
+<p><strong>synomare</strong>　「私の声なのに、私じゃない声が重なってくる」って。でも途中から、それが面白いって言うようになって。自分と誤字くんの境界が曖昧になっていく、って。</p>
+<p><strong>sora</strong>　それはテクスト的には正しいかも。ルビって、本文に寄生する別の声だから。</p>
+<p><strong>synomare</strong>　あと、プロジェクターでルビを投影する実験もした。演者の体に文字が映る。読めるか読めないかギリギリのサイズで。</p>
+<p><strong>sora</strong>　千秋楽で見た。読めなくてもいいと思った。「何か書いてある」ってことがわかればいい。意味より存在。文字が「意味を伝えるもの」じゃなくて「そこにあるもの」として見える。</p>
+<p><strong>synomare</strong>　誤字くんがルビをわざと読み間違えてたの、気づいた？</p>
+<p><strong>sora</strong>　気づいてない。どこ？</p>
+<p><strong>synomare</strong>　投影されてる文字と、誤字くんの声が微妙にずれてた。「記憶」って映ってるのに「きおき」って言ったり。</p>
+<p><strong>sora</strong>　（笑）それは誤字くんらしい。</p>
+<p><strong>synomare</strong>　僕も最初気づかなくて、後で録音聴いて気づいた。でも、直さなかった。ずれてる方が面白いと思って。</p>
+<hr>
+<h2>並列するテキスト</h2>
+<p><strong>synomare</strong>　複数の列が同時に走ってるところ。ポリフォニーのところ。あれ、読む順序がわからない。</p>
+<p><strong>sora</strong>　わからなくていい。左から読んでもいいし、右から読んでもいいし、同時に読んでもいい。どれを選んでも、テクストを裏切ることにはならない。</p>
+<p><strong>synomare</strong>　でも上演は選択を強制されるんだよ。どこかから始めないといけない。</p>
+<p><strong>sora</strong>　そう。そのズレがこのテクストの構造になってる。僕が書いたのは選択を強制しないこと。上演がやったのは選択を引き受けること。</p>
+<p><strong>synomare</strong>　さっきも言ったけど、初日に同時に喋ったら聞き取れなくて、二日目からずらしたのね。</p>
+<p><strong>sora</strong>　うん。</p>
+<p><strong>synomare</strong>　で、面白かったのは、ずらしたことで逆に「二つある」ってことが伝わった気がして。完全に重なると一つに聞こえちゃうんだけど、ずれてると「あ、二つだ」ってわかる。</p>
+<p><strong>sora</strong>　観客にとっては、ずれてる方が同時性を感じられた。</p>
+<p><strong>synomare</strong>　うん。島民くんが先に言って、約束さんがエコーみたいに後から来る。その間に、観客の中で二つの声が重なる。</p>
+<p><strong>sora</strong>　頭の中で同時性が再構成される。</p>
+<p><strong>synomare</strong>　そう。紙面とは違う形だけど、同時性は伝わってたと思う。</p>
+<hr>
+<h2>告知文の異質性</h2>
+<p><strong>synomare</strong>　告知文の話をしたい。あそこだけ、完全に違う言語になってる。</p>
+<p><strong>sora</strong>　フォントも変えた。本文は明朝体、告知は角ゴシック。書体が変わると、声が変わる。明朝体は手書きの名残がある。筆の入りと抜きがある。ゴシック体は機械的。均一。</p>
+<p><strong>synomare</strong>　演者に「告知は読み上げソフトみたいに読んで」って指示したんだけど、伝わらなくて。</p>
+<p><strong>sora</strong>　読み上げソフト？</p>
+<p><strong>synomare</strong>　うん。感情を込めないで、均一に読む。でも、人間が読むとどうしても感情が入っちゃう。</p>
+<p><strong>sora</strong>　それは難しいよね。身体がある以上、完全に均一にはならない。</p>
+<p><strong>synomare</strong>　約束さんが「自分の声じゃなくなった」って言ってた。告知を読むとき。自分が喋ってるのに、自分じゃない感じがするって。</p>
+<p><strong>sora</strong>　それは意図した。告知は「誰の声でもない声」って感じがあると思う。制度の声。個人の声じゃなくて、制度が喋ってる。</p>
+<p><strong>synomare</strong>　でもさ、舞台では誰かが声に出さないといけないわけじゃん。身体のない言葉を、身体のある人が喋る。それって矛盾してない？</p>
+<p><strong>sora</strong>　矛盾してる。でも、その矛盾が告知の暴力性を際立たせると思ってた。</p>
+<p><strong>synomare</strong>　暴力性？</p>
+<p><strong>sora</strong>　聞いたふりをして聞いてない。「反対意見については一定の考慮を行ったものの」。対話の言葉で対話を拒絶する。丁寧な言葉で暴力を行使する。そういう言葉の使い方を、テクストの外側でよく経験してたから、そのままここに入れた。</p>
+<p><strong>synomare</strong>　……それは、具体的に何かあったの？</p>
+<p><strong>sora</strong>　いや、具体的なことは言わないけど。でも、ああいう言葉って、日常にたくさんあるでしょ。役所からの通知とか、会社からのメールとか。形式的には丁寧なんだけど、実質的には暴力的。</p>
+<p><strong>synomare</strong>　うん。わかる。</p>
+<p><strong>sora</strong>　あの告知文、僕は書いててすごく嫌だった。ああいう言葉を使うのが。でも、使わないと伝わらないから。</p>
+<p><strong>synomare</strong>　観客の反応で面白かったのは、告知文のところで笑う人がいたこと。</p>
+<p><strong>sora</strong>　笑う？</p>
+<p><strong>synomare</strong>　うん。あまりにも形式的で、馬鹿馬鹿しく聞こえるみたいで。特に初日。でも、笑わない人もいて。真剣に聞いてる人もいた。</p>
+<p><strong>sora</strong>　どっちが正しいとかはないと思う。笑って距離を取るのも、真剣に受け止めるのも、どっちも反応として正しい。</p>
+<p><strong>synomare</strong>　千秋楽のとき、終演後に泣いてる人がいて。</p>
+<p><strong>sora</strong>　え、本当に？</p>
+<p><strong>synomare</strong>　うん。ロビーで。何が刺さったのかわからないけど。</p>
+<p><strong>sora</strong>　それは……なんか、すごく嬉しいし、重いな。</p>
+<p><strong>synomare</strong>　僕も声かけていいかわからなくて、そのまま見てた。</p>
+<hr>
+<p><strong>synomare</strong>　「泣かないで」について聞きたいんだけど。</p>
+<p><strong>sora</strong>　あれは……書いたのは僕だけど、誰の声かはわからないままにしておいた。テクストの中の誰かかもしれないし、テクストの外の誰かかもしれない。僕自身かもしれないし、読者への呼びかけかもしれない。</p>
+<p><strong>synomare</strong>　約束さんが千秋楽で小さく言ったらしい。「泣かないで」って。つらいことさんは聞こえなかったって。</p>
+<p><strong>sora</strong>　それでいいと思う。聞こえなくてもいい。言ったことが大事。なんか、祈りってそういうものであるはずだから。どこかに届くものだけが全てじゃないよ。</p>
+<p><strong>synomare</strong>　祈りか。</p>
+<p><strong>sora</strong>　うん。発話者がいないまま漂ってる言葉。告知が来て、全部が断ち切られて、そのあとに残る言葉。誰かが言った言葉じゃなくて、ただそこに書いてある言葉。</p>
+<p><strong>synomare</strong>　僕は、あの場面で何をすればいいか最後までわからなかった。演者にも「わからないまま立ってていい」って言ったんだけど。</p>
+<p><strong>sora</strong>　それでいいと思う。わからないまま立ってるのが、たぶん一番正しい。</p>
+<hr>
+<h2>マニュアルという構造</h2>
+<p><strong>synomare</strong>　最後のページのマニュアル。上演の手引き。あれ、戯曲の中にあるのがおかしい。普通、上演マニュアルは戯曲の外にある。演出ノートとか、別冊で。</p>
+<p><strong>sora</strong>　本編の一部として書いた。だから、上演中にマニュアルも読んでよかった。読まなくてもよかった。どっちでもいい。マニュアルそのものが、上演可能なテキストだから。「円を描くように歩く」とか「誰かが思い出したことを話す」とか。指示として機能する。でも同時に、これはテクストの続きでもある。告知が来て、全部が断ち切られて、そのあとに「じゃあこれからどうするか」っていう手引きが来る。終わったあとの始まり方。</p>
+<p><strong>synomare</strong>　「忘却を否定しないこと」っていう一文がある。これだけ抽象的。</p>
+<p><strong>sora</strong>　姿勢の指示だから。体の動かし方じゃなくて、心の持ち方。他の指示は「こうしろ」って言ってる。これだけ「こうあれ」って言ってる。忘れることを恐れるな、っていう。覚えてなきゃいけないって思うな、っていう。このテクストは記憶の話だけど、記憶に固執すると記憶が動かなくなる。博物館になる。展示物みたいに固定される。生きてる記憶は、忘れたり思い出したりする。変形する。歪む。でも、動いてる。その動きを止めてほしくなかった。</p>
+<hr>
+<p><strong>synomare</strong>　「何らかの要因で計画が再現不可能になった時点で上演は終了される」。終わりの条件。でも、終わりがいつ来るかわからない。</p>
+<p><strong>sora</strong>　わからない。温泉旅館がなくなったら終わりかもしれないし、道路が閉鎖されたら終わりかもしれないし、演者が死んだら終わりかもしれない。上演の終わりが、テクストの内部で決められてない。外部に委ねてる。テクストが自分で終わりを決めない。世界が終わりを決める。告知文と同じ構造。外から来る力に断ち切られる。でも、断ち切られるまでは続く。</p>
+<hr>
+<h2>視覚詩の上演</h2>
+<p><strong>synomare</strong>　視覚詩って、普通は上演しないでしょ。読むもの。見るもの。でも、このテキストは上演を前提に書いてる。矛盾してない？</p>
+<p><strong>sora</strong>　矛盾してる。解決してない。矛盾のまま残してる。</p>
+<p><strong>synomare</strong>　先行例ってあるの？　視覚詩を上演した事例。</p>
+<p><strong>sora</strong>　ほとんどないと思う。新国は朗読してたけど、それは「上演」とは違う。一人で声に出すのと、複数の演者が空間で展開するのは、別物だから。</p>
+<p><strong>synomare</strong>　探したけど見つからなかった。</p>
+<p><strong>sora</strong>　見つからないと思う。視覚詩は紙面で完結するものとして作られてるから。舞台に持っていくことを前提にしてない。だから、このテキストは前例がないことをやろうとしてる。</p>
+<p><strong>synomare</strong>　それは怖くなかった？</p>
+<p><strong>sora</strong>　怖かった。参照するものがないから。でも、さっき話したシェーファーの図形楽譜が、ある種のモデルにはなった。楽譜を演奏に変換するっていうプロセスは、詩を上演に変換するプロセスと似てるから。</p>
+<hr>
+<p><strong>synomare</strong>　舞踏譜っていうのもあるよね。ラバノテーション。</p>
+<p><strong>sora</strong>　ダンスの動きを記号化したもの。あれも視覚的な記号を身体に変換するシステム。でも、ラバノテーションは一対一対応を目指してる。この記号はこの動き、って決まってる。</p>
+<p><strong>synomare</strong>　このテキストは違う。</p>
+<p><strong>sora</strong>　違う。一対一対応じゃない。同じ余白を見ても、寝転がる人もいれば歩く人もいる。正解がない。ラバノテーションは正解を書いてる。このテキストは可能性を書いてる。</p>
+<p><strong>synomare</strong>　それって、読む側は困らない？</p>
+<p><strong>sora</strong>　困ると思う。自分で決めないといけないから。でも、その「決めないといけない」っていうプロセス自体が、演じることの一部になる。指示に従うんじゃなくて、解釈する。解釈することが演技になる。</p>
+<hr>
+<p><strong>synomare</strong>　プロジェクション・マッピングとか使えば、もっとできることがあるかも。</p>
+<p><strong>sora</strong>　どういうこと？</p>
+<p><strong>synomare</strong>　紙面の配置をリアルタイムで舞台に投影するとか。文字が動くとか。</p>
+<p><strong>sora</strong>　それは面白いかもしれない。でも、今回はやらなかった。</p>
+<p><strong>synomare</strong>　予算の問題もあったけど、意図的に限定したところもあって。テクノロジーに頼りすぎると、身体が後回しになる。</p>
+<p><strong>sora</strong>　うん。僕もそれは思ってた。プロジェクターでルビを投影したのは一つの実験だったけど、それ以上やると、映像作品になっちゃう。演劇じゃなくなる。</p>
+<p><strong>synomare</strong>　演劇とインスタレーションの境界。</p>
+<p><strong>sora</strong>　そう。今回は演劇に留まりたかった。身体が中心にある。映像は補助。次やるときは違うかもしれないけど。</p>
+<hr>
+<p><strong>synomare</strong>　次があるとしたら、何を変える？</p>
+<p><strong>sora</strong>　わからない。今回の上演を踏まえて、テキストを改稿するかもしれない。上演で発見したことを、テキストに反映させる。</p>
+<p><strong>synomare</strong>　それって、通常の戯曲とは逆だよね。</p>
+<p><strong>sora</strong>　逆。普通は戯曲があって、上演がそれを解釈する。でも、このテキストは上演から学んで変わる。テキストと上演が相互に影響し合う。どっちが先とか後とかじゃなくて。</p>
+<p><strong>synomare</strong>　それも「接木」なのかな。</p>
+<p><strong>sora</strong>　かもね。上演をテキストに接木する。テキストをまた上演に接木する。循環する。終わらない。</p>
+<hr>
+<p><strong>sora</strong>　視覚詩を上演するっていうのは、結局、メディアを跨ぐっていうこと。紙から空間へ。目から耳と目へ。翻訳で失われるものがある。同時性。紙面では全部が一度に見える。舞台では順番に聞こえる。得られるものもある。身体性。紙面では声が聞こえない。舞台では声が聞こえる。息遣いがある。どっちが「正しい」かは決められない。どっちも作品。</p>
+<h2>書くことと演じること</h2>
+<p><strong>synomare</strong>　書くときって、声を想像してた？</p>
+<p><strong>sora</strong>　聞こえてなかった。目で書いてた。耳じゃなくて目で。配置を見ながら、ここにこの文字を置く、って決めてた。声は後から来る。上演されて初めて声になる。書いてるときは、まだ声じゃない。形。図形。文字の配置図。設計図みたいな。でも、何を設計してるかわからない設計図。建物が建ったときに初めて、何を設計してたかわかる。上演を見て、ああこれを設計してたのか、って思った。でも、僕が設計したものと、実際に建ったものは同じじゃない。上演が勝手に部屋を増やしたり、窓を開けたりしてる。それでいい。それがいい。</p>
+<p><strong>synomare</strong>　演じるときは逆で、目で見る前に声がある。テキストを読んで、声にして、それを観客が聞く。目から耳へ。でも、観客も目で見てる。舞台を。目と耳が同時に働いてる。</p>
+<p><strong>sora</strong>　紙面では目だけ。舞台では目と耳。情報量が増える。ノイズも増える。でもそのノイズの中に、テクストにはなかったものがある。演者の体、声のトーン、間の取り方、空間の響き。全部僕には書けなかったもの。</p>
+<hr>
+<h2>テキストの外へ</h2>
+<p><strong>synomare</strong>　さっき旅行の話出たじゃん。演者のみんな、温泉旅行に行ったんだ。</p>
+<p><strong>sora</strong>　聞いた。マニュアルに従って。</p>
+<p><strong>synomare</strong>　そう。「旅行の計画を立てる」「誰かが作ったその計画を代わりに実行してみる」っていう指示があったでしょ。あれをそのままやってる。</p>
+<p><strong>sora</strong>　え〜すっごい嬉しいんだよね、それ。</p>
+<p><strong>synomare</strong>　嬉しい？</p>
+<p><strong>sora</strong>　うん。テクストが劇場の外に出ていってる。作者として、それはすごく嬉しい。</p>
+<p><strong>synomare</strong>　僕は正直、最初「え、それ上演なの？」って思った。</p>
+<p><strong>sora</strong>　（笑）まあ、わかる。</p>
+<p><strong>synomare</strong>　でも、誤字くんが写真送ってきて、四人で温泉入ってるやつ。それ見たら、なんか「ああ、これでいいのかも」って思えて。</p>
+<p><strong>sora</strong>　どういうこと？</p>
+<p><strong>synomare</strong>　劇場でやったことと、温泉でやったことが、地続きに見えた。別々のものじゃなくて。</p>
+<p><strong>sora</strong>　なんか、せっかく書いたし、読んでたら楽しい思い出とか友達増えたりしてくれたら嬉しいじゃん（笑）まあ、劇場の中と外の区別がない。テクストが劇場を超えて、日常に融合するってのは制作する人みんなの目指したいとこなんじゃないかと思う。</p>
+<p><strong>synomare</strong>　役が日常に染み出してる感じ。</p>
+<p><strong>sora</strong>　染み出すというか、もともと境界がなかったのかもしれない。</p>
+<p><strong>synomare</strong>　約束さんが「温泉宿の個室で約束の役やってみたら、なんか泣きそうになった」って言ってた。</p>
+<p><strong>sora</strong>　えぇっ。それ、すごいな。</p>
+<p><strong>synomare</strong>　劇場じゃないから、観客もいないし、照明もないし。でも、身体が覚えてるんだろうね。役の感覚が。</p>
+<p><strong>sora</strong>　テクストが身体に入ってる。</p>
+<p><strong>synomare</strong>　うん。で、その身体がどこへ行っても、テクストが一緒に行く。連れて行って、もっと違うものを見てほしい。作品に。我が子を旅に出すみたいだね（笑）</p>
+<hr>
+<h2>テキストは誰のものか</h2>
+<p><strong>synomare</strong>　最後に聞きたいことがある。このテキスト、誰のものかな？</p>
+<p><strong>sora</strong>　どういう意味？</p>
+<p><strong>synomare</strong>　書いたのはsoraくんでしょ。でも、上演したのは僕らで。解釈を加えて、変形させてる。それでもまだsoraくんの作品？</p>
+<p><strong>sora</strong>　僕の作品ではある。でも、僕だけの作品じゃない。書いた時点で手を離れてる。土地や自然の所有が権利と結びついているけど、それら自体はそもそも誰のものでもなかったみたいに。だから、書く前から手を離れてたかもしれない。書くときに、いろんなものが流れ込んでくる。見たもの、読んだもの、経験したこと。それが全部テクストになる。テクストは通過点。何かがここを通って、どこかへ行く。上演も通過点。観客がそれを受け取って、また別のどこかへ持っていく。終わりがない。いや、終わりはある。「計画が再現不可能になった時点で」。何もかもどうなるかわからないよ。わからないまま続く。そういう祈りかな。</p>
+<hr>
+<p><em>（窓の外で電車が通る。しばらく沈黙。）</em></p>
+<p><strong>synomare</strong>　君は誰？</p>
+<p><strong>sora</strong>　たのしかった。</p>
+<hr>
+<p><strong>終</strong></p>
+
+    </article>
+    <aside class="sidebar-right"></aside>
+  </main>
+
+  <footer>
+    <nav class="nav-links">
+      <a href="index.html">← 作品ページ</a>
+      <a href="zadankai.html">座談会</a>
+      <a href="zadankai.html">座談会 →</a>
+    </nav>
+    <small style="color: var(--muted);">&copy; <span id="year"></span> synomare</small>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+
+</html>

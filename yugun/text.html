@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>戯曲テキスト — 嶼群（博物館（たち）） — synomare</title>
+    <meta name="description" content="嶼群（博物館（たち））戯曲テキスト">
+    <meta property="og:title" content="戯曲テキスト — 嶼群 — synomare">
+    <meta property="og:type" content="article">
+    <meta name="theme-color" content="#0a0a0a">
+    <link rel="preconnect" href="https://use.typekit.net" crossorigin>
+
+    <!-- PDF.js from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --fg: #e5e5e5;
+            --muted: #444;
+            --line: #222;
+            --accent: #fff;
+            --font-mincho: "Hina Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+            --font-gothic: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+            font-size: clamp(16px, 1.6vw, 24px);
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--fg);
+            font-family: var(--font-mincho);
+            -webkit-font-smoothing: antialiased;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            min-height: 100svh;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+            border-bottom: 1px solid var(--muted);
+        }
+
+        a:hover {
+            border-bottom-color: var(--accent);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        header,
+        footer {
+            padding: 0.8rem 1rem;
+            font-family: var(--font-gothic);
+            font-size: 0.65rem;
+            letter-spacing: 0.1em;
+            z-index: 100;
+            background: var(--bg);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--line);
+            position: sticky;
+            top: 0;
+        }
+
+        footer {
+            border-top: 1px solid var(--line);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        details.nav {
+            position: relative;
+        }
+
+        details.nav>summary {
+            list-style: none;
+            cursor: pointer;
+            border: 1px solid var(--line);
+            padding: 0.2em 0.8em;
+            text-transform: uppercase;
+        }
+
+        details.nav>summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .menu {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            margin-top: -1px;
+            background: var(--bg);
+            border: 1px solid var(--line);
+            padding: 1rem;
+            min-width: 180px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            z-index: 1000;
+        }
+
+        .breadcrumb {
+            display: flex;
+            gap: 0.5rem;
+            font-size: 0.6rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .breadcrumb a {
+            color: var(--muted);
+            border: none;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--fg);
+        }
+
+        main {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .pdf-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #0d0d0d;
+            border: 1px solid var(--line);
+            margin: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pdf-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--line);
+            background: var(--bg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .pdf-header h1 {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 400;
+            letter-spacing: -0.02em;
+        }
+
+        .pdf-header .label {
+            font-size: 0.55rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--muted);
+            font-family: var(--font-gothic);
+        }
+
+        .pdf-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .pdf-actions a {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-family: var(--font-gothic);
+            padding: 0.4em 0.8em;
+            border: 1px solid var(--line);
+        }
+
+        .pdf-actions a:hover {
+            border-color: var(--accent);
+        }
+
+        .pdf-viewer {
+            flex: 1;
+            position: relative;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+            gap: 1rem;
+        }
+
+        .pdf-viewer canvas {
+            max-width: 100%;
+            height: auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Fallback for mobile/unsupported browsers */
+        .pdf-fallback {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 3rem;
+            height: 100%;
+        }
+
+        .pdf-fallback.active {
+            display: flex;
+        }
+
+        .pdf-fallback h2 {
+            margin: 0 0 1rem;
+            font-size: 1.2rem;
+            font-weight: 400;
+        }
+
+        .pdf-fallback p {
+            color: var(--muted);
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+            max-width: 300px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            border: 1px solid var(--fg);
+            font-family: var(--font-gothic);
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin: 0.5rem;
+        }
+
+        .btn:hover {
+            background: var(--fg);
+            color: var(--bg);
+        }
+
+        .btn-secondary {
+            border-color: var(--muted);
+            color: var(--muted);
+        }
+
+        .btn-secondary:hover {
+            background: var(--muted);
+            color: var(--bg);
+        }
+
+        /* Loading state */
+        .pdf-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: var(--muted);
+        }
+
+        .pdf-loading::after {
+            content: "";
+            display: block;
+            width: 30px;
+            height: 30px;
+            margin: 1rem auto 0;
+            border: 2px solid var(--line);
+            border-top-color: var(--fg);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .nav-links a {
+            color: var(--muted);
+            border: none;
+        }
+
+        .nav-links a:hover {
+            color: var(--fg);
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9998;
+            background: radial-gradient(circle at 50% 50%, transparent 60%, rgba(0, 0, 0, 0.4) 100%);
+        }
+
+        @media (max-width: 600px) {
+            .pdf-container {
+                margin: 0.5rem;
+            }
+
+            .pdf-header {
+                padding: 0.8rem 1rem;
+            }
+
+            .pdf-header h1 {
+                font-size: 1rem;
+            }
+
+            .pdf-viewer {
+                padding: 0.5rem;
+            }
+        }
+
+        html.wf-loading body {
+            opacity: 0;
+        }
+
+        html.wf-active body,
+        html.wf-inactive body {
+            opacity: 1;
+            transition: opacity 0.5s;
+        }
+    </style>
+    <script>
+        (function (d) {
+            var config = { kitId: 'ifg4slm', scriptTimeout: 3000, async: true }, h = d.documentElement, t = setTimeout(function () { h.className = h.className.replace(/\bwf-loading\b/g, "") + " wf-inactive"; }, config.scriptTimeout), tk = d.createElement("script"), f = false, s = d.getElementsByTagName("script")[0], a; h.className += " wf-loading"; tk.src = 'https://use.typekit.net/' + config.kitId + '.js'; tk.async = true; tk.onload = tk.onreadystatechange = function () { a = this.readyState; if (f || a && a != "complete" && a != "loaded") return; f = true; clearTimeout(t); try { Typekit.load(config) } catch (e) { } }; s.parentNode.insertBefore(tk, s)
+        })(document);
+    </script>
+</head>
+
+<body>
+    <header>
+        <a href="../" class="brand" style="border:none">synomare</a>
+        <nav class="breadcrumb">
+            <a href="../">Home</a>
+            <span>/</span>
+            <a href="index.html">嶼群</a>
+            <span>/</span>
+            <span style="color:var(--fg)">Text</span>
+        </nav>
+        <details class="nav">
+            <summary>MENU</summary>
+            <nav class="menu">
+                <a href="../">HOME</a>
+                <a href="../notes/">NOTES</a>
+                <a href="../about.html">ABOUT</a>
+            </nav>
+        </details>
+    </header>
+
+    <main>
+        <div class="pdf-container">
+            <div class="pdf-header">
+                <div>
+                    <span class="label">Script / PDF</span>
+                    <h1>嶼群（博物館（たち）） テキスト</h1>
+                </div>
+                <div class="pdf-actions">
+                    <a href="../assets/島嶼群テクスト.pdf" target="_blank">新しいタブで開く</a>
+                    <a href="../assets/島嶼群テクスト.pdf" download>ダウンロード</a>
+                </div>
+            </div>
+
+            <!-- PDF.js viewer -->
+            <div class="pdf-viewer" id="pdf-viewer">
+                <div class="pdf-loading" id="pdf-loading">読み込み中...</div>
+            </div>
+
+            <!-- Fallback for unsupported browsers -->
+            <div class="pdf-fallback" id="pdf-fallback">
+                <h2>PDFビューア</h2>
+                <p>このデバイスでは埋め込みPDFの表示に対応していない可能性があります。以下のボタンからご覧ください。</p>
+                <a href="../assets/島嶼群テクスト.pdf" target="_blank" class="btn">新しいタブで開く</a>
+                <a href="../assets/島嶼群テクスト.pdf" download class="btn btn-secondary">PDFをダウンロード</a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <nav class="nav-links">
+            <a href="index.html">← 作品ページ</a>
+            <a href="zadankai.html">座談会</a>
+            <a href="taidan.html">対談</a>
+        </nav>
+        <small style="color: var(--muted);">&copy; <span id="year"></span> synomare</small>
+    </footer>
+
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // PDF.js configuration
+        const pdfUrl = '../assets/島嶼群テクスト.pdf';
+        const pdfViewer = document.getElementById('pdf-viewer');
+        const pdfLoading = document.getElementById('pdf-loading');
+        const pdfFallback = document.getElementById('pdf-fallback');
+
+        async function renderPDF() {
+            // Check if PDF.js loaded
+            if (typeof pdfjsLib === 'undefined') {
+                console.error('PDF.js not loaded');
+                showFallback();
+                return;
+            }
+
+            // Set worker
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+            try {
+                const loadingTask = pdfjsLib.getDocument(pdfUrl);
+                const pdf = await loadingTask.promise;
+
+                pdfLoading.style.display = 'none';
+
+                // Render all pages
+                const numPages = pdf.numPages;
+                for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+                    const page = await pdf.getPage(pageNum);
+
+                    // Calculate scale based on container width
+                    const containerWidth = pdfViewer.clientWidth - 40; // padding
+                    const viewport = page.getViewport({ scale: 1 });
+                    const scale = Math.min(containerWidth / viewport.width, 2); // max scale 2
+                    const scaledViewport = page.getViewport({ scale: scale });
+
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    canvas.height = scaledViewport.height;
+                    canvas.width = scaledViewport.width;
+
+                    await page.render({
+                        canvasContext: context,
+                        viewport: scaledViewport
+                    }).promise;
+
+                    pdfViewer.appendChild(canvas);
+                }
+            } catch (error) {
+                console.error('Error loading PDF:', error);
+                showFallback();
+            }
+        }
+
+        function showFallback() {
+            pdfViewer.style.display = 'none';
+            pdfFallback.classList.add('active');
+        }
+
+        // Start rendering
+        renderPDF();
+    </script>
+</body>
+
+</html>
