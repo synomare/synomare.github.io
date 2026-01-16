@@ -4,12 +4,12 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Links — synomare</title>
-    <meta name="description" content="Mutual links and friends of synomare.">
-    <meta property="og:title" content="Links — synomare">
-    <meta property="og:description" content="Mutual links and friends of synomare.">
+    <title>Works — synomare</title>
+    <meta name="description" content="Creative works by synomare.">
+    <meta property="og:title" content="Works — synomare">
+    <meta property="og:description" content="Creative works by synomare.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://your-domain.example/links.html">
+    <meta property="og:url" content="https://synomare.github.io/works.html">
     <meta name="theme-color" content="#0a0a0a">
     <link rel="preconnect" href="https://use.typekit.net" crossorigin>
     <style>
@@ -79,7 +79,8 @@
         .brand {
             letter-spacing: .02em;
             font-weight: 400;
-            font-family: var(--font-brand)
+            font-family: var(--font-brand);
+            text-decoration: none;
         }
 
         details.nav {
@@ -148,47 +149,73 @@
         h1 {
             font-weight: 400;
             font-size: clamp(24px, 4vw, 32px);
-            margin: 0 0 2rem;
+            margin: 0 0 1rem;
             letter-spacing: -0.02em;
         }
 
-        .links-grid {
+        .intro {
+            color: var(--muted);
+            margin-bottom: 2.5rem;
+            max-width: 60ch;
+        }
+
+        .works-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 2rem;
         }
 
-        .link-card {
+        .work-card {
             display: block;
             text-decoration: none;
-            padding: 1.5rem;
+            padding: 2rem;
             border: 1px solid color-mix(in oklch, var(--fg) 15%, var(--bg));
             border-radius: 12px;
-            transition: background 0.2s, transform 0.2s;
+            transition: background 0.2s, transform 0.2s, border-color 0.2s;
         }
 
-        .link-card:hover {
+        .work-card:hover {
             background: color-mix(in oklch, var(--fg) 5%, var(--bg));
             transform: translateY(-2px);
+            border-color: color-mix(in oklch, var(--fg) 30%, var(--bg));
             opacity: 1;
         }
 
-        .link-title {
+        .work-year {
+            display: block;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .work-title {
             display: block;
             font-weight: 600;
-            font-size: 1.1rem;
+            font-size: 1.25rem;
             margin-bottom: 0.5rem;
             text-decoration: underline;
             text-decoration-color: var(--accent);
             text-decoration-thickness: .05em;
-            text-underline-offset: .08em;
+            text-underline-offset: .12em;
         }
 
-        .link-desc {
+        .work-type {
+            display: inline-block;
+            font-size: 0.8rem;
+            padding: 0.2em 0.6em;
+            border: 1px solid var(--muted);
+            border-radius: 4px;
+            color: var(--muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .work-desc {
             display: block;
             font-size: 0.95rem;
             color: var(--muted);
-            line-height: 1.5;
+            line-height: 1.6;
         }
 
         footer {
@@ -236,7 +263,7 @@
 <body>
     <a class="sr-only" href="#content">Skip to Content</a>
     <header>
-        <div class="brand">synomare</div>
+        <a href="./" class="brand">synomare</a>
         <details class="nav">
             <summary><span id="menuLabel">Open Menu</span></summary>
             <nav class="menu" aria-label="site">
@@ -250,19 +277,16 @@
         </details>
     </header>
     <main id="content">
-        <h1>Links</h1>
-        <div class="links-grid">
-            <!-- Example Link (Reference)
-      <a href="https://example.com" class="link-card" target="_blank" rel="noopener">
-        <span class="link-title">Example Site</span>
-        <span class="link-desc">A wonderful place on the internet.</span>
-      </a>
-      -->
-            <a href="https://mori-chka.github.io/bunko-site/" class="link-card" target="_blank" rel="noopener">
-                <span class="link-title">さなぎのなかから</span>
-                <span class="link-desc">もりちか</span>
+        <h1>Works</h1>
+        <p class="intro">テクスト、演劇、インスタレーションなど、これまでの作品を掲載しています。</p>
+        <div class="works-grid">
+            <a href="yugun/index.html" class="work-card">
+                <span class="work-year">2025</span>
+                <span class="work-title">嶼群（博物館（たち））</span>
+                <span class="work-type">演劇</span>
+                <span class="work-desc">博物館を舞台にした、土地と記憶をめぐる戯曲。テキスト全文、座談会、対談を収録。</span>
             </a>
-            <!-- Add more links here -->
+            <!-- Add more works here -->
         </div>
         <div class="noise-overlay"></div>
     </main>
