@@ -9,21 +9,20 @@
   <meta property="og:title" content="{{TITLE}} — synomare Notes">
   <meta property="og:description" content="{{SUMMARY}}">
   <meta property="og:type" content="article">
-  <meta property="og:url" content="https://your-domain.example/notes/{{SLUG}}.html">
-  <meta name="theme-color" content="#0a0a0a">
+  <meta property="og:url" content="https://synomare.github.io/notes/{{SLUG}}.html">
+  <meta name="theme-color" content="#f2efe8">
   <link rel="preconnect" href="https://use.typekit.net" crossorigin>
   <style>
     :root {
-      --bg: oklch(25.11% 0.006 258.36);
-      --fg: oklch(91.87% 0.003 264.54);
-      --muted: color-mix(in oklch, var(--fg) 60%, var(--bg));
-      --accent: var(--fg);
+      --paper: #f2efe8;
+      --ink: #1a160f;
+      --faint: #8d8577;
+      --rule: #cfc8b8;
+      --seal: #a33b24;
       --maxw: 75ch;
-      --font-body: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans JP", Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-      --font-brand: var(--font-body);
-      --menu-bg: color-mix(in oklch, black 88%, var(--bg) 12%);
-      --menu-fg: color-mix(in oklch, white 94%, var(--bg) 6%);
-      --menu-divider: color-mix(in oklch, var(--menu-fg) 12%, var(--menu-bg));
+      --font-mincho: "Hina Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+      --font-gothic: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+      --font-latin: "Times New Roman", Times, Georgia, serif;
     }
 
     html,
@@ -33,20 +32,25 @@
 
     body {
       margin: 0;
-      background: var(--bg);
-      color: var(--fg);
-      font: 400 16px/1.7 var(--font-body);
+      background: var(--paper);
+      color: var(--ink);
+      font: 400 16px/1.7 var(--font-mincho);
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      min-height: 100svh;
     }
 
     a {
       color: inherit;
-      text-decoration-line: underline;
-      text-decoration-color: var(--accent);
-      text-decoration-thickness: .05em;
-      text-underline-offset: .08em;
-      text-decoration-skip-ink: auto
+      text-decoration: none;
+      border-bottom: 1px solid var(--faint);
+    }
+
+    a:hover {
+      border-bottom-color: var(--ink);
+      background: rgba(26, 22, 15, 0.06);
     }
 
     .sr-only {
@@ -61,18 +65,35 @@
       border: 0
     }
 
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: clamp(12px, 2.5vw, 24px);
-      border-bottom: 1px solid color-mix(in oklch, var(--fg) 15%, var(--bg))
+    header,
+    footer {
+      padding: 0.8rem 1rem;
+      font-family: var(--font-gothic);
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      background: var(--paper);
+      z-index: 100;
     }
 
-    .brand {
-      letter-spacing: .02em;
-      font-weight: 400;
-      font-family: var(--font-brand)
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--rule);
+      position: sticky;
+      top: 0;
+    }
+
+    header .brand {
+      border: none;
+      letter-spacing: 0.18em;
+    }
+
+    footer {
+      border-top: 1px solid var(--rule);
+      display: flex;
+      justify-content: space-between;
+      color: var(--faint);
     }
 
     details.nav {
@@ -83,16 +104,15 @@
       list-style: none;
       cursor: pointer;
       user-select: none;
-      padding: .4rem .7rem;
-      border: 1px solid color-mix(in oklch, var(--fg) 20%, var(--bg));
-      border-radius: 999px;
-      font-size: .95rem
+      border: 1px solid var(--rule);
+      padding: 0.2em 0.8em;
+      text-transform: uppercase;
     }
 
     details.nav[open]>summary {
-      background: var(--menu-bg);
-      color: var(--menu-fg);
-      border-color: var(--menu-divider)
+      background: var(--ink);
+      color: var(--paper);
+      border-color: var(--ink);
     }
 
     details.nav>summary::-webkit-details-marker {
@@ -102,33 +122,54 @@
     .menu {
       position: absolute;
       right: 0;
-      margin-top: .5rem;
+      top: 100%;
+      margin-top: -1px;
+      background: var(--paper);
+      border: 1px solid var(--ink);
+      padding: 1rem;
+      min-width: 180px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
       z-index: 1000;
-      background: var(--menu-bg);
-      color: var(--menu-fg);
-      border: 1px solid var(--menu-divider);
-      border-radius: 16px;
-      min-width: 260px;
-      padding: .4rem;
-      box-shadow: 0 16px 48px rgba(0, 0, 0, .55)
     }
 
     .menu a {
-      display: block;
-      padding: .6rem .9rem;
-      border-radius: 10px;
-      color: inherit;
-      text-decoration: none;
-      letter-spacing: .005em
-    }
-
-    .menu a+a {
-      border-top: 1px solid var(--menu-divider)
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 0.15em;
     }
 
     .menu a:hover {
-      background: color-mix(in oklch, var(--menu-bg) 82%, var(--menu-fg))
+      border-bottom-color: var(--ink);
+      background: none;
     }
+
+    .trim {
+      position: fixed;
+      width: 14px;
+      height: 14px;
+      pointer-events: none;
+      z-index: 200;
+      opacity: 0.55;
+    }
+
+    .trim::before,
+    .trim::after {
+      content: "";
+      position: absolute;
+      background: var(--ink);
+    }
+
+    .trim::before { width: 100%; height: 1px; }
+    .trim::after { width: 1px; height: 100%; }
+    .trim.tl { top: 6px; left: 6px; }
+    .trim.tl::before, .trim.tl::after { top: 0; left: 0; }
+    .trim.tr { top: 6px; right: 6px; }
+    .trim.tr::before, .trim.tr::after { top: 0; right: 0; }
+    .trim.bl { bottom: 6px; left: 6px; }
+    .trim.bl::before, .trim.bl::after { bottom: 0; left: 0; }
+    .trim.br { bottom: 6px; right: 6px; }
+    .trim.br::before, .trim.br::after { bottom: 0; right: 0; }
 
     main {
       padding: clamp(24px, 6vw, 80px)
@@ -140,29 +181,58 @@
     }
 
     nav.breadcrumb {
-      margin-bottom: 1rem
+      margin-bottom: 1.4rem;
+      font-family: var(--font-gothic);
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      color: var(--faint);
     }
 
     h1 {
-      font-weight: 600;
+      font-weight: 400;
       font-size: clamp(24px, 3.2vw, 32px);
+      letter-spacing: -0.02em;
       margin: 0 0 .8rem
     }
 
     time {
       display: block;
-      opacity: .78;
-      font-size: .95rem;
+      color: var(--faint);
+      font-family: var(--font-gothic);
+      font-size: .75rem;
+      letter-spacing: 0.15em;
       margin-bottom: 1.8rem
     }
 
     article {
-      font-size: clamp(18px, 2.1vw, 20px);
-      line-height: 1.8
+      font-size: clamp(17px, 2vw, 19px);
+      line-height: 1.9
     }
 
     article p {
       margin: 0 0 1.2rem
+    }
+
+    article img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .video-container {
+      position: relative;
+      padding-bottom: 56.25%;
+      height: 0;
+      overflow: hidden;
+      margin: 0 0 1.2rem;
+    }
+
+    .video-container iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 1px solid var(--rule);
     }
 
     .entry-nav {
@@ -170,25 +240,44 @@
       flex-wrap: wrap;
       gap: .6rem 1.2rem;
       margin-top: 2.4rem;
-      font-size: .95rem
+      font-family: var(--font-gothic);
+      font-size: .7rem;
+      letter-spacing: 0.1em;
     }
 
     .entry-nav a {
-      text-decoration: none;
+      border: 1px solid var(--rule);
       padding: .35rem .65rem;
-      border: 1px solid color-mix(in oklch, var(--fg) 22%, var(--bg));
-      border-radius: 999px
     }
 
     .entry-nav a:hover {
-      background: color-mix(in oklch, var(--menu-bg) 82%, var(--menu-fg));
-      color: var(--menu-fg)
+      background: var(--ink);
+      color: var(--paper);
+      border-color: var(--ink);
     }
 
-    footer {
-      padding: 24px;
-      color: var(--muted);
-      border-top: 1px solid color-mix(in oklch, var(--fg) 15%, var(--bg))
+    .noise-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.05;
+      mix-blend-mode: multiply;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9998;
+      background: radial-gradient(circle at 50% 45%, transparent 62%, rgba(26, 22, 15, 0.10) 100%);
     }
 
     @media (max-width:520px) {
@@ -197,9 +286,14 @@
       }
     }
 
-    html.wf-active {
-      --font-body: "Hina Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
-      --font-brand: var(--font-body)
+    html.wf-loading body {
+      opacity: 0;
+    }
+
+    html.wf-active body,
+    html.wf-inactive body {
+      opacity: 1;
+      transition: opacity 0.5s;
     }
   </style>
   <script>
@@ -211,22 +305,28 @@
 
 <body>
   <a class="sr-only" href="#main">Skip to Content</a>
+  <div class="trim tl" aria-hidden="true"></div>
+  <div class="trim tr" aria-hidden="true"></div>
+  <div class="trim bl" aria-hidden="true"></div>
+  <div class="trim br" aria-hidden="true"></div>
   <header>
-    <div class="brand">synomare</div>
+    <a href="../" class="brand">synomare</a>
     <details class="nav">
-      <summary><span id="menuLabel">Open Menu</span></summary>
+      <summary>MENU</summary>
       <nav class="menu" aria-label="site">
-        <a href="../">Home</a>
-        <a href="mailto:synomare@gmail.com">Contact</a>
-        <a href="../#content">About</a>
-        <a href="https://x.com/synomare" target="_blank" rel="noopener">X / Twitter</a>
-        <a href="https://www.instagram.com/syno_mare/?utm_source=qr" target="_blank" rel="noopener">Instagram</a>
+        <a href="../">HOME</a>
+        <a href="../works.html">WORKS</a>
+        <a href="index.html">NOTES</a>
+        <a href="../links.html">LINKS</a>
+        <a href="../profile.html">PROFILE</a>
+        <a href="../about.html">ABOUT</a>
+        <a href="mailto:synomare@gmail.com">CONTACT</a>
       </nav>
     </details>
   </header>
   <main id="main">
     <div class="wrap">
-      <nav class="breadcrumb"><a href="../">Home</a> / <a href="index.html">Notes</a> / <strong>{{TITLE}}</strong></nav>
+      <nav class="breadcrumb"><a href="../">HOME</a> / <a href="index.html">NOTES</a> / <strong>{{TITLE}}</strong></nav>
       <article class="entry" data-slug="{{SLUG}}">
         <h1>{{TITLE}}</h1>
         <time datetime="{{DATE}}">{{DATE}}</time>
@@ -234,16 +334,35 @@
       </article>
       <nav class="entry-nav" id="entryNav" aria-label="記事ナビゲーション"></nav>
     </div>
+    <div class="noise-overlay"></div>
   </main>
   <footer>
+    <small>synomare 版 — 雑記</small>
     <small>© <span id="year"></span> synomare — all rights reserved.</small>
   </footer>
   <script>
     (function () {
       var y = document.getElementById('year'); if (y) y.textContent = new Date().getFullYear();
-      var d = document.querySelector('details.nav'); var label = document.getElementById('menuLabel');
-      var set = function () { if (d && label) label.textContent = d.open ? 'Close Menu' : 'Open Menu' }; if (d && label) { set(); d.addEventListener('toggle', set) }
-      var theme = document.querySelector('meta[name="theme-color"]'); if (theme) { var bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim(); theme.setAttribute('content', bg) }
+      var theme = document.querySelector('meta[name="theme-color"]'); if (theme) { var bg = getComputedStyle(document.documentElement).getPropertyValue('--paper').trim(); theme.setAttribute('content', bg) }
+    })();
+  </script>
+  <script>
+    (function () {
+      var overlay = document.querySelector('.noise-overlay');
+      if (!overlay) return;
+      var canvas = document.createElement('canvas');
+      canvas.width = 128;
+      canvas.height = 128;
+      var ctx = canvas.getContext('2d');
+      var idata = ctx.createImageData(128, 128);
+      var buffer32 = new Uint32Array(idata.data.buffer);
+      var len = buffer32.length;
+      for (var i = 0; i < len; i++) {
+        if (Math.random() < 0.5) buffer32[i] = 0xff000000;
+      }
+      ctx.putImageData(idata, 0, 0);
+      overlay.style.backgroundImage = 'url(' + canvas.toDataURL() + ')';
+      overlay.style.backgroundRepeat = 'repeat';
     })();
   </script>
   <script src="posts.js"></script>

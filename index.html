@@ -4,37 +4,36 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>synomare — personal site</title>
-  <meta name="description" content="A minimal, one‑page personal site with oversized type and a deadpan bio.">
-  <meta property="og:title" content="synomare — personal site">
-  <meta property="og:description" content="A minimal, one‑page personal site with oversized type and a deadpan bio.">
+  <title>synomare — 口上</title>
+  <meta name="description" content="synomare。テクスト、デザイン、グラフィック。紙面としてのサイト、第一葉。">
+  <meta property="og:title" content="synomare — 口上">
+  <meta property="og:description" content="synomare。テクスト、デザイン、グラフィック。">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://your-domain.example/">
-  <meta name="theme-color" content="#0a0a0a">
+  <meta name="theme-color" content="#f2efe8">
   <link rel="preconnect" href="https://use.typekit.net" crossorigin>
   <style>
     :root {
-      --bg: oklch(25.11% 0.006 258.36);
-      --fg: oklch(91.87% 0.003 264.54);
-      --muted: color-mix(in oklch, var(--fg) 60%, var(--bg));
-      --accent: var(--fg);
+      --paper: #f2efe8;
+      --ink: #1a160f;
+      --faint: #8d8577;
+      --rule: #cfc8b8;
+      --seal: #a33b24;
       --maxw: 160ch;
-      --font-body: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans JP", Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-      --font-brand: var(--font-body);
-      --menu-bg: color-mix(in oklch, black 88%, var(--bg) 12%);
-      --menu-fg: color-mix(in oklch, white 94%, var(--bg) 6%);
-      --menu-divider: color-mix(in oklch, var(--menu-fg) 12%, var(--menu-bg));
+      --font-mincho: "Hina Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+      --font-gothic: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+      --font-body: var(--font-mincho);
     }
 
     html,
     body {
-      height: 100%
+      height: 100%;
+      overflow-x: hidden;
     }
 
     body {
       margin: 0;
-      background: var(--bg);
-      color: var(--fg);
+      background: var(--paper);
+      color: var(--ink);
       font: 400 16px/1.5 var(--font-body);
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
@@ -46,14 +45,14 @@
     a {
       color: inherit;
       text-decoration-line: underline;
-      text-decoration-color: var(--accent);
+      text-decoration-color: var(--ink);
       text-decoration-thickness: .05em;
       text-underline-offset: .08em;
-      text-decoration-skip-ink: auto
+      text-decoration-skip-ink: auto;
     }
 
     a:hover {
-      opacity: .9
+      background: rgba(26, 22, 15, 0.07);
     }
 
     .sr-only {
@@ -65,85 +64,155 @@
       overflow: hidden;
       clip: rect(0, 0, 0, 0);
       white-space: nowrap;
-      border: 0
+      border: 0;
+    }
+
+    /* ── 紙面クローム ───────────────────── */
+    header,
+    footer {
+      padding: 0.8rem 1rem;
+      font-family: var(--font-gothic);
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      background: var(--paper);
+      z-index: 100;
     }
 
     header {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      padding: clamp(12px, 2.5vw, 24px);
-      border-bottom: 1px solid color-mix(in oklch, var(--fg) 15%, var(--bg))
+      align-items: center;
+      border-bottom: 1px solid var(--rule);
+      position: sticky;
+      top: 0;
     }
 
-    .brand {
-      letter-spacing: .02em;
-      font-weight: 400;
-      font-family: var(--font-brand)
+    header .brand {
+      text-decoration: none;
+      letter-spacing: 0.18em;
+    }
+
+    footer {
+      border-top: 1px solid var(--rule);
+      display: flex;
+      justify-content: space-between;
+      color: var(--faint);
     }
 
     details.nav {
-      position: relative
+      position: relative;
     }
 
     details.nav>summary {
       list-style: none;
       cursor: pointer;
       user-select: none;
-      padding: .4rem .7rem;
-      border: 1px solid color-mix(in oklch, var(--fg) 20%, var(--bg));
-      border-radius: 999px;
-      font-size: .95rem
+      border: 1px solid var(--rule);
+      padding: 0.2em 0.8em;
+      text-transform: uppercase;
     }
 
     details.nav[open]>summary {
-      background: var(--menu-bg);
-      color: var(--menu-fg);
-      border-color: var(--menu-divider)
+      background: var(--ink);
+      color: var(--paper);
+      border-color: var(--ink);
     }
 
     details.nav>summary::-webkit-details-marker {
-      display: none
+      display: none;
     }
 
     .menu {
       position: absolute;
       right: 0;
-      margin-top: .5rem;
+      top: 100%;
+      margin-top: -1px;
+      background: var(--paper);
+      border: 1px solid var(--ink);
+      padding: 1rem;
+      min-width: 180px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
       z-index: 1000;
-      background: var(--menu-bg);
-      color: var(--menu-fg);
-      border: 1px solid var(--menu-divider);
-      border-radius: 16px;
-      min-width: 260px;
-      padding: .4rem;
-      box-shadow: 0 16px 48px rgba(0, 0, 0, .55)
     }
 
     .menu a {
-      display: block;
-      padding: .6rem .9rem;
-      border-radius: 10px;
-      color: inherit;
       text-decoration: none;
-      letter-spacing: .005em
-    }
-
-    .menu a+a {
-      border-top: 1px solid var(--menu-divider)
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 0.15em;
     }
 
     .menu a:hover {
-      background: color-mix(in oklch, var(--menu-bg) 82%, var(--menu-fg))
+      border-bottom-color: var(--ink);
     }
 
+    /* ── トンボ ─────────────────────── */
+    .trim {
+      position: fixed;
+      width: 14px;
+      height: 14px;
+      pointer-events: none;
+      z-index: 200;
+      opacity: 0.55;
+    }
+
+    .trim::before,
+    .trim::after {
+      content: "";
+      position: absolute;
+      background: var(--ink);
+    }
+
+    .trim::before {
+      width: 100%;
+      height: 1px;
+    }
+
+    .trim::after {
+      width: 1px;
+      height: 100%;
+    }
+
+    .trim.tl { top: 6px; left: 6px; }
+    .trim.tl::before { top: 0; left: 0; }
+    .trim.tl::after { top: 0; left: 0; }
+    .trim.tr { top: 6px; right: 6px; }
+    .trim.tr::before { top: 0; right: 0; }
+    .trim.tr::after { top: 0; right: 0; }
+    .trim.bl { bottom: 6px; left: 6px; }
+    .trim.bl::before { bottom: 0; left: 0; }
+    .trim.bl::after { bottom: 0; left: 0; }
+    .trim.br { bottom: 6px; right: 6px; }
+    .trim.br::before { bottom: 0; right: 0; }
+    .trim.br::after { bottom: 0; right: 0; }
+
+    /* ── 柱(欄外) ───────────────────── */
+    .pillar {
+      position: fixed;
+      top: 50%;
+      right: 8px;
+      transform: translateY(-50%);
+      writing-mode: vertical-rl;
+      font-family: var(--font-gothic);
+      font-size: 0.55rem;
+      letter-spacing: 0.5em;
+      color: var(--faint);
+      pointer-events: none;
+      z-index: 90;
+    }
+
+    /* ── 本文 ─────────────────────── */
     main {
+      position: relative;
       display: grid;
       place-items: center;
-      padding: clamp(24px, 6vw, 80px)
+      padding: clamp(24px, 6vw, 80px);
     }
 
     .copy {
+      position: relative;
+      z-index: 2;
       max-width: var(--maxw);
       font-size: var(--dynamic-font-size, clamp(26px, 6.8vw, 56px));
       line-height: 1.10;
@@ -155,16 +224,16 @@
       line-break: strict;
       hanging-punctuation: allow-end;
       touch-action: pan-y;
-      overscroll-behavior: contain
+      overscroll-behavior: contain;
     }
 
     .copy p {
-      margin: 0 0 .55em
+      margin: 0 0 .55em;
     }
 
     .copy.tight {
       line-height: 1.03;
-      letter-spacing: -0.055em
+      letter-spacing: -0.055em;
     }
 
     .copy .c {
@@ -201,11 +270,11 @@
 
     .copy .c.punct {
       margin-left: -0.03em;
-      margin-right: -0.03em
+      margin-right: -0.03em;
     }
 
     .copy .c.latin {
-      margin-right: -0.015em
+      margin-right: -0.015em;
     }
 
     .copy a {
@@ -224,13 +293,61 @@
     }
 
     .muted {
-      color: var(--muted)
+      color: var(--faint);
     }
 
-    footer {
-      padding: 24px;
-      color: var(--muted);
-      border-top: 1px solid color-mix(in oklch, var(--fg) 15%, var(--bg))
+    /* ── 欄外の図版(銅版) ────────────── */
+    .z-frag {
+      position: absolute;
+      pointer-events: none;
+      mix-blend-mode: multiply;
+      z-index: 1;
+    }
+
+    .z-frag img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .z-frag-etch {
+      right: clamp(-4rem, -2vw, 0rem);
+      bottom: -6rem;
+      width: clamp(180px, 24vw, 380px);
+      filter: grayscale(0.35) contrast(1.02);
+      opacity: 0.9;
+    }
+
+    .z-frag-dust {
+      left: -4rem;
+      top: -3rem;
+      width: clamp(240px, 34vw, 520px);
+      opacity: 0.32;
+    }
+
+    /* ── 紙の質感 ─────────────────── */
+    .noise-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.05;
+      mix-blend-mode: multiply;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9998;
+      background: radial-gradient(circle at 50% 45%, transparent 62%, rgba(26, 22, 15, 0.10) 100%);
     }
 
     @media (max-width:520px) {
@@ -246,39 +363,29 @@
         max-width: 100%;
         width: 100%;
         font-size: var(--dynamic-font-size, clamp(18px, 5.2vw, 26px));
-        filter: drop-shadow(0 0 8px oklch(0.9 0.1 260 / 0.3));
       }
 
+      .z-frag-etch {
+        width: 46vw;
+        right: -1.5rem;
+        bottom: -3rem;
+        opacity: 0.65;
+      }
+
+      .z-frag-dust {
+        width: 70vw;
+        left: -2rem;
+        top: -1.5rem;
+        opacity: 0.22;
+      }
+
+      .pillar {
+        display: none;
+      }
     }
 
-
-    .noise-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 9999;
-      opacity: 0.06;
-      mix-blend-mode: overlay;
-    }
-
-    body::after {
-      content: "";
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 9998;
-      background: radial-gradient(circle at 50% 50%, transparent 60%, rgba(0, 0, 0, 0.6) 100%);
-    }
-
-    html.wf-active {
-      --font-body: "Hina Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
-      --font-brand: var(--font-body)
+    html.wf-loading .copy {
+      visibility: hidden;
     }
   </style>
   <script type="application/ld+json">
@@ -286,7 +393,7 @@
     "@context":"https://schema.org",
     "@type":"Person",
     "name":"synomare",
-    "url":"https://your-domain.example/",
+    "url":"https://synomare.github.io/",
     "jobTitle":"Writer / Artist / Designer",
     "address":{"@type":"PostalAddress","addressLocality":"Tokyo","addressCountry":"JP"},
     "sameAs":["https://x.com/synomare","https://www.instagram.com/syno_mare/"]
@@ -301,22 +408,34 @@
 
 <body>
   <a class="sr-only" href="#content">Skip to Content</a>
+  <div class="trim tl" aria-hidden="true"></div>
+  <div class="trim tr" aria-hidden="true"></div>
+  <div class="trim bl" aria-hidden="true"></div>
+  <div class="trim br" aria-hidden="true"></div>
+  <div class="pillar" aria-hidden="true">第一葉 — 口上</div>
+
   <header>
-    <div class="brand">synomare</div>
+    <a href="./" class="brand">synomare</a>
     <details class="nav">
-      <summary><span id="menuLabel">Open Menu</span></summary>
+      <summary>MENU</summary>
       <nav class="menu" aria-label="site">
-        <a href="works.html">Works</a>
-        <a href="notes/">Notes / Blog</a>
-        <a href="links.html">Links</a>
-        <a href="profile.html">Profile</a>
-        <a href="about.html">About</a>
-        <a href="mailto:synomare@gmail.com">Contact</a>
+        <a href="works.html">WORKS</a>
+        <a href="notes/">NOTES</a>
+        <a href="links.html">LINKS</a>
+        <a href="profile.html">PROFILE</a>
+        <a href="about.html">ABOUT</a>
+        <a href="mailto:synomare@gmail.com">CONTACT</a>
       </nav>
     </details>
   </header>
+
   <main id="content">
     <h1 class="sr-only">synomare</h1>
+
+    <figure class="z-frag z-frag-dust" aria-hidden="true">
+      <img src="assets/images/bg-right.png" alt="" width="1009" height="1030" loading="lazy">
+    </figure>
+
     <div class="copy">
       <p>synomare テクスト。デザイン。グラフィック。<br><br>
         synomare テクスト<span class="muted">を書いて、</span>デザイン<span class="muted">して、</span>グラフィック<span
@@ -340,24 +459,44 @@
         名前、えっと、なんだっけ。忘れちゃった。あ、でも、えっと、たしかテクストって書いてたらしいんです。うん。あとデザインもやったことがあったのかな。えーっと、うん、それと、うん。いや、えーグラフィックを作ることがあったって聞いたことがありました。うん。そっか、そうですよね。うん。なんだったっけ、あ、そうだ!
         たしかsynomareっていう名前でした。そうでしたよね？いやきっとそうだったはずです。あなたが覚えていてくれたんですよね。ありがとう。じゃあ、またね!<br><br>
       </p>
-
-      <div class="noise-overlay"></div>
     </div>
+
+    <figure class="z-frag z-frag-etch" aria-hidden="true">
+      <img src="assets/images/collage-12.jpg" alt="" width="724" height="1024" loading="lazy">
+    </figure>
+
+    <div class="noise-overlay"></div>
   </main>
 
   <footer>
+    <small>synomare 版 — 口上 / p.01</small>
     <small>© <span id="year"></span> synomare — all rights reserved.</small>
   </footer>
   <script>
     (function () {
       var y = document.getElementById('year');
       if (y) y.textContent = new Date().getFullYear();
-      var d = document.querySelector('details.nav');
-      var label = document.getElementById('menuLabel');
-      var set = function () { if (d && label) label.textContent = d.open ? 'Close Menu' : 'Open Menu' };
-      if (d && label) { set(); d.addEventListener('toggle', set) }
       var theme = document.querySelector('meta[name="theme-color"]');
-      if (theme) { var bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim(); theme.setAttribute('content', bg) }
+      if (theme) { var bg = getComputedStyle(document.documentElement).getPropertyValue('--paper').trim(); theme.setAttribute('content', bg) }
+    })();
+  </script>
+  <script>
+    (function () {
+      var overlay = document.querySelector('.noise-overlay');
+      if (!overlay) return;
+      var canvas = document.createElement('canvas');
+      canvas.width = 128;
+      canvas.height = 128;
+      var ctx = canvas.getContext('2d');
+      var idata = ctx.createImageData(128, 128);
+      var buffer32 = new Uint32Array(idata.data.buffer);
+      var len = buffer32.length;
+      for (var i = 0; i < len; i++) {
+        if (Math.random() < 0.5) buffer32[i] = 0xff000000;
+      }
+      ctx.putImageData(idata, 0, 0);
+      overlay.style.backgroundImage = 'url(' + canvas.toDataURL() + ')';
+      overlay.style.backgroundRepeat = 'repeat';
     })();
   </script>
   <script>
@@ -811,26 +950,6 @@
 
       measure();
       setTimeout(scheduleMeasure, 400);
-    })();
-  </script>
-
-  <script>
-    (function () {
-      var canvas = document.createElement('canvas');
-      canvas.width = 128;
-      canvas.height = 128;
-      var ctx = canvas.getContext('2d');
-      var idata = ctx.createImageData(128, 128);
-      var buffer32 = new Uint32Array(idata.data.buffer);
-      var len = buffer32.length;
-      for (var i = 0; i < len; i++) {
-        if (Math.random() < 0.5) buffer32[i] = 0xff000000;
-      }
-      ctx.putImageData(idata, 0, 0);
-      var url = canvas.toDataURL();
-      var style = document.createElement('style');
-      style.textContent = '.noise-overlay { background-image: url(' + url + '); }';
-      document.head.appendChild(style);
     })();
   </script>
 </body>

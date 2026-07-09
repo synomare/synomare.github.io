@@ -9,17 +9,18 @@
   <meta property="og:title" content="Profile — synomare">
   <meta property="og:description" content="synomare のプロフィール。テクスト、デザイン、グラフィック。">
   <meta property="og:type" content="website">
-  <meta name="theme-color" content="#0a0a0a">
+  <meta name="theme-color" content="#f2efe8">
   <link rel="preconnect" href="https://use.typekit.net" crossorigin>
   <style>
     :root {
-      --bg: #0a0a0a;
-      --fg: #e5e5e5;
-      --muted: #444;
-      --line: #222;
-      --accent: #fff;
+      --paper: #f2efe8;
+      --ink: #1a160f;
+      --faint: #8d8577;
+      --rule: #cfc8b8;
+      --seal: #a33b24;
       --font-mincho: "Hina Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
       --font-gothic: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+      --font-latin: "Times New Roman", Times, Georgia, serif;
       font-size: clamp(16px, 1.6vw, 32px);
     }
 
@@ -30,8 +31,8 @@
 
     body {
       margin: 0;
-      background: var(--bg);
-      color: var(--fg);
+      background: var(--paper);
+      color: var(--ink);
       font-family: var(--font-mincho);
       -webkit-font-smoothing: antialiased;
       display: grid;
@@ -42,40 +43,46 @@
     a {
       color: inherit;
       text-decoration: none;
-      border-bottom: 1px solid var(--muted);
+      border-bottom: 1px solid var(--faint);
     }
 
     a:hover {
-      border-bottom-color: var(--accent);
-      background: rgba(255, 255, 255, 0.1);
+      border-bottom-color: var(--ink);
+      background: rgba(26, 22, 15, 0.06);
     }
 
-    /* Header & Footer */
+    /* ── 紙面クローム ───────────────────── */
     header,
     footer {
       padding: 0.8rem 1rem;
-      border-color: var(--line);
       font-family: var(--font-gothic);
-      font-size: 0.65rem;
-      letter-spacing: 0.1em;
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      background: var(--paper);
       z-index: 100;
-      background: var(--bg);
     }
 
     header {
       display: flex;
       justify-content: space-between;
-      border-bottom: 1px solid var(--line);
+      align-items: center;
+      border-bottom: 1px solid var(--rule);
       position: sticky;
       top: 0;
     }
 
-    footer {
-      border-top: 1px solid var(--line);
-      text-align: right;
+    header .brand {
+      border: none;
+      letter-spacing: 0.18em;
     }
 
-    /* Navigation */
+    footer {
+      border-top: 1px solid var(--rule);
+      display: flex;
+      justify-content: space-between;
+      color: var(--faint);
+    }
+
     details.nav {
       position: relative;
     }
@@ -83,10 +90,16 @@
     details.nav>summary {
       list-style: none;
       cursor: pointer;
-      border: 1px solid var(--line);
+      user-select: none;
+      border: 1px solid var(--rule);
       padding: 0.2em 0.8em;
-      border-radius: 0;
       text-transform: uppercase;
+    }
+
+    details.nav[open]>summary {
+      background: var(--ink);
+      color: var(--paper);
+      border-color: var(--ink);
     }
 
     details.nav>summary::-webkit-details-marker {
@@ -98,8 +111,8 @@
       right: 0;
       top: 100%;
       margin-top: -1px;
-      background: var(--bg);
-      border: 1px solid var(--line);
+      background: var(--paper);
+      border: 1px solid var(--ink);
       padding: 1rem;
       min-width: 180px;
       display: flex;
@@ -108,7 +121,59 @@
       z-index: 1000;
     }
 
-    /* Main */
+    .menu a {
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 0.15em;
+    }
+
+    .menu a:hover {
+      border-bottom-color: var(--ink);
+      background: none;
+    }
+
+    /* ── トンボ・柱 ───────────────────── */
+    .trim {
+      position: fixed;
+      width: 14px;
+      height: 14px;
+      pointer-events: none;
+      z-index: 200;
+      opacity: 0.55;
+    }
+
+    .trim::before,
+    .trim::after {
+      content: "";
+      position: absolute;
+      background: var(--ink);
+    }
+
+    .trim::before { width: 100%; height: 1px; }
+    .trim::after { width: 1px; height: 100%; }
+    .trim.tl { top: 6px; left: 6px; }
+    .trim.tl::before, .trim.tl::after { top: 0; left: 0; }
+    .trim.tr { top: 6px; right: 6px; }
+    .trim.tr::before, .trim.tr::after { top: 0; right: 0; }
+    .trim.bl { bottom: 6px; left: 6px; }
+    .trim.bl::before, .trim.bl::after { bottom: 0; left: 0; }
+    .trim.br { bottom: 6px; right: 6px; }
+    .trim.br::before, .trim.br::after { bottom: 0; right: 0; }
+
+    .pillar {
+      position: fixed;
+      top: 50%;
+      right: 8px;
+      transform: translateY(-50%);
+      writing-mode: vertical-rl;
+      font-family: var(--font-gothic);
+      font-size: 0.55rem;
+      letter-spacing: 0.5em;
+      color: var(--faint);
+      pointer-events: none;
+      z-index: 90;
+    }
+
+    /* ── 本文 ─────────────────────── */
     main {
       position: relative;
       width: 100%;
@@ -127,64 +192,125 @@
       font-size: 0.6rem;
       letter-spacing: 0.35em;
       text-transform: uppercase;
-      color: var(--muted);
+      color: var(--faint);
     }
 
     .display {
-      margin: 0 0 2.5rem;
+      margin: 0 0 2.2rem;
       font-weight: 400;
+      font-family: var(--font-latin);
       font-size: clamp(3.2rem, 16vw, 12rem);
-      letter-spacing: -0.06em;
+      letter-spacing: -0.05em;
       line-height: 0.85;
       word-break: break-word;
+      filter: url(#etch);
     }
 
     .bio {
       max-width: 34em;
-      margin: 0 0 3rem;
+      margin: 0 0 2.6rem;
       font-size: clamp(0.95rem, 1.4vw, 1.1rem);
       line-height: 2.1;
       letter-spacing: 0.02em;
     }
 
     .bio .muted {
-      color: var(--muted);
+      color: var(--faint);
     }
 
-    /* Channels */
-    .channels {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1.5rem 2.5rem;
-      padding-top: 1.4rem;
-      border-top: 1px solid var(--line);
+    /* ── 奥付 ─────────────────────── */
+    .colophon {
+      border: 1px solid var(--ink);
+      padding: 1.4rem 1.6rem;
+      max-width: 34em;
+      position: relative;
+    }
+
+    .colophon .c-label {
+      position: absolute;
+      top: -0.55em;
+      left: 1.2rem;
+      background: var(--paper);
+      padding: 0 0.6em;
+      font-size: 0.75rem;
+      letter-spacing: 0.5em;
+    }
+
+    .colophon dl {
+      margin: 0;
+      display: grid;
+      grid-template-columns: 7em 1fr;
+      gap: 0.55rem 1.2rem;
+      align-items: baseline;
+    }
+
+    .colophon dt {
       font-family: var(--font-gothic);
-      font-size: 0.6rem;
+      font-size: 0.55rem;
       letter-spacing: 0.25em;
       text-transform: uppercase;
+      color: var(--faint);
     }
 
-    .channels a {
-      border-bottom: 1px solid var(--muted);
-      padding-bottom: 0.15em;
+    .colophon dd {
+      margin: 0;
+      font-size: 0.8rem;
+      letter-spacing: 0.02em;
     }
 
-    /* Vertical margin text */
+    .colophon dd a + a {
+      margin-left: 1.2em;
+    }
+
+    .colophon .c-seal {
+      position: absolute;
+      right: 1.2rem;
+      bottom: 1.2rem;
+      width: 2.2em;
+      height: 2.2em;
+      border: 1.5px solid var(--seal);
+      color: var(--seal);
+      display: grid;
+      place-items: center;
+      font-size: 0.8rem;
+      transform: rotate(-3deg);
+      opacity: 0.85;
+    }
+
+    /* ── 欄外 ─────────────────────── */
     .z-vert {
       position: absolute;
       top: 4rem;
-      right: 0.6rem;
+      right: 1.6rem;
       writing-mode: vertical-rl;
       text-orientation: mixed;
       font-size: 0.65rem;
       line-height: 2.2;
       white-space: pre;
-      color: var(--muted);
-      opacity: 0.6;
+      color: var(--faint);
+      opacity: 0.7;
       pointer-events: none;
     }
 
-    /* Noise Overlay */
+    .z-frag {
+      position: absolute;
+      right: clamp(-3rem, -1vw, 0rem);
+      top: 3.5rem;
+      width: clamp(180px, 22vw, 340px);
+      mix-blend-mode: multiply;
+      filter: grayscale(0.35) contrast(1.02);
+      opacity: 0.85;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .z-frag img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* ── 紙の質感 ─────────────── */
     .noise-overlay {
       position: fixed;
       top: 0;
@@ -193,8 +319,8 @@
       height: 100%;
       pointer-events: none;
       z-index: 9999;
-      opacity: 0.04;
-      mix-blend-mode: overlay;
+      opacity: 0.05;
+      mix-blend-mode: multiply;
     }
 
     body::after {
@@ -206,10 +332,10 @@
       height: 100%;
       pointer-events: none;
       z-index: 9998;
-      background: radial-gradient(circle at 50% 50%, transparent 60%, rgba(0, 0, 0, 0.5) 100%);
+      background: radial-gradient(circle at 50% 45%, transparent 62%, rgba(26, 22, 15, 0.10) 100%);
     }
 
-    /* Responsive */
+    /* ── レスポンシブ ─────────────── */
     @media (max-width: 900px) {
       main {
         padding: 1.5rem;
@@ -220,12 +346,25 @@
         margin-bottom: 2rem;
       }
 
-      .channels {
-        gap: 1rem 1.5rem;
+      .colophon dl {
+        grid-template-columns: 1fr;
+        gap: 0.2rem 0;
       }
 
-      .z-vert {
+      .colophon dt {
+        margin-top: 0.6rem;
+      }
+
+      .z-vert,
+      .pillar {
         display: none;
+      }
+
+      .z-frag {
+        width: 44vw;
+        right: -1.5rem;
+        top: 2rem;
+        opacity: 0.5;
       }
     }
 
@@ -247,8 +386,21 @@
 </head>
 
 <body>
+  <svg width="0" height="0" aria-hidden="true" style="position:absolute">
+    <filter id="etch" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012 0.02" numOctaves="2" seed="11" result="n" />
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="7" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+  </svg>
+
+  <div class="trim tl" aria-hidden="true"></div>
+  <div class="trim tr" aria-hidden="true"></div>
+  <div class="trim bl" aria-hidden="true"></div>
+  <div class="trim br" aria-hidden="true"></div>
+  <div class="pillar" aria-hidden="true">終葉 — 奥付</div>
+
   <header>
-    <a href="./" class="brand" style="border:none">synomare</a>
+    <a href="./" class="brand">synomare</a>
     <details class="nav">
       <summary>MENU</summary>
       <nav class="menu" aria-label="site">
@@ -264,19 +416,37 @@
   </header>
 
   <main>
-    <p class="kicker">Profile — プロフィール</p>
+    <figure class="z-frag" aria-hidden="true">
+      <img src="assets/images/collage-12.jpg" alt="" width="724" height="1024" loading="lazy">
+    </figure>
+
+    <p class="kicker">Profile — 奥付 / Colophon</p>
     <h1 class="display">synomare</h1>
 
     <div class="bio">
       <p>synomare<span class="muted">っていいます。</span>テクスト<span class="muted">を書いて、</span>デザイン<span class="muted">をして、</span>グラフィック<span class="muted">をつくります。</span>演劇の演出<span class="muted">をすることもあります。</span></p>
     </div>
 
-    <nav class="channels" aria-label="links">
-      <a href="https://x.com/synomare" target="_blank" rel="noopener">X / Twitter</a>
-      <a href="https://www.instagram.com/syno_mare/?utm_source=qr" target="_blank" rel="noopener">Instagram</a>
-      <a href="https://note.com/synomare" target="_blank" rel="noopener">Note / 日記</a>
-      <a href="mailto:synomare@gmail.com">Email</a>
-    </nav>
+    <section class="colophon" aria-label="奥付">
+      <span class="c-label">奥付</span>
+      <dl>
+        <dt>名称</dt>
+        <dd>synomare（しのまれ）</dd>
+        <dt>業務</dt>
+        <dd>テクスト・デザイン・グラフィック・演出</dd>
+        <dt>記録</dt>
+        <dd>
+          <a href="https://x.com/synomare" target="_blank" rel="noopener">X / Twitter</a>
+          <a href="https://www.instagram.com/syno_mare/?utm_source=qr" target="_blank" rel="noopener">Instagram</a>
+          <a href="https://note.com/synomare" target="_blank" rel="noopener">note / 日記</a>
+        </dd>
+        <dt>連絡</dt>
+        <dd><a href="mailto:synomare@gmail.com">synomare@gmail.com</a></dd>
+        <dt>印刷</dt>
+        <dd>本頁は、閲覧のたびにあなたのブラウザで刷られています。</dd>
+      </dl>
+      <span class="c-seal" aria-hidden="true">印</span>
+    </section>
 
     <aside class="z-vert" aria-hidden="true">名前、えっと、なんだっけ。
 たしかsynomareっていう名前でした。
@@ -286,6 +456,7 @@
   </main>
 
   <footer>
+    <small>synomare 版 — 奥付</small>
     <small>&copy; <span id="year"></span> synomare. All rights reserved.</small>
   </footer>
 
@@ -294,7 +465,7 @@
       var y = document.getElementById('year');
       if (y) y.textContent = new Date().getFullYear();
       var theme = document.querySelector('meta[name="theme-color"]');
-      if (theme) { var bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim(); theme.setAttribute('content', bg) }
+      if (theme) { var bg = getComputedStyle(document.documentElement).getPropertyValue('--paper').trim(); theme.setAttribute('content', bg) }
     })();
   </script>
   <script>
