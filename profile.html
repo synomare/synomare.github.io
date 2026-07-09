@@ -4,10 +4,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Works — synomare</title>
-  <meta name="description" content="synomare 作品目録。テクスト、演劇、グラフィック。">
-  <meta property="og:title" content="Works — synomare">
-  <meta property="og:description" content="synomare 作品目録。テクスト、演劇、グラフィック。">
+  <title>Profile — synomare</title>
+  <meta name="description" content="synomare のプロフィール。テクスト、デザイン、グラフィック。">
+  <meta property="og:title" content="Profile — synomare">
+  <meta property="og:description" content="synomare のプロフィール。テクスト、デザイン、グラフィック。">
   <meta property="og:type" content="website">
   <meta name="theme-color" content="#0a0a0a">
   <link rel="preconnect" href="https://use.typekit.net" crossorigin>
@@ -115,11 +115,10 @@
       max-width: 100%;
       padding: 2rem;
       box-sizing: border-box;
-    }
-
-    /* Display head */
-    .z-head {
-      padding: 3rem 0 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      min-height: calc(100svh - 6rem);
     }
 
     .kicker {
@@ -132,101 +131,48 @@
     }
 
     .display {
-      margin: 0;
+      margin: 0 0 2.5rem;
       font-weight: 400;
-      font-size: clamp(3.5rem, 17vw, 13rem);
+      font-size: clamp(3.2rem, 16vw, 12rem);
       letter-spacing: -0.06em;
       line-height: 0.85;
+      word-break: break-word;
     }
 
-    .display .jp {
-      display: inline-block;
-      margin-left: 0.25em;
-      font-size: 0.22em;
-      letter-spacing: 0.4em;
+    .bio {
+      max-width: 34em;
+      margin: 0 0 3rem;
+      font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+      line-height: 2.1;
+      letter-spacing: 0.02em;
+    }
+
+    .bio .muted {
       color: var(--muted);
-      vertical-align: baseline;
     }
 
-    /* Works index */
-    .z-index {
+    /* Channels */
+    .channels {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem 2.5rem;
+      padding-top: 1.4rem;
       border-top: 1px solid var(--line);
-      margin-right: clamp(0rem, 8vw, 6rem);
-    }
-
-    .work-row {
-      display: grid;
-      grid-template-columns: 6ch 1fr auto;
-      align-items: baseline;
-      gap: 0 2rem;
-      padding: 1.6rem 0.4rem;
-      border: none;
-      border-bottom: 1px solid var(--line);
-      transition: background 0.25s ease;
-    }
-
-    a.work-row:hover {
-      background: rgba(255, 255, 255, 0.06);
-      border-bottom-color: var(--line);
-    }
-
-    a.work-row:hover .w-title {
-      border-bottom: 1px solid var(--accent);
-    }
-
-    .w-year {
-      font-family: var(--font-gothic);
-      font-size: 0.65rem;
-      letter-spacing: 0.15em;
-      color: var(--muted);
-    }
-
-    .w-title {
-      font-size: clamp(1.3rem, 3.4vw, 2.4rem);
-      letter-spacing: -0.04em;
-      line-height: 1.1;
-    }
-
-    .w-desc {
-      display: block;
-      margin-top: 0.5rem;
-      font-size: 0.7rem;
-      line-height: 1.7;
-      color: var(--muted);
-      max-width: 42em;
-    }
-
-    .w-type {
-      font-family: var(--font-gothic);
-      font-size: 0.55rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--muted);
-      border: 1px solid var(--line);
-      padding: 0.25em 0.8em;
-      white-space: nowrap;
-      justify-self: end;
-    }
-
-    /* Trailing note */
-    .z-more {
-      margin: 3rem 0 1rem;
       font-family: var(--font-gothic);
       font-size: 0.6rem;
-      letter-spacing: 0.2em;
+      letter-spacing: 0.25em;
       text-transform: uppercase;
-      color: var(--muted);
     }
 
-    .z-more a {
+    .channels a {
       border-bottom: 1px solid var(--muted);
-      padding-bottom: 0.1em;
+      padding-bottom: 0.15em;
     }
 
     /* Vertical margin text */
     .z-vert {
       position: absolute;
-      top: 6rem;
+      top: 4rem;
       right: 0.6rem;
       writing-mode: vertical-rl;
       text-orientation: mixed;
@@ -267,24 +213,15 @@
     @media (max-width: 900px) {
       main {
         padding: 1.5rem;
+        min-height: calc(100svh - 5rem);
       }
 
-      .z-head {
-        padding: 2rem 0 1.5rem;
+      .bio {
+        margin-bottom: 2rem;
       }
 
-      .z-index {
-        margin-right: 0;
-      }
-
-      .work-row {
-        grid-template-columns: 1fr;
-        gap: 0.5rem;
-        padding: 1.3rem 0.2rem;
-      }
-
-      .w-type {
-        justify-self: start;
+      .channels {
+        gap: 1rem 1.5rem;
       }
 
       .z-vert {
@@ -327,39 +264,23 @@
   </header>
 
   <main>
-    <section class="z-head">
-      <p class="kicker">Index of Works — 作品目録</p>
-      <h1 class="display">WORKS<span class="jp">作品</span></h1>
-    </section>
+    <p class="kicker">Profile — プロフィール</p>
+    <h1 class="display">synomare</h1>
 
-    <section class="z-index" aria-label="作品一覧">
-      <a class="work-row" href="yugun/index.html">
-        <span class="w-year">2025</span>
-        <span class="w-main">
-          <span class="w-title">嶼群（博物館（たち））</span>
-          <span class="w-desc">博物館を舞台にした、土地と記憶をめぐる戯曲。テキスト全文、座談会、対談を収録。</span>
-        </span>
-        <span class="w-type">演劇 / Theatre</span>
-      </a>
+    <div class="bio">
+      <p>synomare<span class="muted">っていいます。</span>テクスト<span class="muted">を書いて、</span>デザイン<span class="muted">をして、</span>グラフィック<span class="muted">をつくります。</span>演劇の演出<span class="muted">をすることもあります。</span></p>
+    </div>
 
-      <!-- 作品を追加するときは、下の行をコピーして書き換えてください。
-           リンク先のない作品（記録のみ）は <a> を <div> に変えれば同じ見た目で置けます。
-      <a class="work-row" href="作品ページのパス or 外部URL">
-        <span class="w-year">20XX</span>
-        <span class="w-main">
-          <span class="w-title">作品タイトル</span>
-          <span class="w-desc">一行の説明。媒体・会場・共作者など。</span>
-        </span>
-        <span class="w-type">テクスト / Text</span>
-      </a>
-      -->
-    </section>
+    <nav class="channels" aria-label="links">
+      <a href="https://x.com/synomare" target="_blank" rel="noopener">X / Twitter</a>
+      <a href="https://www.instagram.com/syno_mare/?utm_source=qr" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://note.com/synomare" target="_blank" rel="noopener">Note / 日記</a>
+      <a href="mailto:synomare@gmail.com">Email</a>
+    </nav>
 
-    <p class="z-more">その他の制作物 — <a href="https://www.instagram.com/syno_mare/?utm_source=qr" target="_blank" rel="noopener">Instagram</a></p>
-
-    <aside class="z-vert" aria-hidden="true">つくったものは、つくられたあとも
-すこしずつ、べつのものになっていく。
-目録はそのたびに書き直される。</aside>
+    <aside class="z-vert" aria-hidden="true">名前、えっと、なんだっけ。
+たしかsynomareっていう名前でした。
+あなたが覚えていてくれたんですよね。</aside>
 
     <div class="noise-overlay"></div>
   </main>
