@@ -9,18 +9,20 @@
   <meta property="og:title" content="Links — synomare">
   <meta property="og:description" content="synomare の相互リンク・交遊録。">
   <meta property="og:type" content="website">
-  <meta name="theme-color" content="#f2efe8">
-  <link rel="preconnect" href="https://use.typekit.net" crossorigin>
+  <meta name="theme-color" content="#edeae3">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Shippori+Mincho+B1:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --paper: #f2efe8;
-      --ink: #1a160f;
-      --faint: #8d8577;
-      --rule: #cfc8b8;
+      --paper: #edeae3;
+      --ink: #141210;
+      --faint: #97907f;
+      --rule: #d6d0c2;
       --seal: #a33b24;
-      --font-mincho: "Hina Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+      --font-mincho: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", serif;
       --font-gothic: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
-      --font-latin: "Times New Roman", Times, Georgia, serif;
+      --font-latin: "Cormorant Garamond", "Times New Roman", serif;
       font-size: clamp(16px, 1.6vw, 32px);
     }
 
@@ -48,7 +50,7 @@
 
     a:hover {
       border-bottom-color: var(--ink);
-      background: rgba(26, 22, 15, 0.06);
+      background: rgba(20, 18, 16, 0.06);
     }
 
     /* ── 紙面クローム ───────────────────── */
@@ -73,7 +75,11 @@
 
     header .brand {
       border: none;
-      letter-spacing: 0.18em;
+      text-transform: lowercase;
+      font-family: var(--font-latin);
+      font-style: italic;
+      font-size: 1.05rem;
+      letter-spacing: 0.06em;
     }
 
     footer {
@@ -197,10 +203,11 @@
 
     .display {
       margin: 0;
-      font-weight: 400;
+      font-weight: 300;
+      font-style: italic;
       font-family: var(--font-latin);
       font-size: clamp(3rem, 14vw, 10rem);
-      letter-spacing: -0.05em;
+      letter-spacing: -0.03em;
       line-height: 0.85;
       filter: url(#etch);
     }
@@ -233,7 +240,7 @@
     }
 
     a.link-row:hover {
-      background: rgba(26, 22, 15, 0.05);
+      background: rgba(20, 18, 16, 0.05);
       border-bottom-color: var(--rule);
     }
 
@@ -286,7 +293,7 @@
       height: 100%;
       pointer-events: none;
       z-index: 9998;
-      background: radial-gradient(circle at 50% 45%, transparent 62%, rgba(26, 22, 15, 0.10) 100%);
+      background: radial-gradient(circle at 50% 45%, transparent 62%, rgba(20, 18, 16, 0.10) 100%);
     }
 
     @media (max-width: 900px) {
@@ -315,22 +322,7 @@
         display: none;
       }
     }
-
-    html.wf-loading body {
-      opacity: 0;
-    }
-
-    html.wf-active body,
-    html.wf-inactive body {
-      opacity: 1;
-      transition: opacity 0.5s;
-    }
   </style>
-  <script>
-    (function (d) {
-      var config = { kitId: 'ifg4slm', scriptTimeout: 3000, async: true }, h = d.documentElement, t = setTimeout(function () { h.className = h.className.replace(/\bwf-loading\b/g, "") + " wf-inactive"; }, config.scriptTimeout), tk = d.createElement("script"), f = false, s = d.getElementsByTagName("script")[0], a; h.className += " wf-loading"; tk.src = 'https://use.typekit.net/' + config.kitId + '.js'; tk.async = true; tk.onload = tk.onreadystatechange = function () { a = this.readyState; if (f || a && a != "complete" && a != "loaded") return; f = true; clearTimeout(t); try { Typekit.load(config) } catch (e) { } }; s.parentNode.insertBefore(tk, s)
-    })(document);
-  </script>
 </head>
 
 <body>
@@ -340,12 +332,6 @@
       <feDisplacementMap in="SourceGraphic" in2="n" scale="7" xChannelSelector="R" yChannelSelector="G" />
     </filter>
   </svg>
-
-  <div class="trim tl" aria-hidden="true"></div>
-  <div class="trim tr" aria-hidden="true"></div>
-  <div class="trim bl" aria-hidden="true"></div>
-  <div class="trim br" aria-hidden="true"></div>
-  <div class="pillar" aria-hidden="true">附録 — 交遊録</div>
 
   <header>
     <a href="./" class="brand">synomare</a>
@@ -366,7 +352,7 @@
   <main id="content">
     <section class="z-head">
       <p class="kicker">Appendix — 附録 / 交遊録</p>
-      <h1 class="display">LINKS<span class="jp">交遊録</span></h1>
+      <h1 class="display">Links<span class="jp">交遊録</span></h1>
     </section>
 
     <section class="z-register" aria-label="相互リンク">

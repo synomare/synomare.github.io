@@ -8,28 +8,30 @@
   <meta property="og:title" content="Notes — synomare">
   <meta property="og:description" content="synomare の雑記・断章。">
   <meta property="og:type" content="website">
-  <meta name="theme-color" content="#f2efe8">
-  <link rel="preconnect" href="https://use.typekit.net" crossorigin>
+  <meta name="theme-color" content="#edeae3">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Shippori+Mincho+B1:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root{
-      --paper: #f2efe8;
-      --ink: #1a160f;
-      --faint: #8d8577;
-      --rule: #cfc8b8;
+      --paper: #edeae3;
+      --ink: #141210;
+      --faint: #97907f;
+      --rule: #d6d0c2;
       --seal: #a33b24;
       --maxw: 75ch;
-      --font-mincho: "Hina Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+      --font-mincho: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", serif;
       --font-gothic: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
-      --font-latin: "Times New Roman", Times, Georgia, serif;
+      --font-latin: "Cormorant Garamond", "Times New Roman", serif;
     }
     html,body{height:100%}
     body{margin:0; background:var(--paper); color:var(--ink); font:400 16px/1.7 var(--font-mincho); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; display:grid; grid-template-rows:auto 1fr auto; min-height:100svh}
     a{color:inherit; text-decoration:none; border-bottom:1px solid var(--faint)}
-    a:hover{border-bottom-color:var(--ink); background:rgba(26,22,15,0.06)}
+    a:hover{border-bottom-color:var(--ink); background:rgba(20,18,16,0.06)}
     .sr-only{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0}
     header,footer{padding:.8rem 1rem; font-family:var(--font-gothic); font-size:.62rem; letter-spacing:.14em; background:var(--paper); z-index:100}
     header{display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--rule); position:sticky; top:0}
-    header .brand{border:none; letter-spacing:.18em}
+    header .brand{border:none; text-transform:lowercase; font-family:var(--font-latin); font-style:italic; font-size:1.05rem; letter-spacing:.06em}
     footer{border-top:1px solid var(--rule); display:flex; justify-content:space-between; color:var(--faint)}
     details.nav{position:relative}
     details.nav>summary{list-style:none; cursor:pointer; user-select:none; border:1px solid var(--rule); padding:.2em .8em; text-transform:uppercase}
@@ -50,13 +52,13 @@
     main{padding:clamp(24px,6vw,80px)}
     .wrap{max-width:var(--maxw); margin:0 auto}
     .kicker{margin:0 0 1rem; font-family:var(--font-gothic); font-size:.6rem; letter-spacing:.35em; text-transform:uppercase; color:var(--faint)}
-    h1{font-weight:400; font-family:var(--font-latin); font-size:clamp(2.2rem,8vw,4.5rem); letter-spacing:-.04em; line-height:.9; margin:0 0 .8rem}
+    h1{font-weight:300; font-style:italic; font-family:var(--font-latin); font-size:clamp(2.6rem,9vw,5rem); letter-spacing:-.03em; line-height:.9; margin:0 0 .8rem}
     h1 .jp{display:inline-block; margin-left:.25em; font-family:var(--font-mincho); font-size:.3em; letter-spacing:.4em; color:var(--faint)}
     .lead{margin:0 0 1.8rem; font-size:clamp(15px,1.9vw,17px); color:var(--faint)}
     .post-list{list-style:none; margin:0; padding:0; border-top:1px solid var(--ink)}
     .post-list li{margin:0; padding:clamp(14px,2.2vw,20px) 0; border-bottom:1px solid var(--rule); display:flex; flex-direction:column; gap:.35rem}
     .post-list a{display:block; color:inherit; border:none}
-    .post-list a:hover{background:rgba(26,22,15,0.05)}
+    .post-list a:hover{background:rgba(20,18,16,0.05)}
     .post-list a:hover strong{border-bottom:1px solid var(--ink)}
     .post-list strong{display:inline; font-weight:400; font-size:clamp(20px,2.6vw,28px); letter-spacing:-.02em}
     .post-list time{color:var(--faint); font-family:var(--font-gothic); font-size:.75rem; letter-spacing:.15em}
@@ -64,24 +66,12 @@
     .post-meta{display:block; font-size:.85rem}
     nav.breadcrumb{margin-bottom:1.4rem; font-family:var(--font-gothic); font-size:.62rem; letter-spacing:.14em; color:var(--faint)}
     .noise-overlay{position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:9999; opacity:.05; mix-blend-mode:multiply}
-    body::after{content:""; position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:9998; background:radial-gradient(circle at 50% 45%, transparent 62%, rgba(26,22,15,0.10) 100%)}
+    body::after{content:""; position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:9998; background:radial-gradient(circle at 50% 45%, transparent 62%, rgba(20,18,16,0.10) 100%)}
     @media (max-width:520px){body{font-size:15px} .pillar{display:none}}
-    html.wf-loading body{opacity:0}
-    html.wf-active body, html.wf-inactive body{opacity:1; transition:opacity .5s}
   </style>
-  <script>
-  (function(d){
-    var config={kitId:'ifg4slm',scriptTimeout:3000,async:true},h=d.documentElement,t=setTimeout(function(){h.className=h.className.replace(/\bwf-loading\b/g,"")+" wf-inactive";},config.scriptTimeout),tk=d.createElement("script"),f=false,s=d.getElementsByTagName("script")[0],a;h.className+=" wf-loading";tk.src='https://use.typekit.net/'+config.kitId+'.js';tk.async=true;tk.onload=tk.onreadystatechange=function(){a=this.readyState;if(f||a&&a!="complete"&&a!="loaded")return;f=true;clearTimeout(t);try{Typekit.load(config)}catch(e){}};s.parentNode.insertBefore(tk,s)
-  })(document);
-  </script>
 </head>
 <body>
   <a class="sr-only" href="#main">Skip to Content</a>
-  <div class="trim tl" aria-hidden="true"></div>
-  <div class="trim tr" aria-hidden="true"></div>
-  <div class="trim bl" aria-hidden="true"></div>
-  <div class="trim br" aria-hidden="true"></div>
-  <div class="pillar" aria-hidden="true">雑記 — 断章</div>
   <header>
     <a href="../" class="brand">synomare</a>
     <details class="nav">
@@ -100,7 +90,7 @@
     <div class="wrap">
       <nav class="breadcrumb"><a href="../">HOME</a> / <strong>NOTES</strong></nav>
       <p class="kicker">Notes — 雑記 / 断章</p>
-      <h1>NOTES<span class="jp">雑記</span></h1>
+      <h1>Notes<span class="jp">雑記</span></h1>
       <p class="lead">書いたものやメモをここにまとめています。新しい記事から順に並びます。</p>
       <ul class="post-list" id="postList" aria-live="polite"></ul>
     </div>

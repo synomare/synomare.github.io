@@ -9,19 +9,21 @@
   <meta property="og:title" content="Profile — synomare">
   <meta property="og:description" content="synomare のプロフィール。テクスト、デザイン、グラフィック。">
   <meta property="og:type" content="website">
-  <meta name="theme-color" content="#f2efe8">
-  <link rel="preconnect" href="https://use.typekit.net" crossorigin>
+  <meta name="theme-color" content="#edeae3">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Shippori+Mincho+B1:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --paper: #f2efe8;
-      --ink: #1a160f;
-      --faint: #8d8577;
-      --rule: #cfc8b8;
+      --paper: #edeae3;
+      --ink: #141210;
+      --faint: #97907f;
+      --rule: #d6d0c2;
       --seal: #a33b24;
-      --font-mincho: "Hina Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+      --font-jp: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", serif;
+      --font-latin: "Cormorant Garamond", "Times New Roman", serif;
       --font-gothic: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
-      --font-latin: "Times New Roman", Times, Georgia, serif;
-      font-size: clamp(16px, 1.6vw, 32px);
+      font-size: clamp(16px, 1.5vw, 30px);
     }
 
     html,
@@ -33,7 +35,7 @@
       margin: 0;
       background: var(--paper);
       color: var(--ink);
-      font-family: var(--font-mincho);
+      font-family: var(--font-jp);
       -webkit-font-smoothing: antialiased;
       display: grid;
       grid-template-rows: auto 1fr auto;
@@ -48,17 +50,16 @@
 
     a:hover {
       border-bottom-color: var(--ink);
-      background: rgba(26, 22, 15, 0.06);
+      background: rgba(20, 18, 16, 0.06);
     }
 
-    /* ── 紙面クローム ───────────────────── */
+    /* ── chrome ───────────────────────── */
     header,
     footer {
-      padding: 0.8rem 1rem;
+      padding: 1rem 1.4rem;
       font-family: var(--font-gothic);
-      font-size: 0.62rem;
-      letter-spacing: 0.14em;
-      background: var(--paper);
+      font-size: 0.6rem;
+      letter-spacing: 0.22em;
       z-index: 100;
     }
 
@@ -66,21 +67,25 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid var(--rule);
       position: sticky;
       top: 0;
+      mix-blend-mode: multiply;
     }
 
     header .brand {
       border: none;
-      letter-spacing: 0.18em;
+      text-transform: lowercase;
+      font-family: var(--font-latin);
+      font-style: italic;
+      font-size: 1.05rem;
+      letter-spacing: 0.06em;
     }
 
     footer {
-      border-top: 1px solid var(--rule);
       display: flex;
       justify-content: space-between;
       color: var(--faint);
+      border-top: 1px solid var(--rule);
     }
 
     details.nav {
@@ -91,15 +96,9 @@
       list-style: none;
       cursor: pointer;
       user-select: none;
-      border: 1px solid var(--rule);
-      padding: 0.2em 0.8em;
+      padding: 0.3em 0;
       text-transform: uppercase;
-    }
-
-    details.nav[open]>summary {
-      background: var(--ink);
-      color: var(--paper);
-      border-color: var(--ink);
+      border-bottom: 1px solid var(--ink);
     }
 
     details.nav>summary::-webkit-details-marker {
@@ -110,207 +109,177 @@
       position: absolute;
       right: 0;
       top: 100%;
-      margin-top: -1px;
+      margin-top: 0.6rem;
       background: var(--paper);
       border: 1px solid var(--ink);
-      padding: 1rem;
-      min-width: 180px;
+      padding: 1.4rem 1.6rem;
+      min-width: 200px;
       display: flex;
       flex-direction: column;
-      gap: 0.8rem;
+      gap: 0.9rem;
       z-index: 1000;
     }
 
     .menu a {
-      border-bottom: 1px solid var(--rule);
-      padding-bottom: 0.15em;
+      border: none;
+      display: flex;
+      justify-content: space-between;
+      gap: 2rem;
+      align-items: baseline;
+    }
+
+    .menu a::after {
+      content: attr(data-jp);
+      font-family: var(--font-jp);
+      font-size: 0.85em;
+      color: var(--faint);
+      letter-spacing: 0.3em;
     }
 
     .menu a:hover {
-      border-bottom-color: var(--ink);
       background: none;
+      color: var(--seal);
     }
 
-    /* ── トンボ・柱 ───────────────────── */
-    .trim {
-      position: fixed;
-      width: 14px;
-      height: 14px;
-      pointer-events: none;
-      z-index: 200;
-      opacity: 0.55;
-    }
-
-    .trim::before,
-    .trim::after {
-      content: "";
-      position: absolute;
-      background: var(--ink);
-    }
-
-    .trim::before { width: 100%; height: 1px; }
-    .trim::after { width: 1px; height: 100%; }
-    .trim.tl { top: 6px; left: 6px; }
-    .trim.tl::before, .trim.tl::after { top: 0; left: 0; }
-    .trim.tr { top: 6px; right: 6px; }
-    .trim.tr::before, .trim.tr::after { top: 0; right: 0; }
-    .trim.bl { bottom: 6px; left: 6px; }
-    .trim.bl::before, .trim.bl::after { bottom: 0; left: 0; }
-    .trim.br { bottom: 6px; right: 6px; }
-    .trim.br::before, .trim.br::after { bottom: 0; right: 0; }
-
-    .pillar {
-      position: fixed;
-      top: 50%;
-      right: 8px;
-      transform: translateY(-50%);
-      writing-mode: vertical-rl;
-      font-family: var(--font-gothic);
-      font-size: 0.55rem;
-      letter-spacing: 0.5em;
-      color: var(--faint);
-      pointer-events: none;
-      z-index: 90;
-    }
-
-    /* ── 本文 ─────────────────────── */
+    /* ── main ─────────────────────── */
     main {
       position: relative;
-      width: 100%;
-      max-width: 100%;
-      padding: 2rem;
-      box-sizing: border-box;
+      padding: 0 clamp(1.2rem, 4vw, 3.4rem) clamp(2rem, 5vw, 4rem);
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
-      min-height: calc(100svh - 6rem);
+      overflow: hidden;
     }
 
-    .kicker {
-      margin: 0 0 1rem;
+    .z-name {
+      margin: 0;
+      margin-left: -0.045em;
+      font-family: var(--font-latin);
+      font-style: italic;
+      font-weight: 300;
+      font-size: clamp(5.5rem, 21vw, 19rem);
+      letter-spacing: -0.04em;
+      line-height: 0.86;
+      white-space: nowrap;
+      filter: url(#etch);
+      mix-blend-mode: multiply;
+      position: relative;
+      z-index: 3;
+    }
+
+    .z-name .rt {
+      display: block;
       font-family: var(--font-gothic);
+      font-style: normal;
       font-size: 0.6rem;
-      letter-spacing: 0.35em;
+      letter-spacing: 0.6em;
       text-transform: uppercase;
       color: var(--faint);
-    }
-
-    .display {
-      margin: 0 0 2.2rem;
-      font-weight: 400;
-      font-family: var(--font-latin);
-      font-size: clamp(3.2rem, 16vw, 12rem);
-      letter-spacing: -0.05em;
-      line-height: 0.85;
-      word-break: break-word;
-      filter: url(#etch);
+      margin-bottom: 1.4rem;
+      filter: none;
     }
 
     .bio {
-      max-width: 34em;
-      margin: 0 0 2.6rem;
-      font-size: clamp(0.95rem, 1.4vw, 1.1rem);
-      line-height: 2.1;
+      max-width: 30em;
+      margin: 2.4rem 0 0;
+      font-size: clamp(0.92rem, 1.35vw, 1.05rem);
+      line-height: 2.15;
       letter-spacing: 0.02em;
+      position: relative;
+      z-index: 3;
     }
 
     .bio .muted {
       color: var(--faint);
     }
 
-    /* ── 奥付 ─────────────────────── */
+    /* ── colophon ─────────────────── */
     .colophon {
-      border: 1px solid var(--ink);
-      padding: 1.4rem 1.6rem;
+      margin-top: 2.6rem;
+      padding-top: 1.4rem;
+      border-top: 1px solid var(--ink);
       max-width: 34em;
       position: relative;
-    }
-
-    .colophon .c-label {
-      position: absolute;
-      top: -0.55em;
-      left: 1.2rem;
-      background: var(--paper);
-      padding: 0 0.6em;
-      font-size: 0.75rem;
-      letter-spacing: 0.5em;
+      z-index: 3;
     }
 
     .colophon dl {
       margin: 0;
       display: grid;
-      grid-template-columns: 7em 1fr;
-      gap: 0.55rem 1.2rem;
+      grid-template-columns: 8em 1fr;
+      gap: 0.7rem 1.4rem;
       align-items: baseline;
     }
 
     .colophon dt {
       font-family: var(--font-gothic);
-      font-size: 0.55rem;
-      letter-spacing: 0.25em;
+      font-size: 0.52rem;
+      letter-spacing: 0.4em;
       text-transform: uppercase;
       color: var(--faint);
     }
 
     .colophon dd {
       margin: 0;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       letter-spacing: 0.02em;
     }
 
-    .colophon dd a + a {
-      margin-left: 1.2em;
+    .colophon dd a+a {
+      margin-left: 1.4em;
     }
 
-    .colophon .c-seal {
+    .c-seal {
       position: absolute;
-      right: 1.2rem;
-      bottom: 1.2rem;
-      width: 2.2em;
-      height: 2.2em;
+      right: 0;
+      top: 1.6rem;
+      width: 2em;
+      height: 2em;
       border: 1.5px solid var(--seal);
       color: var(--seal);
       display: grid;
       place-items: center;
-      font-size: 0.8rem;
-      transform: rotate(-3deg);
+      font-size: 0.78rem;
+      transform: rotate(-4deg);
       opacity: 0.85;
     }
 
-    /* ── 欄外 ─────────────────────── */
-    .z-vert {
+    /* ── artwork layers ─────────────── */
+    .z-art {
       position: absolute;
-      top: 4rem;
-      right: 1.6rem;
-      writing-mode: vertical-rl;
-      text-orientation: mixed;
-      font-size: 0.65rem;
-      line-height: 2.2;
-      white-space: pre;
-      color: var(--faint);
-      opacity: 0.7;
       pointer-events: none;
-    }
-
-    .z-frag {
-      position: absolute;
-      right: clamp(-3rem, -1vw, 0rem);
-      top: 3.5rem;
-      width: clamp(180px, 22vw, 340px);
       mix-blend-mode: multiply;
-      filter: grayscale(0.35) contrast(1.02);
-      opacity: 0.85;
-      pointer-events: none;
-      z-index: -1;
     }
 
-    .z-frag img {
+    .z-art img {
       width: 100%;
       height: auto;
       display: block;
     }
 
-    /* ── 紙の質感 ─────────────── */
+    .z-anatomy {
+      right: -14vw;
+      top: -4vh;
+      width: clamp(380px, 52vw, 900px);
+      opacity: 0.55;
+      filter: grayscale(0.1) contrast(1.02);
+      z-index: 1;
+    }
+
+    .z-prism {
+      position: absolute;
+      left: -20%;
+      top: 26%;
+      width: 140%;
+      height: 4px;
+      background: linear-gradient(90deg, transparent 0%, rgba(255, 0, 160, 0.4) 22%, rgba(255, 220, 0, 0.45) 42%, rgba(0, 235, 200, 0.4) 60%, rgba(110, 0, 255, 0.3) 78%, transparent 100%);
+      filter: blur(3px);
+      transform: rotate(-18deg);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* ── grain ─────────────────── */
     .noise-overlay {
       position: fixed;
       top: 0;
@@ -332,103 +301,76 @@
       height: 100%;
       pointer-events: none;
       z-index: 9998;
-      background: radial-gradient(circle at 50% 45%, transparent 62%, rgba(26, 22, 15, 0.10) 100%);
+      background: radial-gradient(circle at 50% 45%, transparent 62%, rgba(20, 18, 16, 0.10) 100%);
     }
 
-    /* ── レスポンシブ ─────────────── */
     @media (max-width: 900px) {
-      main {
-        padding: 1.5rem;
-        min-height: calc(100svh - 5rem);
-      }
-
-      .bio {
-        margin-bottom: 2rem;
+      .z-name {
+        font-size: clamp(4rem, 19vw, 7rem);
+        white-space: normal;
       }
 
       .colophon dl {
         grid-template-columns: 1fr;
-        gap: 0.2rem 0;
+        gap: 0.15rem 0;
       }
 
       .colophon dt {
-        margin-top: 0.6rem;
+        margin-top: 0.8rem;
       }
 
-      .z-vert,
-      .pillar {
-        display: none;
+      .c-seal {
+        top: auto;
+        bottom: 0;
       }
 
-      .z-frag {
-        width: 44vw;
-        right: -1.5rem;
-        top: 2rem;
-        opacity: 0.5;
+      .z-anatomy {
+        width: 88vw;
+        right: -26vw;
+        opacity: 0.35;
       }
-    }
-
-    html.wf-loading body {
-      opacity: 0;
-    }
-
-    html.wf-active body,
-    html.wf-inactive body {
-      opacity: 1;
-      transition: opacity 0.5s;
     }
   </style>
-  <script>
-    (function (d) {
-      var config = { kitId: 'ifg4slm', scriptTimeout: 3000, async: true }, h = d.documentElement, t = setTimeout(function () { h.className = h.className.replace(/\bwf-loading\b/g, "") + " wf-inactive"; }, config.scriptTimeout), tk = d.createElement("script"), f = false, s = d.getElementsByTagName("script")[0], a; h.className += " wf-loading"; tk.src = 'https://use.typekit.net/' + config.kitId + '.js'; tk.async = true; tk.onload = tk.onreadystatechange = function () { a = this.readyState; if (f || a && a != "complete" && a != "loaded") return; f = true; clearTimeout(t); try { Typekit.load(config) } catch (e) { } }; s.parentNode.insertBefore(tk, s)
-    })(document);
-  </script>
 </head>
 
 <body>
   <svg width="0" height="0" aria-hidden="true" style="position:absolute">
     <filter id="etch" x="-5%" y="-5%" width="110%" height="110%">
-      <feTurbulence type="fractalNoise" baseFrequency="0.012 0.02" numOctaves="2" seed="11" result="n" />
-      <feDisplacementMap in="SourceGraphic" in2="n" scale="7" xChannelSelector="R" yChannelSelector="G" />
+      <feTurbulence type="fractalNoise" baseFrequency="0.011 0.019" numOctaves="2" seed="11" result="n" />
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="5" xChannelSelector="R" yChannelSelector="G" />
     </filter>
   </svg>
-
-  <div class="trim tl" aria-hidden="true"></div>
-  <div class="trim tr" aria-hidden="true"></div>
-  <div class="trim bl" aria-hidden="true"></div>
-  <div class="trim br" aria-hidden="true"></div>
-  <div class="pillar" aria-hidden="true">終葉 — 奥付</div>
 
   <header>
     <a href="./" class="brand">synomare</a>
     <details class="nav">
-      <summary>MENU</summary>
+      <summary>Menu</summary>
       <nav class="menu" aria-label="site">
-        <a href="./">HOME</a>
-        <a href="works.html">WORKS</a>
-        <a href="notes/">NOTES</a>
-        <a href="links.html">LINKS</a>
-        <a href="profile.html">PROFILE</a>
-        <a href="about.html">ABOUT</a>
-        <a href="mailto:synomare@gmail.com">CONTACT</a>
+        <a href="./" data-jp="口上">HOME</a>
+        <a href="works.html" data-jp="作品">WORKS</a>
+        <a href="notes/" data-jp="雑記">NOTES</a>
+        <a href="links.html" data-jp="交遊">LINKS</a>
+        <a href="profile.html" data-jp="奥付">PROFILE</a>
+        <a href="about.html" data-jp="図版">ABOUT</a>
+        <a href="mailto:synomare@gmail.com" data-jp="連絡">CONTACT</a>
       </nav>
     </details>
   </header>
 
   <main>
-    <figure class="z-frag" aria-hidden="true">
-      <img src="assets/images/collage-12.jpg" alt="" width="724" height="1024" loading="lazy">
+    <figure class="z-art z-anatomy" aria-hidden="true">
+      <img src="assets/images/graphics/angel-anatomy.jpg" alt="" width="1600" height="2263" loading="eager" fetchpriority="high">
     </figure>
 
-    <p class="kicker">Profile — 奥付 / Colophon</p>
-    <h1 class="display">synomare</h1>
+    <div class="z-prism" aria-hidden="true"></div>
+
+    <h1 class="z-name"><span class="rt">Profile — 奥付 / Colophon</span>synomare</h1>
 
     <div class="bio">
       <p>synomare<span class="muted">っていいます。</span>テクスト<span class="muted">を書いて、</span>デザイン<span class="muted">をして、</span>グラフィック<span class="muted">をつくります。</span>演劇の演出<span class="muted">をすることもあります。</span></p>
     </div>
 
     <section class="colophon" aria-label="奥付">
-      <span class="c-label">奥付</span>
       <dl>
         <dt>名称</dt>
         <dd>synomare（しのまれ）</dd>
@@ -448,15 +390,11 @@
       <span class="c-seal" aria-hidden="true">印</span>
     </section>
 
-    <aside class="z-vert" aria-hidden="true">名前、えっと、なんだっけ。
-たしかsynomareっていう名前でした。
-あなたが覚えていてくれたんですよね。</aside>
-
     <div class="noise-overlay"></div>
   </main>
 
   <footer>
-    <small>synomare 版 — 奥付</small>
+    <small>synomare — profile</small>
     <small>&copy; <span id="year"></span> synomare. All rights reserved.</small>
   </footer>
 
