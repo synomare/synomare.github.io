@@ -9,401 +9,266 @@
   <meta property="og:title" content="Profile — synomare">
   <meta property="og:description" content="synomare のプロフィール。テクスト、デザイン、グラフィック。">
   <meta property="og:type" content="website">
-  <meta name="theme-color" content="#edeae3">
+  <meta name="theme-color" content="#060606">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Shippori+Mincho+B1:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300&family=IBM+Plex+Mono:wght@400;500&family=Shippori+Mincho+B1:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --paper: #edeae3;
-      --ink: #141210;
-      --faint: #97907f;
-      --rule: #d6d0c2;
-      --seal: #a33b24;
-      --font-jp: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", serif;
-      --font-latin: "Cormorant Garamond", "Times New Roman", serif;
-      --font-gothic: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
-      font-size: clamp(16px, 1.5vw, 30px);
+      --void: #060606;
+      --bone: #e8e3d5;
+      --dim: #6f6a5a;
+      --line: #26231c;
+      --acid: #c6f312;
+      --hot: #ff4517;
+      --mono: "IBM Plex Mono", "SFMono-Regular", Menlo, Consolas, "Hiragino Kaku Gothic ProN", monospace;
+      --jp: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", serif;
+      --latin: "Cormorant Garamond", "Times New Roman", serif;
     }
 
-    html,
-    body {
-      overflow-x: hidden;
-    }
+    html, body { overflow-x: hidden; }
 
     body {
       margin: 0;
-      background: var(--paper);
-      color: var(--ink);
-      font-family: var(--font-jp);
+      background: var(--void);
+      color: var(--bone);
+      font-family: var(--jp);
+      font-size: 16px;
+      line-height: 1.6;
       -webkit-font-smoothing: antialiased;
       display: grid;
-      grid-template-rows: auto 1fr auto;
+      grid-template-rows: auto auto 1fr auto;
       min-height: 100svh;
     }
 
-    a {
-      color: inherit;
-      text-decoration: none;
-      border-bottom: 1px solid var(--faint);
-    }
+    ::selection { background: var(--acid); color: #000; }
 
-    a:hover {
-      border-bottom-color: var(--ink);
-      background: rgba(20, 18, 16, 0.06);
-    }
+    a { color: inherit; text-decoration: none; }
+    a:hover { background: var(--acid); color: #000; }
 
-    /* ── chrome ───────────────────────── */
-    header,
-    footer {
-      padding: 1rem 1.4rem;
-      font-family: var(--font-gothic);
-      font-size: 0.6rem;
-      letter-spacing: 0.22em;
-      z-index: 100;
-    }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 
-    header {
+    /* topbar */
+    .topbar {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0.4em 1.6em;
+      padding: 0.7rem 1rem;
+      border-bottom: 1px solid var(--line);
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
       position: sticky;
       top: 0;
-      mix-blend-mode: multiply;
+      background: var(--void);
+      z-index: 500;
     }
 
-    header .brand {
-      border: none;
-      text-transform: lowercase;
-      font-family: var(--font-latin);
-      font-style: italic;
-      font-size: 1.05rem;
-      letter-spacing: 0.06em;
-    }
+    .topbar .brand { font-weight: 500; }
+    .topbar .brand sup { font-size: 0.7em; }
+    .topbar .clock { color: var(--acid); }
+    .topbar nav { margin-left: auto; display: flex; flex-wrap: wrap; gap: 0.4em 1.1em; }
+    .topbar nav a[aria-current] { background: var(--bone); color: #000; padding: 0 0.35em; }
 
-    footer {
+    /* hud */
+    .hud {
       display: flex;
-      justify-content: space-between;
-      color: var(--faint);
-      border-top: 1px solid var(--rule);
-    }
-
-    details.nav {
-      position: relative;
-    }
-
-    details.nav>summary {
-      list-style: none;
-      cursor: pointer;
-      user-select: none;
-      padding: 0.3em 0;
+      flex-wrap: wrap;
+      gap: 0.3em 1.6em;
+      padding: 0.45rem 1rem;
+      border-bottom: 1px solid var(--line);
+      font-family: var(--mono);
+      font-size: 0.56rem;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
-      border-bottom: 1px solid var(--ink);
+      color: var(--dim);
     }
 
-    details.nav>summary::-webkit-details-marker {
-      display: none;
-    }
+    .hud .on { color: var(--acid); }
+    .hud .hot { color: var(--hot); }
 
-    .menu {
-      position: absolute;
-      right: 0;
-      top: 100%;
-      margin-top: 0.6rem;
-      background: var(--paper);
-      border: 1px solid var(--ink);
-      padding: 1.4rem 1.6rem;
-      min-width: 200px;
-      display: flex;
-      flex-direction: column;
-      gap: 0.9rem;
-      z-index: 1000;
-    }
-
-    .menu a {
-      border: none;
-      display: flex;
-      justify-content: space-between;
-      gap: 2rem;
-      align-items: baseline;
-    }
-
-    .menu a::after {
-      content: attr(data-jp);
-      font-family: var(--font-jp);
-      font-size: 0.85em;
-      color: var(--faint);
-      letter-spacing: 0.3em;
-    }
-
-    .menu a:hover {
-      background: none;
-      color: var(--seal);
-    }
-
-    /* ── main ─────────────────────── */
-    main {
-      position: relative;
-      padding: 0 clamp(1.2rem, 4vw, 3.4rem) clamp(2rem, 5vw, 4rem);
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
+    /* ticker */
+    footer.ticker {
+      border-top: 1px solid var(--line);
       overflow: hidden;
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      color: var(--dim);
+      padding: 0.55rem 0;
+      white-space: nowrap;
     }
 
-    .z-name {
-      margin: 0;
-      margin-left: -0.045em;
-      font-family: var(--font-latin);
+    footer.ticker .belt { display: inline-block; animation: belt 52s linear infinite; }
+    footer.ticker .belt span { margin-right: 3.5em; }
+    footer.ticker .belt .a { color: var(--acid); }
+
+    @keyframes belt { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* plates */
+    .plate { margin: 0; border: 1px solid var(--line); position: relative; }
+    .plate img { width: 100%; height: auto; display: block; }
+    .plate figcaption {
+      position: absolute; left: 0; bottom: -1.7em;
+      font-family: var(--mono); font-size: 0.56rem;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--dim);
+    }
+
+    /* grain */
+    .noise-overlay { position: fixed; inset: 0; pointer-events: none; z-index: 9999; opacity: 0.05; mix-blend-mode: screen; }
+
+    @media (max-width: 700px) {
+      .topbar { font-size: 0.56rem; }
+      .topbar nav { margin-left: 0; width: 100%; }
+      .hud { font-size: 0.5rem; }
+    }
+
+    main { position: relative; padding: clamp(20px, 4vw, 56px) clamp(16px, 3vw, 40px) clamp(3rem, 6vw, 5rem); overflow: hidden; }
+
+    .z-bg {
+      position: absolute; right: -10vw; top: -2vh;
+      width: clamp(360px, 46vw, 820px);
+      opacity: 0.4; mix-blend-mode: screen;
+      filter: invert(1) grayscale(0.2) contrast(1.05);
+      pointer-events: none; margin: 0;
+    }
+    .z-bg img { width: 100%; height: auto; display: block; }
+
+    .display {
+      position: relative; z-index: 2;
+      margin: clamp(1rem, 3vw, 2.5rem) 0 0;
+      margin-left: -0.04em;
+      font-family: var(--latin);
       font-style: italic;
       font-weight: 300;
-      font-size: clamp(5.5rem, 21vw, 19rem);
+      font-size: clamp(4.6rem, 20vw, 17rem);
       letter-spacing: -0.04em;
-      line-height: 0.86;
+      line-height: 0.85;
+      color: var(--bone);
       white-space: nowrap;
-      filter: url(#etch);
-      mix-blend-mode: multiply;
-      position: relative;
-      z-index: 3;
-    }
-
-    .z-name .rt {
-      display: block;
-      font-family: var(--font-gothic);
-      font-style: normal;
-      font-size: 0.6rem;
-      letter-spacing: 0.6em;
-      text-transform: uppercase;
-      color: var(--faint);
-      margin-bottom: 1.4rem;
-      filter: none;
     }
 
     .bio {
+      position: relative; z-index: 2;
       max-width: 30em;
-      margin: 2.4rem 0 0;
-      font-size: clamp(0.92rem, 1.35vw, 1.05rem);
+      margin: 2.6rem 0 0;
+      font-size: clamp(15px, 1.6vw, 18px);
       line-height: 2.15;
       letter-spacing: 0.02em;
-      position: relative;
-      z-index: 3;
     }
+    .bio .muted { color: var(--dim); }
 
-    .bio .muted {
-      color: var(--faint);
-    }
-
-    /* ── colophon ─────────────────── */
     .colophon {
-      margin-top: 2.6rem;
-      padding-top: 1.4rem;
-      border-top: 1px solid var(--ink);
-      max-width: 34em;
-      position: relative;
-      z-index: 3;
+      position: relative; z-index: 2;
+      margin-top: 3rem;
+      border-top: 1px solid var(--bone);
+      max-width: 46em;
+      font-family: var(--mono);
     }
 
-    .colophon dl {
-      margin: 0;
-      display: grid;
-      grid-template-columns: 8em 1fr;
-      gap: 0.7rem 1.4rem;
-      align-items: baseline;
+    .col-head {
+      display: flex; justify-content: space-between;
+      padding: 0.5em 0; font-size: 0.6rem;
+      letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--dim); border-bottom: 1px solid var(--line);
     }
 
-    .colophon dt {
-      font-family: var(--font-gothic);
-      font-size: 0.52rem;
-      letter-spacing: 0.4em;
-      text-transform: uppercase;
-      color: var(--faint);
-    }
+    .colophon dl { margin: 0; }
+    .colophon .kv { display: grid; grid-template-columns: 9em 1fr; gap: 0 2em; padding: 0.7em 0.2em; border-bottom: 1px solid var(--line); align-items: baseline; }
+    .colophon dt { font-size: 0.56rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--acid); }
+    .colophon dd { margin: 0; font-family: var(--jp); font-size: 0.85rem; }
+    .colophon dd a + a { margin-left: 1.4em; }
 
-    .colophon dd {
-      margin: 0;
-      font-size: 0.78rem;
-      letter-spacing: 0.02em;
-    }
-
-    .colophon dd a+a {
-      margin-left: 1.4em;
-    }
-
-    .c-seal {
-      position: absolute;
-      right: 0;
-      top: 1.6rem;
-      width: 2em;
-      height: 2em;
-      border: 1.5px solid var(--seal);
-      color: var(--seal);
-      display: grid;
-      place-items: center;
-      font-size: 0.78rem;
+    .seal {
+      display: inline-grid; place-items: center;
+      width: 2.4em; height: 2.4em;
+      border: 1.5px solid var(--hot); color: var(--hot);
+      font-family: var(--jp); font-size: 0.85rem;
       transform: rotate(-4deg);
-      opacity: 0.85;
+      margin-top: 1.6rem;
     }
 
-    /* ── artwork layers ─────────────── */
-    .z-art {
-      position: absolute;
-      pointer-events: none;
-      mix-blend-mode: multiply;
-    }
-
-    .z-art img {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
-
-    .z-anatomy {
-      right: -14vw;
-      top: -4vh;
-      width: clamp(380px, 52vw, 900px);
-      opacity: 0.55;
-      filter: grayscale(0.1) contrast(1.02);
-      z-index: 1;
-    }
-
-    .z-prism {
-      position: absolute;
-      left: -20%;
-      top: 26%;
-      width: 140%;
-      height: 4px;
-      background: linear-gradient(90deg, transparent 0%, rgba(255, 0, 160, 0.4) 22%, rgba(255, 220, 0, 0.45) 42%, rgba(0, 235, 200, 0.4) 60%, rgba(110, 0, 255, 0.3) 78%, transparent 100%);
-      filter: blur(3px);
-      transform: rotate(-18deg);
-      pointer-events: none;
-      z-index: 2;
-    }
-
-    /* ── grain ─────────────────── */
-    .noise-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 9999;
-      opacity: 0.05;
-      mix-blend-mode: multiply;
-    }
-
-    body::after {
-      content: "";
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 9998;
-      background: radial-gradient(circle at 50% 45%, transparent 62%, rgba(20, 18, 16, 0.10) 100%);
-    }
-
-    @media (max-width: 900px) {
-      .z-name {
-        font-size: clamp(4rem, 19vw, 7rem);
-        white-space: normal;
-      }
-
-      .colophon dl {
-        grid-template-columns: 1fr;
-        gap: 0.15rem 0;
-      }
-
-      .colophon dt {
-        margin-top: 0.8rem;
-      }
-
-      .c-seal {
-        top: auto;
-        bottom: 0;
-      }
-
-      .z-anatomy {
-        width: 88vw;
-        right: -26vw;
-        opacity: 0.35;
-      }
+    @media (max-width: 700px) {
+      .display { white-space: normal; font-size: clamp(3.4rem, 19vw, 6rem); }
+      .colophon .kv { grid-template-columns: 1fr; gap: 0.3em; }
+      .z-bg { width: 90vw; right: -30vw; opacity: 0.25; }
     }
   </style>
 </head>
 
 <body>
-  <svg width="0" height="0" aria-hidden="true" style="position:absolute">
-    <filter id="etch" x="-5%" y="-5%" width="110%" height="110%">
-      <feTurbulence type="fractalNoise" baseFrequency="0.011 0.019" numOctaves="2" seed="11" result="n" />
-      <feDisplacementMap in="SourceGraphic" in2="n" scale="5" xChannelSelector="R" yChannelSelector="G" />
-    </filter>
-  </svg>
-
-  <header>
-    <a href="./" class="brand">synomare</a>
-    <details class="nav">
-      <summary>Menu</summary>
-      <nav class="menu" aria-label="site">
-        <a href="./" data-jp="口上">HOME</a>
-        <a href="works.html" data-jp="作品">WORKS</a>
-        <a href="notes/" data-jp="雑記">NOTES</a>
-        <a href="links.html" data-jp="交遊">LINKS</a>
-        <a href="profile.html" data-jp="奥付">PROFILE</a>
-        <a href="about.html" data-jp="図版">ABOUT</a>
-        <a href="mailto:synomare@gmail.com" data-jp="連絡">CONTACT</a>
-      </nav>
-    </details>
+  <header class="topbar">
+    <a class="brand" href="./">SYNOMARE<sup>&trade;</sup></a>
+    <span class="clock" id="clock">--:--:--</span>
+    <nav aria-label="site">
+        <a href="./">INDEX</a>
+        <a href="works.html">WORKS</a>
+        <a href="notes/">NOTES</a>
+        <a href="links.html">LINKS</a>
+        <a href="profile.html" aria-current="page">PROFILE</a>
+        <a href="about.html">ABOUT</a>
+        <a href="mailto:synomare@gmail.com">CONTACT</a>
+    </nav>
   </header>
+  <div class="hud" aria-hidden="true">
+    <span>COLOPHON — 奥付</span>
+    <span>SESSION <span id="session">------</span></span>
+    <span>JST <span id="hud-date">----.--.--</span></span>
+    <span>STATUS: <span class="on">稼働中</span></span>
+    <span>ENTITY: SYNOMARE</span>
+    <span class="hot">観測により頁は変化する</span>
+  </div>
 
   <main>
-    <figure class="z-art z-anatomy" aria-hidden="true">
-      <img src="assets/images/graphics/angel-anatomy.jpg" alt="" width="1600" height="2263" loading="eager" fetchpriority="high">
+    <figure class="z-bg" aria-hidden="true">
+      <img src="assets/images/graphics/angel-anatomy.jpg" alt="" width="1600" height="2263" loading="eager">
     </figure>
 
-    <div class="z-prism" aria-hidden="true"></div>
-
-    <h1 class="z-name"><span class="rt">Profile — 奥付 / Colophon</span>synomare</h1>
+    <h1 class="display">synomare</h1>
 
     <div class="bio">
       <p>synomare<span class="muted">っていいます。</span>テクスト<span class="muted">を書いて、</span>デザイン<span class="muted">をして、</span>グラフィック<span class="muted">をつくります。</span>演劇の演出<span class="muted">をすることもあります。</span></p>
     </div>
 
     <section class="colophon" aria-label="奥付">
+      <div class="col-head"><span>Colophon — 奥付</span><span>REC P-001</span></div>
       <dl>
-        <dt>名称</dt>
-        <dd>synomare（しのまれ）</dd>
-        <dt>業務</dt>
-        <dd>テクスト・デザイン・グラフィック・演出</dd>
-        <dt>記録</dt>
-        <dd>
+        <div class="kv"><dt>名称 / Name</dt><dd>synomare（しのまれ）</dd></div>
+        <div class="kv"><dt>業務 / Field</dt><dd>テクスト・デザイン・グラフィック・演出</dd></div>
+        <div class="kv"><dt>記録 / Records</dt><dd>
           <a href="https://x.com/synomare" target="_blank" rel="noopener">X / Twitter</a>
           <a href="https://www.instagram.com/syno_mare/?utm_source=qr" target="_blank" rel="noopener">Instagram</a>
           <a href="https://note.com/synomare" target="_blank" rel="noopener">note / 日記</a>
-        </dd>
-        <dt>連絡</dt>
-        <dd><a href="mailto:synomare@gmail.com">synomare@gmail.com</a></dd>
-        <dt>印刷</dt>
-        <dd>本頁は、閲覧のたびにあなたのブラウザで刷られています。</dd>
+        </dd></div>
+        <div class="kv"><dt>連絡 / Contact</dt><dd><a href="mailto:synomare@gmail.com">synomare@gmail.com</a></dd></div>
+        <div class="kv"><dt>印刷 / Printing</dt><dd>本頁は、閲覧のたびにあなたのブラウザで刷られています。</dd></div>
       </dl>
-      <span class="c-seal" aria-hidden="true">印</span>
+      <span class="seal" aria-hidden="true">印</span>
     </section>
 
     <div class="noise-overlay"></div>
   </main>
 
-  <footer>
-    <small>synomare — profile</small>
-    <small>&copy; <span id="year"></span> synomare. All rights reserved.</small>
+  <footer class="ticker" aria-hidden="true">
+    <div class="belt"><span>SYNOMARE — SPECULATIVE ARCHIVE</span><span class="a">テクスト。デザイン。グラフィック。</span><span>つくったものは、つくられたあとも、すこしずつべつのものになっていく。</span><span class="a">本頁は閲覧のたびにあなたのブラウザで刷られています。</span><span>正誤表 — 本頁の誤りは、未だ発見されていない。</span><span>SYNOMARE — SPECULATIVE ARCHIVE</span><span class="a">テクスト。デザイン。グラフィック。</span><span>つくったものは、つくられたあとも、すこしずつべつのものになっていく。</span><span class="a">本頁は閲覧のたびにあなたのブラウザで刷られています。</span><span>正誤表 — 本頁の誤りは、未だ発見されていない。</span></div>
   </footer>
-
   <script>
     (function () {
+      function pad(n) { return n < 10 ? '0' + n : n; }
+      var clock = document.getElementById('clock');
+      var hd = document.getElementById('hud-date');
+      function tick() {
+        var now = new Date(Date.now() + (9 * 60 + new Date().getTimezoneOffset()) * 60000);
+        if (clock) clock.textContent = pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+        if (hd) hd.textContent = now.getFullYear() + '.' + pad(now.getMonth() + 1) + '.' + pad(now.getDate());
+      }
+      tick(); setInterval(tick, 1000);
+      var s = document.getElementById('session');
+      if (s) s.textContent = Math.random().toString(36).slice(2, 8).toUpperCase();
       var y = document.getElementById('year');
       if (y) y.textContent = new Date().getFullYear();
-      var theme = document.querySelector('meta[name="theme-color"]');
-      if (theme) { var bg = getComputedStyle(document.documentElement).getPropertyValue('--paper').trim(); theme.setAttribute('content', bg) }
     })();
   </script>
   <script>
@@ -411,14 +276,12 @@
       var overlay = document.querySelector('.noise-overlay');
       if (!overlay) return;
       var canvas = document.createElement('canvas');
-      canvas.width = 128;
-      canvas.height = 128;
+      canvas.width = 128; canvas.height = 128;
       var ctx = canvas.getContext('2d');
       var idata = ctx.createImageData(128, 128);
       var buffer32 = new Uint32Array(idata.data.buffer);
-      var len = buffer32.length;
-      for (var i = 0; i < len; i++) {
-        if (Math.random() < 0.5) buffer32[i] = 0xff000000;
+      for (var i = 0; i < buffer32.length; i++) {
+        if (Math.random() < 0.5) buffer32[i] = 0xffffffff;
       }
       ctx.putImageData(idata, 0, 0);
       overlay.style.backgroundImage = 'url(' + canvas.toDataURL() + ')';

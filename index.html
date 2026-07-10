@@ -4,422 +4,245 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>synomare</title>
-  <meta name="description" content="synomare。テクスト、デザイン、グラフィック。">
-  <meta property="og:title" content="synomare">
-  <meta property="og:description" content="synomare。テクスト、デザイン、グラフィック。">
+  <title>synomare — speculative archive</title>
+  <meta name="description" content="synomare。テクスト、デザイン、グラフィック。投機的アーカイブ端末。">
+  <meta property="og:title" content="synomare — speculative archive">
+  <meta property="og:description" content="synomare。テクスト、デザイン、グラフィック。投機的アーカイブ端末。">
   <meta property="og:type" content="website">
-  <meta name="theme-color" content="#edeae3">
+  <meta name="theme-color" content="#060606">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Shippori+Mincho+B1:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300&family=IBM+Plex+Mono:wght@400;500&family=Shippori+Mincho+B1:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --paper: #edeae3;
-      --ink: #141210;
-      --faint: #97907f;
-      --rule: #d6d0c2;
-      --seal: #a33b24;
-      --maxw: 160ch;
-      --font-jp: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", serif;
-      --font-latin: "Cormorant Garamond", "Times New Roman", serif;
-      --font-gothic: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
-      --font-body: var(--font-jp);
+      --void: #060606;
+      --bone: #e8e3d5;
+      --dim: #6f6a5a;
+      --line: #26231c;
+      --acid: #c6f312;
+      --hot: #ff4517;
+      --mono: "IBM Plex Mono", "SFMono-Regular", Menlo, Consolas, "Hiragino Kaku Gothic ProN", monospace;
+      --jp: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", serif;
+      --latin: "Cormorant Garamond", "Times New Roman", serif;
     }
 
-    html,
-    body {
-      height: 100%;
-      overflow-x: hidden;
-    }
+    html, body { overflow-x: hidden; }
 
     body {
       margin: 0;
-      background: var(--paper);
-      color: var(--ink);
-      font: 400 16px/1.5 var(--font-body);
+      background: var(--void);
+      color: var(--bone);
+      font-family: var(--jp);
+      font-size: 16px;
+      line-height: 1.6;
       -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
       display: grid;
-      grid-template-rows: auto 1fr auto;
+      grid-template-rows: auto auto 1fr auto;
       min-height: 100svh;
     }
 
-    a {
-      color: inherit;
-      text-decoration-line: underline;
-      text-decoration-color: var(--ink);
-      text-decoration-thickness: .04em;
-      text-underline-offset: .1em;
-      text-decoration-skip-ink: auto;
-    }
+    ::selection { background: var(--acid); color: #000; }
 
-    a:hover {
-      background: rgba(20, 18, 16, 0.07);
-    }
+    a { color: inherit; text-decoration: none; }
+    a:hover { background: var(--acid); color: #000; }
 
-    .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
-    }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 
-    /* ── chrome ───────────────────────── */
-    header,
-    footer {
-      padding: 1rem 1.4rem;
-      font-family: var(--font-gothic);
-      font-size: 0.6rem;
-      letter-spacing: 0.22em;
-      z-index: 100;
-    }
-
-    header {
+    /* topbar */
+    .topbar {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0.4em 1.6em;
+      padding: 0.7rem 1rem;
+      border-bottom: 1px solid var(--line);
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
       position: sticky;
       top: 0;
-      mix-blend-mode: multiply;
+      background: var(--void);
+      z-index: 500;
     }
 
-    header .brand {
-      text-decoration: none;
-      text-transform: lowercase;
-      font-family: var(--font-latin);
-      font-style: italic;
-      font-size: 1.05rem;
-      letter-spacing: 0.06em;
-    }
+    .topbar .brand { font-weight: 500; }
+    .topbar .brand sup { font-size: 0.7em; }
+    .topbar .clock { color: var(--acid); }
+    .topbar nav { margin-left: auto; display: flex; flex-wrap: wrap; gap: 0.4em 1.1em; }
+    .topbar nav a[aria-current] { background: var(--bone); color: #000; padding: 0 0.35em; }
 
-    footer {
+    /* hud */
+    .hud {
       display: flex;
-      justify-content: space-between;
-      color: var(--faint);
-      border-top: 1px solid var(--rule);
-    }
-
-    details.nav {
-      position: relative;
-    }
-
-    details.nav>summary {
-      list-style: none;
-      cursor: pointer;
-      user-select: none;
-      padding: 0.3em 0;
+      flex-wrap: wrap;
+      gap: 0.3em 1.6em;
+      padding: 0.45rem 1rem;
+      border-bottom: 1px solid var(--line);
+      font-family: var(--mono);
+      font-size: 0.56rem;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
-      border-bottom: 1px solid var(--ink);
+      color: var(--dim);
     }
 
-    details.nav>summary::-webkit-details-marker {
-      display: none;
-    }
+    .hud .on { color: var(--acid); }
+    .hud .hot { color: var(--hot); }
 
-    .menu {
-      position: absolute;
-      right: 0;
-      top: 100%;
-      margin-top: 0.6rem;
-      background: var(--paper);
-      border: 1px solid var(--ink);
-      padding: 1.4rem 1.6rem;
-      min-width: 200px;
-      display: flex;
-      flex-direction: column;
-      gap: 0.9rem;
-      z-index: 1000;
-    }
-
-    .menu a {
-      text-decoration: none;
-      display: flex;
-      justify-content: space-between;
-      gap: 2rem;
-      align-items: baseline;
-    }
-
-    .menu a::after {
-      content: attr(data-jp);
-      font-family: var(--font-jp);
-      font-size: 0.85em;
-      color: var(--faint);
-      letter-spacing: 0.3em;
-    }
-
-    .menu a:hover {
-      background: none;
-      color: var(--seal);
-    }
-
-    /* ── collage field ─────────────────── */
-    main {
-      position: relative;
-      display: grid;
-      place-items: center;
-      padding: clamp(24px, 6vw, 80px);
+    /* ticker */
+    footer.ticker {
+      border-top: 1px solid var(--line);
       overflow: hidden;
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      color: var(--dim);
+      padding: 0.55rem 0;
+      white-space: nowrap;
     }
+
+    footer.ticker .belt { display: inline-block; animation: belt 52s linear infinite; }
+    footer.ticker .belt span { margin-right: 3.5em; }
+    footer.ticker .belt .a { color: var(--acid); }
+
+    @keyframes belt { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* plates */
+    .plate { margin: 0; border: 1px solid var(--line); position: relative; }
+    .plate img { width: 100%; height: auto; display: block; }
+    .plate figcaption {
+      position: absolute; left: 0; bottom: -1.7em;
+      font-family: var(--mono); font-size: 0.56rem;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--dim);
+    }
+
+    /* grain */
+    .noise-overlay { position: fixed; inset: 0; pointer-events: none; z-index: 9999; opacity: 0.05; mix-blend-mode: screen; }
+
+    @media (max-width: 700px) {
+      .topbar { font-size: 0.56rem; }
+      .topbar nav { margin-left: 0; width: 100%; }
+      .hud { font-size: 0.5rem; }
+    }
+
+    main { position: relative; padding: clamp(20px, 4vw, 56px) clamp(16px, 3vw, 40px); overflow: hidden; }
+
+    .z-bg {
+      position: absolute; right: -12vw; top: -4vh;
+      width: clamp(420px, 58vw, 1000px);
+      opacity: 0.32; mix-blend-mode: screen;
+      filter: invert(1) grayscale(0.25) contrast(1.05);
+      pointer-events: none; margin: 0;
+    }
+    .z-bg img { width: 100%; height: auto; display: block; }
 
     .copy {
-      position: relative;
-      z-index: 2;
-      max-width: var(--maxw);
-      font-size: var(--dynamic-font-size, clamp(26px, 6.8vw, 56px));
-      line-height: 1.10;
-      letter-spacing: -0.03em;
-      font-kerning: normal;
-      font-variant-east-asian: proportional-width;
+      position: relative; z-index: 2; max-width: 160ch;
+      font-size: var(--dynamic-font-size, clamp(24px, 5.6vw, 48px));
+      line-height: 1.10; letter-spacing: -0.03em;
+      font-kerning: normal; font-variant-east-asian: proportional-width;
       font-feature-settings: "palt" 1, "kern" 1;
-      text-rendering: optimizeLegibility;
-      line-break: strict;
-      hanging-punctuation: allow-end;
-      touch-action: pan-y;
-      overscroll-behavior: contain;
+      text-rendering: optimizeLegibility; line-break: strict;
+      hanging-punctuation: allow-end; touch-action: pan-y; overscroll-behavior: contain;
     }
 
-    .copy p {
-      margin: 0 0 .55em;
-    }
-
-    .copy.tight {
-      line-height: 1.03;
-      letter-spacing: -0.055em;
-    }
+    .copy p { margin: 0 0 .55em; }
+    .copy.tight { line-height: 1.03; letter-spacing: -0.055em; }
 
     .copy .c {
-      display: inline-block;
-      --ix: 1;
-      --iy: 1;
+      display: inline-block; --ix: 1; --iy: 1;
       transform: translateX(var(--tx, 0)) translateY(var(--ty, 0)) scale(var(--sx, 1), var(--sy, 1)) scale(var(--ix, 1), var(--iy, 1));
-      transform-origin: 50% 75%;
-      will-change: transform;
+      transform-origin: 50% 75%; will-change: transform;
       transition: transform .1s cubic-bezier(.25, .82, .25, 1);
-      opacity: 0;
-      translate: 0 15px;
-      scale: 0.95;
-      filter: blur(4px);
+      opacity: 0; translate: 0 15px; scale: 0.95; filter: blur(4px);
       animation: reveal 0.8s cubic-bezier(0.2, 1, 0.3, 1) forwards;
       animation-delay: calc(var(--i) * 0.003s + 0.1s);
     }
 
     @keyframes reveal {
-      0% {
-        opacity: 0;
-        translate: 0 15px;
-        scale: 0.95;
-        filter: blur(4px);
-      }
-
-      100% {
-        opacity: 1;
-        translate: 0 0;
-        scale: 1;
-        filter: blur(0);
-      }
+      0% { opacity: 0; translate: 0 15px; scale: 0.95; filter: blur(4px); }
+      100% { opacity: 1; translate: 0 0; scale: 1; filter: blur(0); }
     }
 
-    .copy .c.punct {
-      margin-left: -0.03em;
-      margin-right: -0.03em;
-    }
-
-    .copy .c.latin {
-      font-family: var(--font-latin);
-      margin-right: -0.015em;
-    }
+    .copy .c.punct { margin-left: -0.03em; margin-right: -0.03em; }
+    .copy .c.latin { font-family: var(--latin); margin-right: -0.015em; }
 
     .copy a {
       text-decoration: none;
       background-image: linear-gradient(currentColor, currentColor);
-      background-repeat: no-repeat;
-      background-size: 100% .035em;
+      background-repeat: no-repeat; background-size: 100% .035em;
       background-position: 0 calc(100% - .03em);
-      -webkit-box-decoration-break: clone;
-      box-decoration-break: clone;
-      padding-bottom: .03em;
-      position: relative;
-      z-index: 1;
-      cursor: pointer;
-      pointer-events: auto;
+      -webkit-box-decoration-break: clone; box-decoration-break: clone;
+      padding-bottom: .03em; position: relative; z-index: 1;
+      cursor: pointer; pointer-events: auto;
     }
 
-    .muted {
-      color: var(--faint);
+    .muted { color: var(--dim); }
+
+    /* database wall */
+    .db {
+      position: relative; z-index: 2;
+      margin-top: clamp(3rem, 8vw, 6rem);
+      border-top: 1px solid var(--bone);
+      font-family: var(--mono);
+      font-size: clamp(0.72rem, 1.5vw, 0.95rem);
+      letter-spacing: 0.05em;
     }
 
-    /* ── layered artwork ───────────────── */
-    .z-art {
-      position: absolute;
-      pointer-events: none;
-      mix-blend-mode: multiply;
+    .db-head {
+      display: flex; justify-content: space-between;
+      padding: 0.5em 0; font-size: 0.62rem;
+      letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--dim); border-bottom: 1px solid var(--line);
     }
 
-    .z-art img {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
+    .db .row { display: flex; align-items: baseline; gap: 1em; padding: 0.62em 0.2em; border-bottom: 1px solid var(--line); }
+    .db .row:hover { background: var(--acid); color: #000; }
+    .db .row:hover .no, .db .row:hover .dest, .db .row:hover .tag { color: #000; }
+    .db .no { color: var(--acid); flex-shrink: 0; }
+    .db .lbl { text-transform: uppercase; }
+    .db .lbl .jp { font-family: var(--jp); text-transform: none; }
+    .db .dots { flex: 1; border-bottom: 1px dotted var(--line); transform: translateY(-0.3em); min-width: 2em; }
+    .db .row:hover .dots { border-bottom-color: #000; }
+    .db .dest { color: var(--dim); flex-shrink: 0; }
+    .db .tag { color: var(--dim); font-size: 0.85em; flex-shrink: 0; }
 
-    .z-anatomy {
-      right: -16vw;
-      top: -8vh;
-      width: clamp(420px, 58vw, 1100px);
-      opacity: 0.42;
-      filter: grayscale(0.15) contrast(1.02);
-      z-index: 1;
-    }
-
-    .z-dust {
-      left: -6vw;
-      bottom: -10vh;
-      width: clamp(280px, 40vw, 640px);
-      opacity: 0.3;
-      z-index: 1;
-    }
-
-    /* ghost wordmark */
-    .z-ghost {
-      position: absolute;
-      left: -0.06em;
-      bottom: -0.28em;
-      font-family: var(--font-latin);
-      font-style: italic;
-      font-weight: 300;
-      font-size: clamp(9rem, 24vw, 26rem);
-      line-height: 1;
-      letter-spacing: -0.04em;
-      color: transparent;
-      -webkit-text-stroke: 1px rgba(20, 18, 16, 0.34);
-      pointer-events: none;
-      user-select: none;
-      z-index: 1;
-      white-space: nowrap;
-    }
-
-    /* prismatic streak */
-    .z-prism {
-      position: absolute;
-      left: -20%;
-      top: 34%;
-      width: 140%;
-      height: 5px;
-      background: linear-gradient(90deg, transparent 0%, rgba(255, 0, 160, 0.4) 22%, rgba(255, 220, 0, 0.45) 42%, rgba(0, 235, 200, 0.4) 60%, rgba(110, 0, 255, 0.3) 78%, transparent 100%);
-      filter: blur(3px);
-      transform: rotate(-16deg);
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    /* ── grain ─────────────────────── */
-    .noise-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 9999;
-      opacity: 0.05;
-      mix-blend-mode: multiply;
-    }
-
-    body::after {
-      content: "";
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 9998;
-      background: radial-gradient(circle at 50% 45%, transparent 62%, rgba(20, 18, 16, 0.10) 100%);
-    }
-
-    @media (max-width:520px) {
-      main {
-        align-content: start;
-        align-items: start;
-        justify-items: stretch;
-        padding: clamp(16px, 6vw, 32px) clamp(18px, 7vw, 28px) clamp(32px, 9vw, 40px);
-        row-gap: clamp(16px, 6vw, 28px);
-      }
-
-      .copy {
-        max-width: 100%;
-        width: 100%;
-        font-size: var(--dynamic-font-size, clamp(18px, 5.2vw, 26px));
-      }
-
-      .z-anatomy {
-        width: 92vw;
-        right: -22vw;
-        top: -4vh;
-        opacity: 0.32;
-      }
-
-      .z-dust {
-        width: 70vw;
-        left: -8vw;
-        opacity: 0.2;
-      }
-
-      .z-ghost {
-        font-size: 34vw;
-        bottom: -0.2em;
-      }
+    @media (max-width: 700px) {
+      .db .dest { display: none; }
+      .z-bg { width: 100vw; right: -30vw; opacity: 0.22; }
     }
   </style>
-  <script type="application/ld+json">
-  {
-    "@context":"https://schema.org",
-    "@type":"Person",
-    "name":"synomare",
-    "url":"https://synomare.github.io/",
-    "jobTitle":"Writer / Artist / Designer",
-    "address":{"@type":"PostalAddress","addressLocality":"Tokyo","addressCountry":"JP"},
-    "sameAs":["https://x.com/synomare","https://www.instagram.com/syno_mare/"]
-  }
-  </script>
 </head>
 
 <body>
   <a class="sr-only" href="#content">Skip to Content</a>
-
-  <header>
-    <a href="./" class="brand">synomare</a>
-    <details class="nav">
-      <summary>Menu</summary>
-      <nav class="menu" aria-label="site">
-        <a href="works.html" data-jp="作品">WORKS</a>
-        <a href="notes/" data-jp="雑記">NOTES</a>
-        <a href="links.html" data-jp="交遊">LINKS</a>
-        <a href="profile.html" data-jp="奥付">PROFILE</a>
-        <a href="about.html" data-jp="図版">ABOUT</a>
-        <a href="mailto:synomare@gmail.com" data-jp="連絡">CONTACT</a>
-      </nav>
-    </details>
+  <header class="topbar">
+    <a class="brand" href="./">SYNOMARE<sup>&trade;</sup></a>
+    <span class="clock" id="clock">--:--:--</span>
+    <nav aria-label="site">
+        <a href="./" aria-current="page">INDEX</a>
+        <a href="works.html">WORKS</a>
+        <a href="notes/">NOTES</a>
+        <a href="links.html">LINKS</a>
+        <a href="profile.html">PROFILE</a>
+        <a href="about.html">ABOUT</a>
+        <a href="mailto:synomare@gmail.com">CONTACT</a>
+    </nav>
   </header>
+  <div class="hud" aria-hidden="true">
+    <span>ARCHIVE ROOT — 口上</span>
+    <span>SESSION <span id="session">------</span></span>
+    <span>JST <span id="hud-date">----.--.--</span></span>
+    <span>STATUS: <span class="on">稼働中</span></span>
+    <span class="hot">観測により頁は変化する</span>
+  </div>
 
   <main id="content">
     <h1 class="sr-only">synomare</h1>
 
-    <figure class="z-art z-anatomy" aria-hidden="true">
+    <figure class="z-bg" aria-hidden="true">
       <img src="assets/images/graphics/angel-anatomy.jpg" alt="" width="1600" height="2263" loading="eager" fetchpriority="high">
     </figure>
-
-    <figure class="z-art z-dust" aria-hidden="true">
-      <img src="assets/images/bg-right.png" alt="" width="1009" height="1030" loading="lazy">
-    </figure>
-
-    <div class="z-prism" aria-hidden="true"></div>
-    <div class="z-ghost" aria-hidden="true">synomare</div>
 
     <div class="copy">
       <p>synomare テクスト。デザイン。グラフィック。<br><br>
@@ -446,19 +269,70 @@
       </p>
     </div>
 
+    <section class="db" aria-label="archive index">
+      <div class="db-head"><span>Archive Index — 総目次</span><span>REC 0001&ndash;0013</span></div>
+      <a class="row" href="works.html">
+        <span class="no">[0001]</span><span class="lbl">WORKS <span class="jp">作品目録</span></span><span class="dots"></span><span class="tag">CATALOGUE</span><span class="dest">/works</span>
+      </a>
+      <a class="row" href="yugun/index.html">
+        <span class="no">[0002]</span><span class="lbl">嶼群（博物館（たち）） 2025</span><span class="dots"></span><span class="tag">THEATRE</span><span class="dest">/yugun</span>
+      </a>
+      <a class="row" href="assets/島嶼群テクスト.pdf">
+        <span class="no">[0003]</span><span class="lbl">戯曲テキスト PDF</span><span class="dots"></span><span class="tag">SCRIPT</span><span class="dest">/pdf</span>
+      </a>
+      <a class="row" href="yugun/taidan.html">
+        <span class="no">[0004]</span><span class="lbl">作家・演出家対談</span><span class="dots"></span><span class="tag">INTERVIEW</span><span class="dest">/yugun/taidan</span>
+      </a>
+      <a class="row" href="yugun/zadankai.html">
+        <span class="no">[0005]</span><span class="lbl">振り返り座談会</span><span class="dots"></span><span class="tag">DISCUSSION</span><span class="dest">/yugun/zadankai</span>
+      </a>
+      <a class="row" href="notes/">
+        <span class="no">[0006]</span><span class="lbl">NOTES <span class="jp">雑記・断章</span></span><span class="dots"></span><span class="tag">JOURNAL</span><span class="dest">/notes</span>
+      </a>
+      <a class="row" href="about.html">
+        <span class="no">[0007]</span><span class="lbl">ABOUT <span class="jp">図版</span></span><span class="dots"></span><span class="tag">COLLAGE</span><span class="dest">/about</span>
+      </a>
+      <a class="row" href="profile.html">
+        <span class="no">[0008]</span><span class="lbl">PROFILE <span class="jp">奥付</span></span><span class="dots"></span><span class="tag">COLOPHON</span><span class="dest">/profile</span>
+      </a>
+      <a class="row" href="links.html">
+        <span class="no">[0009]</span><span class="lbl">LINKS <span class="jp">交遊録</span></span><span class="dots"></span><span class="tag">APPENDIX</span><span class="dest">/links</span>
+      </a>
+      <a class="row" href="https://www.instagram.com/syno_mare/?utm_source=qr" target="_blank" rel="noopener">
+        <span class="no">[0010]</span><span class="lbl">INSTAGRAM <span class="jp">過去の制作物</span></span><span class="dots"></span><span class="tag">EXTERNAL</span><span class="dest">IG</span>
+      </a>
+      <a class="row" href="https://x.com/synomare" target="_blank" rel="noopener">
+        <span class="no">[0011]</span><span class="lbl">X / TWITTER</span><span class="dots"></span><span class="tag">EXTERNAL</span><span class="dest">X</span>
+      </a>
+      <a class="row" href="https://note.com/synomare" target="_blank" rel="noopener">
+        <span class="no">[0012]</span><span class="lbl">NOTE <span class="jp">日記</span></span><span class="dots"></span><span class="tag">EXTERNAL</span><span class="dest">NOTE</span>
+      </a>
+      <a class="row" href="mailto:synomare@gmail.com">
+        <span class="no">[0013]</span><span class="lbl">CONTACT <span class="jp">連絡</span></span><span class="dots"></span><span class="tag">MAIL</span><span class="dest">@</span>
+      </a>
+    </section>
+
     <div class="noise-overlay"></div>
   </main>
 
-  <footer>
-    <small>synomare</small>
-    <small>© <span id="year"></span> synomare — all rights reserved.</small>
+  <footer class="ticker" aria-hidden="true">
+    <div class="belt"><span>SYNOMARE — SPECULATIVE ARCHIVE</span><span class="a">テクスト。デザイン。グラフィック。</span><span>つくったものは、つくられたあとも、すこしずつべつのものになっていく。</span><span class="a">本頁は閲覧のたびにあなたのブラウザで刷られています。</span><span>正誤表 — 本頁の誤りは、未だ発見されていない。</span><span>SYNOMARE — SPECULATIVE ARCHIVE</span><span class="a">テクスト。デザイン。グラフィック。</span><span>つくったものは、つくられたあとも、すこしずつべつのものになっていく。</span><span class="a">本頁は閲覧のたびにあなたのブラウザで刷られています。</span><span>正誤表 — 本頁の誤りは、未だ発見されていない。</span></div>
   </footer>
   <script>
     (function () {
+      function pad(n) { return n < 10 ? '0' + n : n; }
+      var clock = document.getElementById('clock');
+      var hd = document.getElementById('hud-date');
+      function tick() {
+        var now = new Date(Date.now() + (9 * 60 + new Date().getTimezoneOffset()) * 60000);
+        if (clock) clock.textContent = pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+        if (hd) hd.textContent = now.getFullYear() + '.' + pad(now.getMonth() + 1) + '.' + pad(now.getDate());
+      }
+      tick(); setInterval(tick, 1000);
+      var s = document.getElementById('session');
+      if (s) s.textContent = Math.random().toString(36).slice(2, 8).toUpperCase();
       var y = document.getElementById('year');
       if (y) y.textContent = new Date().getFullYear();
-      var theme = document.querySelector('meta[name="theme-color"]');
-      if (theme) { var bg = getComputedStyle(document.documentElement).getPropertyValue('--paper').trim(); theme.setAttribute('content', bg) }
     })();
   </script>
   <script>
@@ -466,14 +340,12 @@
       var overlay = document.querySelector('.noise-overlay');
       if (!overlay) return;
       var canvas = document.createElement('canvas');
-      canvas.width = 128;
-      canvas.height = 128;
+      canvas.width = 128; canvas.height = 128;
       var ctx = canvas.getContext('2d');
       var idata = ctx.createImageData(128, 128);
       var buffer32 = new Uint32Array(idata.data.buffer);
-      var len = buffer32.length;
-      for (var i = 0; i < len; i++) {
-        if (Math.random() < 0.5) buffer32[i] = 0xff000000;
+      for (var i = 0; i < buffer32.length; i++) {
+        if (Math.random() < 0.5) buffer32[i] = 0xffffffff;
       }
       ctx.putImageData(idata, 0, 0);
       overlay.style.backgroundImage = 'url(' + canvas.toDataURL() + ')';

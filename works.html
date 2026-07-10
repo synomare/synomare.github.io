@@ -9,415 +9,224 @@
   <meta property="og:title" content="Works — synomare">
   <meta property="og:description" content="synomare 作品目録。テクスト、演劇、グラフィック。">
   <meta property="og:type" content="website">
-  <meta name="theme-color" content="#edeae3">
+  <meta name="theme-color" content="#060606">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Shippori+Mincho+B1:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300&family=IBM+Plex+Mono:wght@400;500&family=Shippori+Mincho+B1:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --paper: #edeae3;
-      --ink: #141210;
-      --faint: #97907f;
-      --rule: #d6d0c2;
-      --seal: #a33b24;
-      --font-jp: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", serif;
-      --font-latin: "Cormorant Garamond", "Times New Roman", serif;
-      --font-gothic: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
-      font-size: clamp(16px, 1.5vw, 30px);
+      --void: #060606;
+      --bone: #e8e3d5;
+      --dim: #6f6a5a;
+      --line: #26231c;
+      --acid: #c6f312;
+      --hot: #ff4517;
+      --mono: "IBM Plex Mono", "SFMono-Regular", Menlo, Consolas, "Hiragino Kaku Gothic ProN", monospace;
+      --jp: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", serif;
+      --latin: "Cormorant Garamond", "Times New Roman", serif;
     }
 
-    html,
-    body {
-      overflow-x: hidden;
-    }
+    html, body { overflow-x: hidden; }
 
     body {
       margin: 0;
-      background: var(--paper);
-      color: var(--ink);
-      font-family: var(--font-jp);
+      background: var(--void);
+      color: var(--bone);
+      font-family: var(--jp);
+      font-size: 16px;
+      line-height: 1.6;
       -webkit-font-smoothing: antialiased;
       display: grid;
-      grid-template-rows: auto 1fr auto;
+      grid-template-rows: auto auto 1fr auto;
       min-height: 100svh;
     }
 
-    a {
-      color: inherit;
-      text-decoration: none;
-      border-bottom: 1px solid var(--faint);
-    }
+    ::selection { background: var(--acid); color: #000; }
 
-    a:hover {
-      border-bottom-color: var(--ink);
-      background: rgba(20, 18, 16, 0.06);
-    }
+    a { color: inherit; text-decoration: none; }
+    a:hover { background: var(--acid); color: #000; }
 
-    /* ── chrome ───────────────────────── */
-    header,
-    footer {
-      padding: 1rem 1.4rem;
-      font-family: var(--font-gothic);
-      font-size: 0.6rem;
-      letter-spacing: 0.22em;
-      z-index: 100;
-    }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 
-    header {
+    /* topbar */
+    .topbar {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      mix-blend-mode: multiply;
-    }
-
-    header .brand {
-      border: none;
-      text-transform: lowercase;
-      font-family: var(--font-latin);
-      font-style: italic;
-      font-size: 1.05rem;
-      letter-spacing: 0.06em;
-    }
-
-    footer {
-      display: flex;
-      justify-content: space-between;
-      color: var(--faint);
-      border-top: 1px solid var(--rule);
-    }
-
-    details.nav {
-      position: relative;
-    }
-
-    details.nav>summary {
-      list-style: none;
-      cursor: pointer;
-      user-select: none;
-      padding: 0.3em 0;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0.4em 1.6em;
+      padding: 0.7rem 1rem;
+      border-bottom: 1px solid var(--line);
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      border-bottom: 1px solid var(--ink);
+      position: sticky;
+      top: 0;
+      background: var(--void);
+      z-index: 500;
     }
 
-    details.nav>summary::-webkit-details-marker {
-      display: none;
-    }
+    .topbar .brand { font-weight: 500; }
+    .topbar .brand sup { font-size: 0.7em; }
+    .topbar .clock { color: var(--acid); }
+    .topbar nav { margin-left: auto; display: flex; flex-wrap: wrap; gap: 0.4em 1.1em; }
+    .topbar nav a[aria-current] { background: var(--bone); color: #000; padding: 0 0.35em; }
 
-    .menu {
-      position: absolute;
-      right: 0;
-      top: 100%;
-      margin-top: 0.6rem;
-      background: var(--paper);
-      border: 1px solid var(--ink);
-      padding: 1.4rem 1.6rem;
-      min-width: 200px;
+    /* hud */
+    .hud {
       display: flex;
-      flex-direction: column;
-      gap: 0.9rem;
-      z-index: 1000;
+      flex-wrap: wrap;
+      gap: 0.3em 1.6em;
+      padding: 0.45rem 1rem;
+      border-bottom: 1px solid var(--line);
+      font-family: var(--mono);
+      font-size: 0.56rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--dim);
     }
 
-    .menu a {
-      border: none;
-      display: flex;
-      justify-content: space-between;
-      gap: 2rem;
-      align-items: baseline;
-    }
+    .hud .on { color: var(--acid); }
+    .hud .hot { color: var(--hot); }
 
-    .menu a::after {
-      content: attr(data-jp);
-      font-family: var(--font-jp);
-      font-size: 0.85em;
-      color: var(--faint);
-      letter-spacing: 0.3em;
-    }
-
-    .menu a:hover {
-      background: none;
-      color: var(--seal);
-    }
-
-    /* ── hero ─────────────────────── */
-    .z-hero {
-      position: relative;
-      height: min(74vh, 780px);
+    /* ticker */
+    footer.ticker {
+      border-top: 1px solid var(--line);
       overflow: hidden;
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      color: var(--dim);
+      padding: 0.55rem 0;
+      white-space: nowrap;
     }
 
-    .z-hero img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: 50% 42%;
-      display: block;
+    footer.ticker .belt { display: inline-block; animation: belt 52s linear infinite; }
+    footer.ticker .belt span { margin-right: 3.5em; }
+    footer.ticker .belt .a { color: var(--acid); }
+
+    @keyframes belt { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* plates */
+    .plate { margin: 0; border: 1px solid var(--line); position: relative; }
+    .plate img { width: 100%; height: auto; display: block; }
+    .plate figcaption {
+      position: absolute; left: 0; bottom: -1.7em;
+      font-family: var(--mono); font-size: 0.56rem;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--dim);
     }
 
-    .z-hero::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to bottom, rgba(237, 234, 227, 0.32) 0%, rgba(237, 234, 227, 0) 30%, rgba(237, 234, 227, 0) 62%, var(--paper) 100%);
-      pointer-events: none;
+    /* grain */
+    .noise-overlay { position: fixed; inset: 0; pointer-events: none; z-index: 9999; opacity: 0.05; mix-blend-mode: screen; }
+
+    @media (max-width: 700px) {
+      .topbar { font-size: 0.56rem; }
+      .topbar nav { margin-left: 0; width: 100%; }
+      .hud { font-size: 0.5rem; }
     }
 
-    .z-title {
-      position: relative;
-      margin-top: calc(-0.62 * clamp(5rem, 19vw, 15rem));
-      padding: 0 clamp(1.2rem, 4vw, 3.4rem);
-      z-index: 5;
-      display: flex;
-      align-items: baseline;
-      gap: 1.6rem;
-    }
+    main { position: relative; padding: clamp(20px, 4vw, 56px) clamp(16px, 3vw, 40px) clamp(3rem, 6vw, 5rem); }
 
-    .z-title h1 {
+    .display {
       margin: 0;
-      font-family: var(--font-latin);
+      font-family: var(--latin);
       font-style: italic;
       font-weight: 300;
-      font-size: clamp(5rem, 19vw, 15rem);
+      font-size: clamp(4.5rem, 19vw, 15rem);
       letter-spacing: -0.03em;
       line-height: 0.8;
-      mix-blend-mode: multiply;
-      filter: url(#etch);
+      color: var(--bone);
     }
 
-    .z-title .jp {
-      font-family: var(--font-jp);
-      font-size: clamp(0.75rem, 1.6vw, 1.05rem);
-      letter-spacing: 0.85em;
-      white-space: nowrap;
-      color: var(--ink);
+    .display-row { display: flex; align-items: baseline; gap: 2rem; flex-wrap: wrap; margin: clamp(1rem, 3vw, 2.5rem) 0 clamp(2rem, 5vw, 3.5rem); }
+    .display-row .jp { font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.6em; text-transform: uppercase; color: var(--acid); }
+
+    .plate-wrap { position: relative; margin: 0 0 3.4rem; }
+    .plate:hover img { filter: invert(1); }
+
+    .catalogue {
+      border-top: 1px solid var(--bone);
+      font-family: var(--mono);
+      letter-spacing: 0.04em;
     }
 
-    .z-kicker {
-      position: absolute;
-      top: clamp(4rem, 12vh, 7rem);
-      left: 1.2rem;
-      writing-mode: vertical-rl;
-      font-family: var(--font-gothic);
-      font-size: 0.55rem;
-      letter-spacing: 0.5em;
-      text-transform: uppercase;
-      color: var(--ink);
-      mix-blend-mode: multiply;
-      opacity: 0.8;
-    }
-
-    /* ── catalogue ─────────────────── */
-    main {
-      position: relative;
-    }
-
-    .z-index {
-      margin: clamp(2.4rem, 6vw, 4.5rem) clamp(1.2rem, 4vw, 3.4rem) 0;
-      border-top: 1px solid var(--ink);
+    .cat-head {
+      display: flex; justify-content: space-between;
+      padding: 0.5em 0; font-size: 0.6rem;
+      letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--dim); border-bottom: 1px solid var(--line);
     }
 
     .work-row {
       display: grid;
-      grid-template-columns: 9ch 1fr auto;
+      grid-template-columns: 7em 1fr auto;
+      gap: 0 2em;
       align-items: baseline;
-      gap: 0 2.4rem;
-      padding: 2rem 0.4rem;
-      border: none;
-      border-bottom: 1px solid var(--rule);
-      transition: background 0.25s ease;
+      padding: 1.5em 0.2em;
+      border-bottom: 1px solid var(--line);
     }
 
-    a.work-row:hover {
-      background: rgba(20, 18, 16, 0.045);
-      border-bottom-color: var(--rule);
-    }
+    a.work-row:hover { background: var(--acid); color: #000; }
+    a.work-row:hover .w-no, a.work-row:hover .w-desc, a.work-row:hover .w-type { color: #000; }
 
-    a.work-row:hover .w-title {
-      border-bottom: 1px solid var(--ink);
-    }
+    .w-no { color: var(--acid); font-size: 0.8rem; }
+    .w-no .w-year { display: block; color: var(--dim); font-size: 0.62rem; letter-spacing: 0.2em; margin-top: 0.4em; }
+    a.work-row:hover .w-no .w-year { color: #000; }
+    .w-title { font-family: var(--jp); font-size: clamp(1.2rem, 3vw, 2rem); font-weight: 500; letter-spacing: -0.01em; line-height: 1.2; }
+    .w-desc { display: block; font-family: var(--jp); margin-top: 0.5em; font-size: 0.74rem; line-height: 1.8; color: var(--dim); max-width: 44em; }
+    .w-type { font-size: 0.56rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--dim); white-space: nowrap; justify-self: end; }
 
-    .w-no {
-      font-family: var(--font-latin);
-      font-style: italic;
-      font-size: 0.95rem;
-      letter-spacing: 0.04em;
-      color: var(--seal);
-    }
+    .errata { margin: 2.4rem 0 0; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.14em; color: var(--hot); }
+    .more { margin: 0.9rem 0 0; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--dim); }
 
-    .w-no .w-year {
-      display: block;
-      font-family: var(--font-gothic);
-      font-size: 0.55rem;
-      letter-spacing: 0.2em;
-      color: var(--faint);
-      margin-top: 0.5em;
-    }
-
-    .w-title {
-      font-size: clamp(1.3rem, 3.2vw, 2.2rem);
-      font-weight: 500;
-      letter-spacing: -0.02em;
-      line-height: 1.15;
-    }
-
-    .w-desc {
-      display: block;
-      margin-top: 0.55rem;
-      font-size: 0.68rem;
-      font-weight: 400;
-      line-height: 1.8;
-      color: var(--faint);
-      max-width: 44em;
-    }
-
-    .w-type {
-      font-family: var(--font-gothic);
-      font-size: 0.52rem;
-      letter-spacing: 0.32em;
-      text-transform: uppercase;
-      color: var(--faint);
-      white-space: nowrap;
-      justify-self: end;
-      border-bottom: 1px solid var(--rule);
-      padding-bottom: 0.3em;
-    }
-
-    /* ── margins ─────────────────── */
-    .z-errata {
-      margin: 2.6rem clamp(1.2rem, 4vw, 3.4rem) 0;
-      font-size: 0.58rem;
-      letter-spacing: 0.14em;
-      color: var(--seal);
-    }
-
-    .z-more {
-      margin: 1.1rem clamp(1.2rem, 4vw, 3.4rem) 3rem;
-      font-family: var(--font-gothic);
-      font-size: 0.56rem;
-      letter-spacing: 0.26em;
-      text-transform: uppercase;
-      color: var(--faint);
-    }
-
-    .z-prism {
-      position: absolute;
-      left: -20%;
-      top: min(30vh, 320px);
-      width: 140%;
-      height: 5px;
-      background: linear-gradient(90deg, transparent 0%, rgba(255, 0, 160, 0.5) 22%, rgba(255, 220, 0, 0.55) 42%, rgba(0, 235, 200, 0.5) 60%, rgba(110, 0, 255, 0.4) 78%, transparent 100%);
-      filter: blur(3px);
-      transform: rotate(-9deg);
-      pointer-events: none;
-      z-index: 4;
-      mix-blend-mode: screen;
-    }
-
-    /* ── grain ─────────────────── */
-    .noise-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 9999;
-      opacity: 0.05;
-      mix-blend-mode: multiply;
-    }
-
-    body::after {
-      content: "";
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 9998;
-      background: radial-gradient(circle at 50% 45%, transparent 62%, rgba(20, 18, 16, 0.10) 100%);
-    }
-
-    /* ── responsive ─────────────── */
-    @media (max-width: 900px) {
-      .z-hero {
-        height: 52vh;
-      }
-
-      .z-title {
-        gap: 1rem;
-      }
-
-      .z-title h1 {
-        font-size: clamp(4rem, 22vw, 7rem);
-      }
-
-      .z-kicker {
-        display: none;
-      }
-
-      .work-row {
-        grid-template-columns: 1fr;
-        gap: 0.5rem;
-        padding: 1.5rem 0.2rem;
-      }
-
-      .w-no .w-year {
-        display: inline;
-        margin-left: 1em;
-      }
-
-      .w-type {
-        justify-self: start;
-      }
+    @media (max-width: 700px) {
+      .work-row { grid-template-columns: 1fr; gap: 0.4em; }
+      .w-type { justify-self: start; }
     }
   </style>
 </head>
 
 <body>
-  <svg width="0" height="0" aria-hidden="true" style="position:absolute">
-    <filter id="etch" x="-5%" y="-5%" width="110%" height="110%">
-      <feTurbulence type="fractalNoise" baseFrequency="0.011 0.019" numOctaves="2" seed="7" result="n" />
-      <feDisplacementMap in="SourceGraphic" in2="n" scale="5" xChannelSelector="R" yChannelSelector="G" />
-    </filter>
-  </svg>
-
-  <header>
-    <a href="./" class="brand">synomare</a>
-    <details class="nav">
-      <summary>Menu</summary>
-      <nav class="menu" aria-label="site">
-        <a href="./" data-jp="口上">HOME</a>
-        <a href="works.html" data-jp="作品">WORKS</a>
-        <a href="notes/" data-jp="雑記">NOTES</a>
-        <a href="links.html" data-jp="交遊">LINKS</a>
-        <a href="profile.html" data-jp="奥付">PROFILE</a>
-        <a href="about.html" data-jp="図版">ABOUT</a>
-        <a href="mailto:synomare@gmail.com" data-jp="連絡">CONTACT</a>
-      </nav>
-    </details>
+  <header class="topbar">
+    <a class="brand" href="./">SYNOMARE<sup>&trade;</sup></a>
+    <span class="clock" id="clock">--:--:--</span>
+    <nav aria-label="site">
+        <a href="./">INDEX</a>
+        <a href="works.html" aria-current="page">WORKS</a>
+        <a href="notes/">NOTES</a>
+        <a href="links.html">LINKS</a>
+        <a href="profile.html">PROFILE</a>
+        <a href="about.html">ABOUT</a>
+        <a href="mailto:synomare@gmail.com">CONTACT</a>
+    </nav>
   </header>
+  <div class="hud" aria-hidden="true">
+    <span>CATALOGUE — 作品目録</span>
+    <span>SESSION <span id="session">------</span></span>
+    <span>JST <span id="hud-date">----.--.--</span></span>
+    <span>STATUS: <span class="on">稼働中</span></span>
+    <span>REC W-001</span>
+    <span class="hot">観測により頁は変化する</span>
+  </div>
 
   <main>
-    <section class="z-hero" aria-label="Terpsichora">
-      <img src="assets/images/graphics/terpsichora.jpg" alt="Terpsichora — synomare" width="2000" height="1414" loading="eager" fetchpriority="high">
+    <section class="display-row">
+      <h1 class="display">Works</h1>
+      <span class="jp">作品目録 — Catalogue</span>
     </section>
 
-    <div class="z-prism" aria-hidden="true"></div>
-    <p class="z-kicker" aria-hidden="true">Catalogue of Works — 作品目録</p>
+    <div class="plate-wrap">
+      <figure class="plate">
+        <img src="assets/images/graphics/terpsichora.jpg" alt="Terpsichora — synomare" width="2000" height="1414" loading="eager" fetchpriority="high">
+        <figcaption>FIG. 01 — TERPSICHORA / MARBLED FIELD / 2000&times;1414</figcaption>
+      </figure>
+    </div>
 
-    <section class="z-title">
-      <h1>Works</h1>
-      <span class="jp">作品目録</span>
-    </section>
+    <section class="catalogue" aria-label="作品一覧">
+      <div class="cat-head"><span>Registered Works</span><span>001&ndash;&hellip;</span></div>
 
-    <section class="z-index" aria-label="作品一覧">
       <a class="work-row" href="yugun/index.html">
-        <span class="w-no">No. 001<span class="w-year">2025</span></span>
+        <span class="w-no">[W-001]<span class="w-year">2025</span></span>
         <span class="w-main">
           <span class="w-title">嶼群（博物館（たち））</span>
           <span class="w-desc">博物館を舞台にした、土地と記憶をめぐる戯曲。テキスト全文、座談会、対談を収録。</span>
@@ -428,7 +237,7 @@
       <!-- 作品を追加するときは、下の行をコピーして書き換えてください。
            リンク先のない作品（記録のみ）は <a> を <div> に変えれば同じ見た目で置けます。
       <a class="work-row" href="作品ページのパス or 外部URL">
-        <span class="w-no">No. 00X<span class="w-year">20XX</span></span>
+        <span class="w-no">[W-00X]<span class="w-year">20XX</span></span>
         <span class="w-main">
           <span class="w-title">作品タイトル</span>
           <span class="w-desc">一行の説明。媒体・会場・共作者など。</span>
@@ -438,24 +247,30 @@
       -->
     </section>
 
-    <p class="z-errata">正誤表 — 本頁の誤りは、未だ発見されていない。</p>
-
-    <p class="z-more">その他の制作物 — <a href="https://www.instagram.com/syno_mare/?utm_source=qr" target="_blank" rel="noopener">Instagram</a></p>
+    <p class="errata">ERRATA — 本頁の誤りは、未だ発見されていない。</p>
+    <p class="more">その他の制作物 — <a href="https://www.instagram.com/syno_mare/?utm_source=qr" target="_blank" rel="noopener">INSTAGRAM</a></p>
 
     <div class="noise-overlay"></div>
   </main>
 
-  <footer>
-    <small>synomare — works</small>
-    <small>&copy; <span id="year"></span> synomare. All rights reserved.</small>
+  <footer class="ticker" aria-hidden="true">
+    <div class="belt"><span>SYNOMARE — SPECULATIVE ARCHIVE</span><span class="a">テクスト。デザイン。グラフィック。</span><span>つくったものは、つくられたあとも、すこしずつべつのものになっていく。</span><span class="a">本頁は閲覧のたびにあなたのブラウザで刷られています。</span><span>正誤表 — 本頁の誤りは、未だ発見されていない。</span><span>SYNOMARE — SPECULATIVE ARCHIVE</span><span class="a">テクスト。デザイン。グラフィック。</span><span>つくったものは、つくられたあとも、すこしずつべつのものになっていく。</span><span class="a">本頁は閲覧のたびにあなたのブラウザで刷られています。</span><span>正誤表 — 本頁の誤りは、未だ発見されていない。</span></div>
   </footer>
-
   <script>
     (function () {
+      function pad(n) { return n < 10 ? '0' + n : n; }
+      var clock = document.getElementById('clock');
+      var hd = document.getElementById('hud-date');
+      function tick() {
+        var now = new Date(Date.now() + (9 * 60 + new Date().getTimezoneOffset()) * 60000);
+        if (clock) clock.textContent = pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+        if (hd) hd.textContent = now.getFullYear() + '.' + pad(now.getMonth() + 1) + '.' + pad(now.getDate());
+      }
+      tick(); setInterval(tick, 1000);
+      var s = document.getElementById('session');
+      if (s) s.textContent = Math.random().toString(36).slice(2, 8).toUpperCase();
       var y = document.getElementById('year');
       if (y) y.textContent = new Date().getFullYear();
-      var theme = document.querySelector('meta[name="theme-color"]');
-      if (theme) { var bg = getComputedStyle(document.documentElement).getPropertyValue('--paper').trim(); theme.setAttribute('content', bg) }
     })();
   </script>
   <script>
@@ -463,14 +278,12 @@
       var overlay = document.querySelector('.noise-overlay');
       if (!overlay) return;
       var canvas = document.createElement('canvas');
-      canvas.width = 128;
-      canvas.height = 128;
+      canvas.width = 128; canvas.height = 128;
       var ctx = canvas.getContext('2d');
       var idata = ctx.createImageData(128, 128);
       var buffer32 = new Uint32Array(idata.data.buffer);
-      var len = buffer32.length;
-      for (var i = 0; i < len; i++) {
-        if (Math.random() < 0.5) buffer32[i] = 0xff000000;
+      for (var i = 0; i < buffer32.length; i++) {
+        if (Math.random() < 0.5) buffer32[i] = 0xffffffff;
       }
       ctx.putImageData(idata, 0, 0);
       overlay.style.backgroundImage = 'url(' + canvas.toDataURL() + ')';
