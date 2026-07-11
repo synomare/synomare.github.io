@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>synomare — OVERPRINT (variant C)</title>
+  <meta name="theme-color" content="#e9e7e0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300&family=IBM+Plex+Mono:wght@400;500&family=Shippori+Mincho+B1:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --stock: #e9e7e0;
+      --ink: #12100c;
+      --mag: #e5007e;
+      --cyn: #009fe3;
+      --mono: "IBM Plex Mono", Menlo, monospace;
+      --jp: "Shippori Mincho B1", "Hiragino Mincho ProN", serif;
+      --latin: "Cormorant Garamond", "Times New Roman", serif;
+    }
+
+    html, body { overflow-x: hidden; }
+
+    body {
+      margin: 0;
+      background: var(--stock);
+      color: var(--ink);
+      font-family: var(--jp);
+      min-height: 100svh;
+      position: relative;
+    }
+
+    ::selection { background: var(--mag); color: #fff; }
+    a { color: inherit; text-decoration: none; }
+
+    /* misregistered plates */
+    .press { position: relative; min-height: 100svh; overflow: hidden; }
+
+    .plate-t {
+      position: absolute;
+      top: -6vh;
+      left: -8vw;
+      width: 74vw;
+      transform: rotate(-7deg);
+      mix-blend-mode: multiply;
+      opacity: 0.92;
+    }
+
+    .plate-a {
+      position: absolute;
+      top: 16vh;
+      right: -14vw;
+      width: 52vw;
+      transform: rotate(4deg);
+      mix-blend-mode: multiply;
+      filter: contrast(1.05);
+      opacity: 0.9;
+    }
+
+    .plate-t img, .plate-a img { width: 100%; height: auto; display: block; }
+
+    /* misregistered CMY wordmark */
+    .mark {
+      position: absolute;
+      top: 30vh;
+      left: 3vw;
+      z-index: 10;
+      font-family: var(--latin);
+      font-style: italic;
+      font-weight: 300;
+      font-size: clamp(4.4rem, 15.5vw, 15rem);
+      line-height: 0.8;
+      letter-spacing: -0.04em;
+      transform: rotate(-7deg);
+      mix-blend-mode: multiply;
+      pointer-events: none;
+    }
+
+    .mark .lay { position: absolute; top: 0; left: 0; white-space: nowrap; }
+    .mark .m { color: var(--mag); transform: translate(-0.035em, -0.03em); }
+    .mark .c { color: var(--cyn); transform: translate(0.035em, 0.03em); }
+    .mark .k { position: relative; color: var(--ink); }
+
+    /* rotated JP slogans */
+    .slogan {
+      position: absolute;
+      z-index: 11;
+      font-size: clamp(1.1rem, 3vw, 2.2rem);
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      mix-blend-mode: multiply;
+      white-space: nowrap;
+    }
+
+    .s1 { top: 62vh; left: 6vw; transform: rotate(-7deg); }
+    .s2 { top: 12vh; right: 4vw; transform: rotate(4deg); writing-mode: vertical-rl; letter-spacing: 0.3em; font-weight: 400; font-size: clamp(0.85rem, 1.8vw, 1.2rem); }
+
+    /* nav — loose stamps */
+    .stamps {
+      position: absolute;
+      z-index: 12;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .stamp {
+      position: absolute;
+      pointer-events: auto;
+      font-family: var(--mono);
+      font-size: clamp(0.62rem, 1.3vw, 0.8rem);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      border: 1.5px solid var(--ink);
+      padding: 0.45em 0.9em;
+      background: rgba(233, 231, 224, 0.82);
+      mix-blend-mode: hard-light;
+    }
+
+    .stamp:hover { background: var(--ink); color: var(--stock); }
+    .stamp small { display: block; font-family: var(--jp); letter-spacing: 0.4em; font-size: 0.82em; margin-top: 0.25em; color: inherit; opacity: 0.6; }
+
+    .st-works { top: 71vh; left: 8vw; transform: rotate(-6deg); border-color: var(--mag); color: var(--mag); }
+    .st-works:hover { background: var(--mag); color: #fff; }
+    .st-notes { top: 79vh; left: 30vw; transform: rotate(3deg); }
+    .st-links { top: 68vh; right: 26vw; transform: rotate(-2deg); border-color: var(--cyn); color: var(--cyn); }
+    .st-links:hover { background: var(--cyn); color: #fff; }
+    .st-profile { top: 82vh; right: 8vw; transform: rotate(5deg); }
+    .st-about { top: 88vh; left: 55vw; transform: rotate(-4deg); }
+    .st-contact { top: 58vh; right: 6vw; transform: rotate(-8deg); }
+
+    /* registration marks + meta */
+    .reg {
+      position: absolute;
+      z-index: 13;
+      font-family: var(--mono);
+      font-size: 0.54rem;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+
+    .reg-tl { top: 0.7rem; left: 0.8rem; }
+    .reg-tr { top: 0.7rem; right: 0.8rem; text-align: right; }
+    .reg-bl { bottom: 0.7rem; left: 0.8rem; }
+    .reg-br { bottom: 0.7rem; right: 0.8rem; text-align: right; }
+    .reg .m { color: var(--mag); }
+    .reg .c { color: var(--cyn); }
+
+    /* intro paragraph block */
+    .intro {
+      position: absolute;
+      z-index: 11;
+      top: 44vh;
+      right: 5vw;
+      max-width: 19em;
+      font-size: clamp(12px, 1.3vw, 15px);
+      line-height: 2.1;
+      background: rgba(233, 231, 224, 0.75);
+      padding: 0.9rem 1rem;
+      transform: rotate(2deg);
+      border-left: 3px solid var(--mag);
+    }
+
+    .intro .muted { opacity: 0.55; }
+
+    @media (max-width: 700px) {
+      .plate-t { width: 130vw; }
+      .plate-a { width: 90vw; top: 30vh; }
+      .mark { font-size: 17vw; top: 22vh; }
+      .intro { position: relative; top: auto; right: auto; margin: 58vh 6vw 0; max-width: none; }
+      .stamps { position: relative; inset: auto; display: flex; flex-wrap: wrap; gap: 0.7rem; padding: 1.2rem 6vw 3rem; }
+      .stamp { position: relative; top: auto !important; left: auto !important; right: auto !important; }
+      .s1, .s2 { display: none; }
+      .press { min-height: auto; padding-bottom: 1rem; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="press">
+    <figure class="plate-t" aria-hidden="true" style="margin:0">
+      <img src="../assets/images/graphics/terpsichora.jpg" alt="">
+    </figure>
+    <figure class="plate-a" aria-hidden="true" style="margin:0">
+      <img src="../assets/images/graphics/angel-anatomy.jpg" alt="">
+    </figure>
+
+    <div class="mark" aria-hidden="true">
+      <span class="lay m">synomare</span>
+      <span class="lay c">synomare</span>
+      <span class="lay k">synomare</span>
+    </div>
+
+    <p class="slogan s1">テクスト。デザイン。グラフィック。</p>
+    <p class="slogan s2">刷るたびに、版はすこしずつ、ずれていく。</p>
+
+    <div class="intro">
+      synomare<span class="muted">っていいます。</span>テクスト<span class="muted">を書いて、</span>デザイン<span class="muted">をして、</span>グラフィック<span class="muted">をつくります。</span>演劇の演出<span class="muted">をすることもあります。</span>
+    </div>
+
+    <nav class="stamps" aria-label="site">
+      <a class="stamp st-works" href="../works.html">Works<small>作品目録</small></a>
+      <a class="stamp st-notes" href="../notes/">Notes<small>雑記</small></a>
+      <a class="stamp st-links" href="../links.html">Links<small>交遊録</small></a>
+      <a class="stamp st-profile" href="../profile.html">Profile<small>奥付</small></a>
+      <a class="stamp st-about" href="../about.html">About<small>図版</small></a>
+      <a class="stamp st-contact" href="mailto:synomare@gmail.com">Contact<small>連絡</small></a>
+    </nav>
+
+    <p class="reg reg-tl">SYNOMARE — OVERPRINT<br>MISREGISTRATION: <span class="m">M+0.03</span> / <span class="c">C−0.03</span></p>
+    <p class="reg reg-tr">PLATE I: TERPSICHORA<br>PLATE II: ANGEL ANATOMY</p>
+    <p class="reg reg-bl">刷り重ね(見当ずれ)により<br>本頁の色は毎回一致しない</p>
+    <p class="reg reg-br">EDITION: UNLIMITED<br>JST <span id="d"></span></p>
+  </div>
+
+  <script>
+    (function () {
+      var d = document.getElementById('d');
+      if (d) { var n = new Date(); d.textContent = n.getFullYear() + '.' + (n.getMonth() + 1) + '.' + n.getDate(); }
+    })();
+  </script>
+</body>
+
+</html>
