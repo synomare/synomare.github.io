@@ -195,15 +195,6 @@
     .colophon dd a:hover { background: var(--ink); color: var(--paper); border-bottom-color: var(--ink); }
     .colophon dd a + a { margin-left: 1.4em; }
 
-    .seal {
-      display: inline-grid; place-items: center;
-      width: 2.4em; height: 2.4em;
-      border: 1.5px solid var(--red); color: var(--red);
-      font-size: 0.85rem;
-      transform: rotate(-4deg);
-      margin-top: 1.6rem;
-    }
-
     .p-thread { top: 30vh; left: 30vw; width: 34vw; transform: rotate(14deg); }
 
     @media (max-width: 700px) {
@@ -217,7 +208,7 @@
 
 <body>
   <header class="topbar">
-    <a class="brand" href="./">SYNOMARE<span class="jp">標本帖</span></a>
+    <a class="brand" href="./">SYNOMARE</a>
     <span class="date">JST <span id="d">----.--.--</span></span>
     <nav aria-label="site">
         <a href="./">INDEX</a>
@@ -225,7 +216,6 @@
         <a href="notes/">NOTES</a>
         <a href="links.html">LINKS</a>
         <a href="profile.html" aria-current="page">PROFILE</a>
-        <a href="about.html">ABOUT</a>
         <a href="mailto:synomare@gmail.com">CONTACT</a>
     </nav>
   </header>
@@ -240,14 +230,13 @@
     <h1 class="ghost-name">synomare</h1>
 
     <div class="bio">
-      <div class="sec-head"><span>Specimen — 標本</span><span class="r">No. 000</span></div>
       synomare<span class="muted">っていいます。</span>テクスト<span class="muted">を書いて、</span>デザイン<span class="muted">をして、</span>グラフィック<span class="muted">をつくります。</span>演劇の演出<span class="muted">をすることもあります。</span>
     </div>
 
     <section class="colophon" aria-label="奥付">
-      <div class="sec-head"><span>Colophon — 奥付</span><span class="r">SPEC. P-001</span></div>
+      <div class="sec-head"><span>Colophon — 奥付</span></div>
       <dl>
-        <div class="kv"><dt>名称 / Name</dt><dd>synomare（しのまれ）</dd></div>
+        <div class="kv"><dt>名称 / Name</dt><dd>synomare（しのめあ）</dd></div>
         <div class="kv"><dt>業務 / Field</dt><dd>テクスト・デザイン・グラフィック・演出</dd></div>
         <div class="kv"><dt>記録 / Records</dt><dd>
           <a href="https://x.com/synomare" target="_blank" rel="noopener">X / Twitter</a>
@@ -255,15 +244,12 @@
           <a href="https://note.com/synomare" target="_blank" rel="noopener">note / 日記</a>
         </dd></div>
         <div class="kv"><dt>連絡 / Contact</dt><dd><a href="mailto:synomare@gmail.com">synomare@gmail.com</a></dd></div>
-        <div class="kv"><dt>印刷 / Printing</dt><dd>本頁は、閲覧のたびにあなたのブラウザで刷られています。</dd></div>
       </dl>
-      <span class="seal" aria-hidden="true">印</span>
     </section>
   </main>
 
   <footer class="caption">
-    <span>SYNOMARE — SPECIMEN SHEET / PROFILE — 奥付</span>
-    <span class="r">観察は変形である</span>
+    <span>SYNOMARE / PROFILE — 奥付</span>
     <span class="d">&copy; <span id="year"></span> synomare — all rights reserved.</span>
   </footer>
   <script>

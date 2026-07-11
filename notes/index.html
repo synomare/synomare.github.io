@@ -176,7 +176,7 @@
 <body>
   <a class="sr-only" href="#main">Skip to Content</a>
   <header class="topbar">
-    <a class="brand" href="../">SYNOMARE<span class="jp">標本帖</span></a>
+    <a class="brand" href="../">SYNOMARE</a>
     <span class="date">JST <span id="d">----.--.--</span></span>
     <nav aria-label="site">
         <a href="../">INDEX</a>
@@ -184,7 +184,6 @@
         <a href="../notes/" aria-current="page">NOTES</a>
         <a href="../links.html">LINKS</a>
         <a href="../profile.html">PROFILE</a>
-        <a href="../about.html">ABOUT</a>
         <a href="mailto:synomare@gmail.com">CONTACT</a>
     </nav>
   </header>
@@ -196,14 +195,13 @@
         <span class="jp">Journal — 雑記・断章</span>
       </section>
       <p class="lead">書いたものやメモをここにまとめています。新しい記事から順に並びます。</p>
-      <div class="sec-head"><span>Field Notes — 採集記録</span><span class="r">N-001&ndash;&hellip;</span></div>
+      <div class="sec-head"><span>Entries — 投稿一覧</span></div>
       <ul class="post-list" id="postList" aria-live="polite"></ul>
     </div>
   </main>
 
   <footer class="caption">
-    <span>SYNOMARE — SPECIMEN SHEET / NOTES — 雑記</span>
-    <span class="r">観察は変形である</span>
+    <span>SYNOMARE / NOTES — 雑記</span>
     <span class="d">&copy; <span id="year"></span> synomare — all rights reserved.</span>
   </footer>
   <script>
@@ -245,7 +243,7 @@
         var meta=document.createElement('span');
         meta.className='post-meta';
         var time=document.createElement('time');
-        if(post.date){ time.setAttribute('datetime',post.date); time.textContent='SPEC. N-'+String(posts.length-i).padStart(3,'0')+' / '+post.date; }
+        if(post.date){ time.setAttribute('datetime',post.date); time.textContent=post.date; }
         meta.appendChild(time);
         link.appendChild(meta);
         var title=document.createElement('strong');
