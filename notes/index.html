@@ -9,19 +9,19 @@
   <meta property="og:title" content="Notes — synomare">
   <meta property="og:description" content="synomare の雑記・断章。">
   <meta property="og:type" content="website">
-  <meta name="theme-color" content="#060606">
+  <meta name="theme-color" content="#f4f3ef">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300&family=IBM+Plex+Mono:wght@400;500&family=Shippori+Mincho+B1:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --void: #060606;
-      --bone: #e8e3d5;
-      --dim: #6f6a5a;
-      --line: #26231c;
-      --acid: #c6f312;
-      --hot: #ff4517;
-      --mono: "IBM Plex Mono", "SFMono-Regular", Menlo, Consolas, "Hiragino Kaku Gothic ProN", monospace;
+      --paper: #f4f3ef;
+      --ink: #17140f;
+      --red: #c41f1f;
+      --dim: #8f887a;
+      --line: #d9d5c9;
+      --card: #fdfdfb;
+      --mono: "IBM Plex Mono", Menlo, Consolas, monospace;
       --jp: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", serif;
       --latin: "Cormorant Garamond", "Times New Roman", serif;
     }
@@ -30,21 +30,19 @@
 
     body {
       margin: 0;
-      background: var(--void);
-      color: var(--bone);
+      background: var(--paper);
+      color: var(--ink);
       font-family: var(--jp);
       font-size: 16px;
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
       display: grid;
-      grid-template-rows: auto auto 1fr auto;
+      grid-template-rows: auto 1fr auto;
       min-height: 100svh;
     }
 
-    ::selection { background: var(--acid); color: #000; }
-
+    ::selection { background: var(--red); color: #fff; }
     a { color: inherit; text-decoration: none; }
-    a:hover { background: var(--acid); color: #000; }
 
     .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 
@@ -55,92 +53,121 @@
       align-items: baseline;
       gap: 0.4em 1.6em;
       padding: 0.7rem 1rem;
-      border-bottom: 1px solid var(--line);
+      border-bottom: 1px solid var(--ink);
       font-family: var(--mono);
       font-size: 0.62rem;
       letter-spacing: 0.12em;
       text-transform: uppercase;
       position: sticky;
       top: 0;
-      background: var(--void);
+      background: var(--paper);
       z-index: 500;
     }
 
     .topbar .brand { font-weight: 500; }
-    .topbar .brand sup { font-size: 0.7em; }
-    .topbar .clock { color: var(--acid); }
+    .topbar .brand .jp { font-family: var(--jp); color: var(--dim); letter-spacing: 0.3em; margin-left: 1em; }
+    .topbar .date { color: var(--red); }
     .topbar nav { margin-left: auto; display: flex; flex-wrap: wrap; gap: 0.4em 1.1em; }
-    .topbar nav a[aria-current] { background: var(--bone); color: #000; padding: 0 0.35em; }
+    .topbar nav a:hover { background: var(--ink); color: var(--paper); }
+    .topbar nav a[aria-current] { background: var(--ink); color: var(--paper); padding: 0 0.35em; }
 
-    /* hud */
-    .hud {
+    /* specimen tag (shared) */
+    .tag {
+      background: var(--card);
+      border: 1px solid var(--ink);
+      box-shadow: 3px 3px 0 rgba(23, 20, 15, 0.22);
+      padding: 0.55rem 0.7rem 0.5rem;
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.12em;
+    }
+
+    a.tag:hover { background: var(--ink); color: var(--paper); }
+    .tag .no { display: block; color: var(--red); font-size: 0.85em; margin-bottom: 0.35em; }
+    .tag .en { display: block; text-transform: uppercase; font-weight: 500; font-size: 1.05em; }
+    .tag .jp { display: block; font-family: var(--jp); color: var(--dim); margin-top: 0.3em; letter-spacing: 0.3em; }
+    a.tag:hover .jp { color: var(--paper); }
+
+    /* section head */
+    .sec-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-family: var(--mono);
+      font-size: 0.58rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--red);
+      border-bottom: 1px solid var(--ink);
+      padding-bottom: 0.5em;
+      margin-bottom: 1.2em;
+    }
+
+    .sec-head .r { color: var(--dim); }
+
+    /* red thread */
+    .thread {
+      position: absolute;
+      height: 1px;
+      background: var(--red);
+      transform-origin: 0 0;
+      pointer-events: none;
+      opacity: 0.85;
+      z-index: 4;
+    }
+
+    /* footer caption */
+    footer.caption {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.3em 1.6em;
-      padding: 0.45rem 1rem;
-      border-bottom: 1px solid var(--line);
+      justify-content: space-between;
+      gap: 0.4em 2em;
+      padding: 0.7rem 1rem;
+      border-top: 1px solid var(--ink);
       font-family: var(--mono);
       font-size: 0.56rem;
-      letter-spacing: 0.14em;
+      letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: var(--dim);
+      color: var(--ink);
+      background: var(--paper);
     }
 
-    .hud .on { color: var(--acid); }
-    .hud .hot { color: var(--hot); }
-
-    /* ticker */
-    footer.ticker {
-      border-top: 1px solid var(--line);
-      overflow: hidden;
-      font-family: var(--mono);
-      font-size: 0.62rem;
-      letter-spacing: 0.14em;
-      color: var(--dim);
-      padding: 0.55rem 0;
-      white-space: nowrap;
-    }
-
-    footer.ticker .belt { display: inline-block; animation: belt 52s linear infinite; }
-    footer.ticker .belt span { margin-right: 3.5em; }
-    footer.ticker .belt .a { color: var(--acid); }
-
-    @keyframes belt { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-
-    /* plates */
-    .plate { margin: 0; border: 1px solid var(--line); position: relative; }
-    .plate img { width: 100%; height: auto; display: block; }
-    .plate figcaption {
-      position: absolute; left: 0; bottom: -1.7em;
-      font-family: var(--mono); font-size: 0.56rem;
-      letter-spacing: 0.2em; text-transform: uppercase; color: var(--dim);
-    }
-
-    /* grain */
-    .noise-overlay { position: fixed; inset: 0; pointer-events: none; z-index: 9999; opacity: 0.05; mix-blend-mode: screen; }
+    footer.caption .r { color: var(--red); }
+    footer.caption .d { color: var(--dim); }
 
     @media (max-width: 700px) {
       .topbar { font-size: 0.56rem; }
       .topbar nav { margin-left: 0; width: 100%; }
-      .hud { font-size: 0.5rem; }
+      .topbar .brand .jp { display: none; }
     }
 
-    main { position: relative; padding: clamp(20px, 4vw, 56px) clamp(16px, 3vw, 40px) clamp(3rem, 6vw, 5rem); }
+    main { position: relative; padding: clamp(20px, 4vw, 56px) clamp(16px, 3.4vw, 44px) clamp(3rem, 6vw, 4.5rem); }
     .wrap { max-width: 80ch; }
 
-    .display-row { display: flex; align-items: baseline; gap: 2rem; flex-wrap: wrap; margin: clamp(1rem, 3vw, 2.5rem) 0 clamp(1.6rem, 4vw, 2.6rem); }
-    .display { margin: 0; font-family: var(--latin); font-style: italic; font-weight: 300; font-size: clamp(3.2rem, 12vw, 8rem); letter-spacing: -0.03em; line-height: 0.8; }
-    .display-row .jp { font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.6em; text-transform: uppercase; color: var(--acid); }
+    .display-row { display: flex; align-items: baseline; gap: 2rem; flex-wrap: wrap; margin: 0 0 clamp(1.2rem, 3vw, 2rem); }
+    .display {
+      margin: 0;
+      font-family: var(--latin);
+      font-style: italic;
+      font-weight: 300;
+      font-size: clamp(3rem, 11vw, 8rem);
+      letter-spacing: -0.03em;
+      line-height: 0.8;
+      color: transparent;
+      -webkit-text-stroke: 1.5px var(--ink);
+    }
+    .display-row .jp { font-family: var(--mono); font-size: 0.64rem; letter-spacing: 0.5em; text-transform: uppercase; color: var(--red); }
 
-    .lead { margin: 0 0 1.8rem; font-size: 0.9rem; color: var(--dim); }
+    .lead { margin: 0 0 1.6rem; font-size: 0.9rem; color: var(--dim); }
 
-    .post-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--bone); }
-    .post-list li { margin: 0; padding: 1.1em 0.2em; border-bottom: 1px solid var(--line); }
+    .post-list { list-style: none; margin: 0; padding: 0; }
+    .post-list li { margin: 0; padding: 1.1em 0.3em; border-bottom: 1px solid var(--line); }
     .post-list a { display: block; }
-    .post-list a:hover { background: var(--acid); color: #000; }
-    .post-list a:hover time, .post-list a:hover p { color: #000; }
+    .post-list a:hover { background: var(--ink); color: var(--paper); }
+    .post-list a:hover time { color: var(--paper); opacity: 0.75; }
+    .post-list a:hover p { color: var(--paper); opacity: 0.75; }
     .post-list strong { display: inline; font-weight: 500; font-size: clamp(18px, 2.4vw, 26px); letter-spacing: -0.01em; }
-    .post-list time { color: var(--acid); font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.15em; margin-right: 1em; }
+    .post-list time { display: inline-block; color: var(--red); font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.15em; margin-right: 1em; }
     .post-list p { margin: .4rem 0 0; font-size: 0.82rem; color: var(--dim); }
     .post-meta { display: inline; }
   </style>
@@ -149,8 +176,8 @@
 <body>
   <a class="sr-only" href="#main">Skip to Content</a>
   <header class="topbar">
-    <a class="brand" href="../">SYNOMARE<sup>&trade;</sup></a>
-    <span class="clock" id="clock">--:--:--</span>
+    <a class="brand" href="../">SYNOMARE<span class="jp">標本帖</span></a>
+    <span class="date">JST <span id="d">----.--.--</span></span>
     <nav aria-label="site">
         <a href="../">INDEX</a>
         <a href="../works.html">WORKS</a>
@@ -161,61 +188,34 @@
         <a href="mailto:synomare@gmail.com">CONTACT</a>
     </nav>
   </header>
-  <div class="hud" aria-hidden="true">
-    <span>JOURNAL — 雑記・断章</span>
-    <span>SESSION <span id="session">------</span></span>
-    <span>JST <span id="hud-date">----.--.--</span></span>
-    <span>STATUS: <span class="on">稼働中</span></span>
-    <span class="hot">観測により頁は変化する</span>
-  </div>
 
   <main id="main">
     <div class="wrap">
       <section class="display-row">
         <h1 class="display">Notes</h1>
-        <span class="jp">雑記・断章 — Journal</span>
+        <span class="jp">Journal — 雑記・断章</span>
       </section>
       <p class="lead">書いたものやメモをここにまとめています。新しい記事から順に並びます。</p>
+      <div class="sec-head"><span>Field Notes — 採集記録</span><span class="r">N-001&ndash;&hellip;</span></div>
       <ul class="post-list" id="postList" aria-live="polite"></ul>
     </div>
-    <div class="noise-overlay"></div>
   </main>
 
-  <footer class="ticker" aria-hidden="true">
-    <div class="belt"><span>SYNOMARE — SPECULATIVE ARCHIVE</span><span class="a">テクスト。デザイン。グラフィック。</span><span>つくったものは、つくられたあとも、すこしずつべつのものになっていく。</span><span class="a">本頁は閲覧のたびにあなたのブラウザで刷られています。</span><span>正誤表 — 本頁の誤りは、未だ発見されていない。</span><span>SYNOMARE — SPECULATIVE ARCHIVE</span><span class="a">テクスト。デザイン。グラフィック。</span><span>つくったものは、つくられたあとも、すこしずつべつのものになっていく。</span><span class="a">本頁は閲覧のたびにあなたのブラウザで刷られています。</span><span>正誤表 — 本頁の誤りは、未だ発見されていない。</span></div>
+  <footer class="caption">
+    <span>SYNOMARE — SPECIMEN SHEET / NOTES — 雑記</span>
+    <span class="r">観察は変形である</span>
+    <span class="d">&copy; <span id="year"></span> synomare — all rights reserved.</span>
   </footer>
   <script>
     (function () {
       function pad(n) { return n < 10 ? '0' + n : n; }
-      var clock = document.getElementById('clock');
-      var hd = document.getElementById('hud-date');
-      function tick() {
+      var d = document.getElementById('d');
+      if (d) {
         var now = new Date(Date.now() + (9 * 60 + new Date().getTimezoneOffset()) * 60000);
-        if (clock) clock.textContent = pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
-        if (hd) hd.textContent = now.getFullYear() + '.' + pad(now.getMonth() + 1) + '.' + pad(now.getDate());
+        d.textContent = now.getFullYear() + '.' + pad(now.getMonth() + 1) + '.' + pad(now.getDate());
       }
-      tick(); setInterval(tick, 1000);
-      var s = document.getElementById('session');
-      if (s) s.textContent = Math.random().toString(36).slice(2, 8).toUpperCase();
       var y = document.getElementById('year');
       if (y) y.textContent = new Date().getFullYear();
-    })();
-  </script>
-  <script>
-    (function () {
-      var overlay = document.querySelector('.noise-overlay');
-      if (!overlay) return;
-      var canvas = document.createElement('canvas');
-      canvas.width = 128; canvas.height = 128;
-      var ctx = canvas.getContext('2d');
-      var idata = ctx.createImageData(128, 128);
-      var buffer32 = new Uint32Array(idata.data.buffer);
-      for (var i = 0; i < buffer32.length; i++) {
-        if (Math.random() < 0.5) buffer32[i] = 0xffffffff;
-      }
-      ctx.putImageData(idata, 0, 0);
-      overlay.style.backgroundImage = 'url(' + canvas.toDataURL() + ')';
-      overlay.style.backgroundRepeat = 'repeat';
     })();
   </script>
   <script src="posts.js"></script>
@@ -245,7 +245,7 @@
         var meta=document.createElement('span');
         meta.className='post-meta';
         var time=document.createElement('time');
-        if(post.date){ time.setAttribute('datetime',post.date); time.textContent='[N-'+String(posts.length-i).padStart(3,'0')+'] '+post.date; }
+        if(post.date){ time.setAttribute('datetime',post.date); time.textContent='SPEC. N-'+String(posts.length-i).padStart(3,'0')+' / '+post.date; }
         meta.appendChild(time);
         link.appendChild(meta);
         var title=document.createElement('strong');
