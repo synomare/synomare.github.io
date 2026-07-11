@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>synomare — VESSEL (variant B)</title>
+  <meta name="theme-color" content="#0a0906">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=IBM+Plex+Mono:wght@400&family=Shippori+Mincho+B1:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --nave: #0a0906;
+      --gold: #c9a45c;
+      --pale: #e4dbc8;
+      --dim: #5e5844;
+      --line: #2a2517;
+      --mono: "IBM Plex Mono", Menlo, monospace;
+      --jp: "Shippori Mincho B1", "Hiragino Mincho ProN", serif;
+      --latin: "Cormorant Garamond", "Times New Roman", serif;
+    }
+
+    html, body { overflow-x: hidden; }
+
+    body {
+      margin: 0;
+      background: var(--nave);
+      color: var(--pale);
+      font-family: var(--latin);
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 0 1rem;
+      box-sizing: border-box;
+    }
+
+    ::selection { background: var(--gold); color: #000; }
+    a { color: inherit; text-decoration: none; }
+    a:hover { color: var(--gold); }
+
+    .ordinal {
+      margin-top: 2.4rem;
+      font-family: var(--mono);
+      font-size: 0.58rem;
+      letter-spacing: 0.6em;
+      color: var(--dim);
+      text-transform: uppercase;
+    }
+
+    .name {
+      margin: 1.6rem 0 0;
+      font-weight: 400;
+      font-size: clamp(2.2rem, 7.4vw, 6.4rem);
+      letter-spacing: 0.34em;
+      text-transform: uppercase;
+      text-indent: 0.34em;
+      line-height: 1;
+      color: var(--pale);
+    }
+
+    .name .thin { font-style: italic; font-weight: 300; color: var(--gold); }
+
+    .epithet {
+      margin: 1.1rem 0 0;
+      font-family: var(--jp);
+      font-size: clamp(0.7rem, 1.5vw, 0.85rem);
+      letter-spacing: 1.1em;
+      text-indent: 1.1em;
+      color: var(--dim);
+    }
+
+    .rule {
+      width: min(46rem, 82vw);
+      border: none;
+      border-top: 1px solid var(--line);
+      margin: 2.2rem auto 0;
+      position: relative;
+    }
+
+    .rule::after {
+      content: "✳";
+      position: absolute;
+      top: -0.72em;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--nave);
+      padding: 0 0.8em;
+      color: var(--gold);
+      font-size: 0.7rem;
+    }
+
+    /* arched window */
+    .arch {
+      margin: 2.6rem 0 0;
+      width: min(30rem, 76vw);
+      aspect-ratio: 3 / 4;
+      overflow: hidden;
+      border-radius: 50% 50% 0 0 / 34% 34% 0 0;
+      border: 1px solid var(--line);
+      box-shadow: 0 0 0 6px var(--nave), 0 0 0 7px var(--line);
+      position: relative;
+    }
+
+    .arch img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: 46% 40%;
+      display: block;
+      filter: sepia(0.28) contrast(1.04) brightness(0.94);
+    }
+
+    .arch::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(10, 9, 6, 0) 55%, rgba(10, 9, 6, 0.66) 100%);
+    }
+
+    .arch-caption {
+      margin: 1rem 0 0;
+      font-family: var(--mono);
+      font-size: 0.56rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--dim);
+    }
+
+    /* litany nav */
+    .litany {
+      margin: 2.8rem 0 0;
+      display: flex;
+      flex-direction: column;
+      gap: 1.05rem;
+      font-size: clamp(1rem, 2.3vw, 1.5rem);
+      letter-spacing: 0.42em;
+      text-indent: 0.42em;
+      text-transform: uppercase;
+    }
+
+    .litany a { display: block; }
+    .litany .num { font-family: var(--latin); font-style: italic; color: var(--gold); margin-right: 1.2em; font-size: 0.8em; letter-spacing: 0.1em; }
+    .litany .jp { display: block; font-family: var(--jp); font-size: 0.5em; letter-spacing: 1em; text-indent: 1em; color: var(--dim); margin-top: 0.4em; }
+    .litany a:hover .jp { color: var(--gold); }
+
+    .verse {
+      margin: 3rem 0 0;
+      font-family: var(--jp);
+      font-size: 0.8rem;
+      line-height: 2.6;
+      letter-spacing: 0.3em;
+      color: var(--dim);
+      max-width: 34em;
+    }
+
+    .foot {
+      margin: 3rem 0 2rem;
+      font-family: var(--mono);
+      font-size: 0.54rem;
+      letter-spacing: 0.5em;
+      text-transform: uppercase;
+      color: var(--dim);
+    }
+
+    .foot .g { color: var(--gold); }
+  </style>
+</head>
+
+<body>
+  <p class="ordinal">Anno MMXXVI — 投機的祭壇</p>
+
+  <h1 class="name">SYNO<span class="thin">MARE</span></h1>
+  <p class="epithet">テクスト・デザイン・グラフィック・演出</p>
+
+  <hr class="rule">
+
+  <figure class="arch" aria-label="Terpsichora">
+    <img src="../assets/images/graphics/terpsichora.jpg" alt="Terpsichora — synomare">
+  </figure>
+  <p class="arch-caption">Tabula I — Terpsichora</p>
+
+  <nav class="litany" aria-label="site">
+    <a href="../works.html"><span class="num">i.</span>Works<span class="jp">作品目録</span></a>
+    <a href="../notes/"><span class="num">ii.</span>Notes<span class="jp">雑記・断章</span></a>
+    <a href="../links.html"><span class="num">iii.</span>Links<span class="jp">交遊録</span></a>
+    <a href="../profile.html"><span class="num">iv.</span>Profile<span class="jp">奥付</span></a>
+    <a href="../about.html"><span class="num">v.</span>About<span class="jp">図版</span></a>
+    <a href="mailto:synomare@gmail.com"><span class="num">vi.</span>Contact<span class="jp">連絡</span></a>
+  </nav>
+
+  <p class="verse">つくったものは、つくられたあとも、<br>すこしずつ、べつのものになっていく。<br>目録はそのたびに書き直される。</p>
+
+  <p class="foot">SYNOMARE — VESSEL / <span class="g">本頁は閲覧のたびに刷られる</span></p>
+</body>
+
+</html>

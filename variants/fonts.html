@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>synomare — font patterns</title>
+  <meta name="theme-color" content="#f4f3ef">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,300&family=Shippori+Mincho+B1:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=EB+Garamond:ital,wght@1,400;1,500&family=Zen+Old+Mincho:wght@400;700&family=Space+Mono:wght@400;700&family=Space+Grotesk:wght@400;600&family=Zen+Kaku+Gothic+New:wght@400;500&family=JetBrains+Mono:wght@400;500&family=IM+Fell+English:ital@1&family=Courier+Prime:wght@400;700&family=Shippori+Antique+B1&family=Fraunces:ital,opsz,wght@1,9..144,300;1,9..144,400&family=Klee+One:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #f4f3ef;
+      --ink: #17140f;
+      --red: #c41f1f;
+      --dim: #8f887a;
+      --line: #d9d5c9;
+      --card: #fdfdfb;
+    }
+
+    html, body { overflow-x: hidden; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-size: 16px; -webkit-font-smoothing: antialiased; }
+    ::selection { background: var(--red); color: #fff; }
+
+    .panel {
+      padding: 2.2rem clamp(16px, 4vw, 48px) 2.8rem;
+      border-bottom: 2px solid var(--ink);
+      position: relative;
+    }
+
+    .p-label {
+      font-size: 0.62rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--red);
+      border-bottom: 1px solid var(--ink);
+      padding-bottom: 0.5em;
+      margin: 0 0 1.4em;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.3em 2em;
+    }
+
+    .p-label .r { color: var(--dim); letter-spacing: 0.12em; text-transform: none; }
+
+    .display {
+      margin: 0 0 0.28em;
+      font-weight: 300;
+      font-size: clamp(3.4rem, 11vw, 8.5rem);
+      letter-spacing: -0.03em;
+      line-height: 0.84;
+      color: transparent;
+      -webkit-text-stroke: 1.4px var(--ink);
+    }
+
+    .row { display: flex; flex-wrap: wrap; gap: 1.6rem; align-items: flex-start; margin-top: 1.2rem; }
+
+    .tag {
+      background: var(--card);
+      border: 1px solid var(--ink);
+      box-shadow: 3px 3px 0 rgba(23, 20, 15, 0.22);
+      padding: 0.55rem 0.7rem 0.5rem;
+      font-size: 0.6rem;
+      letter-spacing: 0.12em;
+      min-width: 11em;
+    }
+
+    .tag .no { display: block; color: var(--red); font-size: 0.85em; margin-bottom: 0.35em; }
+    .tag .en { display: block; text-transform: uppercase; font-weight: 500; font-size: 1.05em; }
+    .tag .jp2 { display: block; color: var(--dim); margin-top: 0.3em; letter-spacing: 0.3em; }
+
+    .bio {
+      max-width: 23em;
+      background: var(--card);
+      border: 1px solid var(--ink);
+      box-shadow: 4px 4px 0 rgba(23, 20, 15, 0.22);
+      padding: 0.9rem 1.1rem;
+      font-size: 14px;
+      line-height: 2.05;
+    }
+
+    .bio .muted { color: var(--dim); }
+
+    .cat { flex: 1; min-width: 16em; }
+    .cat .no { font-size: 0.68rem; letter-spacing: 0.12em; color: var(--red); display: block; margin-bottom: 0.3em; }
+    .cat .ttl { font-size: clamp(1.2rem, 2.6vw, 1.7rem); font-weight: 500; line-height: 1.25; }
+    .cat .desc { display: block; margin-top: 0.4em; font-size: 0.76rem; line-height: 1.85; color: var(--dim); max-width: 30em; }
+
+    /* ============ P1 現行 ============ */
+    .p1 .display { font-family: "Cormorant Garamond", serif; font-style: italic; }
+    .p1 .mono, .p1 .p-label, .p1 .tag, .p1 .cat .no { font-family: "IBM Plex Mono", monospace; }
+    .p1 .jp, .p1 .bio, .p1 .cat .ttl, .p1 .cat .desc, .p1 .tag .jp2 { font-family: "Shippori Mincho B1", serif; }
+
+    /* ============ P2 古典強め ============ */
+    .p2 .display { font-family: "EB Garamond", serif; font-style: italic; }
+    .p2 .mono, .p2 .p-label, .p2 .tag, .p2 .cat .no { font-family: "Space Mono", monospace; }
+    .p2 .jp, .p2 .bio, .p2 .cat .ttl, .p2 .cat .desc, .p2 .tag .jp2 { font-family: "Zen Old Mincho", serif; }
+
+    /* ============ P3 硬質・近代科学 ============ */
+    .p3 .display { font-family: "Space Grotesk", sans-serif; font-style: normal; font-weight: 600; letter-spacing: -0.05em; -webkit-text-stroke-width: 1.6px; }
+    .p3 .mono, .p3 .p-label, .p3 .tag, .p3 .cat .no { font-family: "JetBrains Mono", monospace; }
+    .p3 .jp, .p3 .bio, .p3 .cat .ttl, .p3 .cat .desc, .p3 .tag .jp2 { font-family: "Zen Kaku Gothic New", sans-serif; }
+
+    /* ============ P4 古書・活版 ============ */
+    .p4 .display { font-family: "IM Fell English", serif; font-style: italic; }
+    .p4 .mono, .p4 .p-label, .p4 .tag, .p4 .cat .no { font-family: "Courier Prime", monospace; }
+    .p4 .jp, .p4 .bio, .p4 .cat .ttl, .p4 .cat .desc, .p4 .tag .jp2 { font-family: "Shippori Antique B1", sans-serif; }
+
+    /* ============ P5 採集ノート ============ */
+    .p5 .display { font-family: "Fraunces", serif; font-style: italic; font-weight: 300; }
+    .p5 .mono, .p5 .p-label, .p5 .tag, .p5 .cat .no { font-family: "IBM Plex Mono", monospace; }
+    .p5 .jp, .p5 .bio, .p5 .cat .ttl, .p5 .cat .desc, .p5 .tag .jp2 { font-family: "Klee One", cursive; }
+  </style>
+</head>
+
+<body>
+  <section class="panel p1" id="p1">
+    <p class="p-label"><span>P1 — 現行 / SPECIMEN STANDARD</span><span class="r">Cormorant Garamond it + Shippori Mincho B1 + IBM Plex Mono</span></p>
+    <h2 class="display">Works</h2>
+    <div class="row">
+      <span class="tag"><span class="no">SPEC. 001</span><span class="en">Works</span><span class="jp2">作品目録</span></span>
+      <div class="bio jp">synomare<span class="muted">っていいます。</span>テクスト<span class="muted">を書いて、</span>デザイン<span class="muted">をして、</span>グラフィック<span class="muted">をつくります。</span></div>
+      <div class="cat"><span class="no">SPEC. W-001 / 2025</span><span class="ttl">嶼群（博物館（たち））</span><span class="desc">博物館を舞台にした、土地と記憶をめぐる戯曲。テキスト全文、座談会、対談を収録。</span></div>
+    </div>
+  </section>
+
+  <section class="panel p2" id="p2">
+    <p class="p-label"><span>P2 — 古典強め / OLD-STYLE PRESS</span><span class="r">EB Garamond it + Zen Old Mincho + Space Mono</span></p>
+    <h2 class="display">Works</h2>
+    <div class="row">
+      <span class="tag"><span class="no">SPEC. 001</span><span class="en">Works</span><span class="jp2">作品目録</span></span>
+      <div class="bio jp">synomare<span class="muted">っていいます。</span>テクスト<span class="muted">を書いて、</span>デザイン<span class="muted">をして、</span>グラフィック<span class="muted">をつくります。</span></div>
+      <div class="cat"><span class="no">SPEC. W-001 / 2025</span><span class="ttl">嶼群（博物館（たち））</span><span class="desc">博物館を舞台にした、土地と記憶をめぐる戯曲。テキスト全文、座談会、対談を収録。</span></div>
+    </div>
+  </section>
+
+  <section class="panel p3" id="p3">
+    <p class="p-label"><span>P3 — 硬質・近代科学 / MODERN LABORATORY</span><span class="r">Space Grotesk + Zen Kaku Gothic New + JetBrains Mono</span></p>
+    <h2 class="display">Works</h2>
+    <div class="row">
+      <span class="tag"><span class="no">SPEC. 001</span><span class="en">Works</span><span class="jp2">作品目録</span></span>
+      <div class="bio jp">synomare<span class="muted">っていいます。</span>テクスト<span class="muted">を書いて、</span>デザイン<span class="muted">をして、</span>グラフィック<span class="muted">をつくります。</span></div>
+      <div class="cat"><span class="no">SPEC. W-001 / 2025</span><span class="ttl">嶼群（博物館（たち））</span><span class="desc">博物館を舞台にした、土地と記憶をめぐる戯曲。テキスト全文、座談会、対談を収録。</span></div>
+    </div>
+  </section>
+
+  <section class="panel p4" id="p4">
+    <p class="p-label"><span>P4 — 古書・活版 / ANTIQUARIAN CABINET</span><span class="r">IM Fell English it + Shippori Antique B1 + Courier Prime</span></p>
+    <h2 class="display">Works</h2>
+    <div class="row">
+      <span class="tag"><span class="no">SPEC. 001</span><span class="en">Works</span><span class="jp2">作品目録</span></span>
+      <div class="bio jp">synomare<span class="muted">っていいます。</span>テクスト<span class="muted">を書いて、</span>デザイン<span class="muted">をして、</span>グラフィック<span class="muted">をつくります。</span></div>
+      <div class="cat"><span class="no">SPEC. W-001 / 2025</span><span class="ttl">嶼群（博物館（たち））</span><span class="desc">博物館を舞台にした、土地と記憶をめぐる戯曲。テキスト全文、座談会、対談を収録。</span></div>
+    </div>
+  </section>
+
+  <section class="panel p5" id="p5">
+    <p class="p-label"><span>P5 — 採集ノート / FIELD NOTEBOOK</span><span class="r">Fraunces it + Klee One + IBM Plex Mono</span></p>
+    <h2 class="display">Works</h2>
+    <div class="row">
+      <span class="tag"><span class="no">SPEC. 001</span><span class="en">Works</span><span class="jp2">作品目録</span></span>
+      <div class="bio jp">synomare<span class="muted">っていいます。</span>テクスト<span class="muted">を書いて、</span>デザイン<span class="muted">をして、</span>グラフィック<span class="muted">をつくります。</span></div>
+      <div class="cat"><span class="no">SPEC. W-001 / 2025</span><span class="ttl">嶼群（博物館（たち））</span><span class="desc">博物館を舞台にした、土地と記憶をめぐる戯曲。テキスト全文、座談会、対談を収録。</span></div>
+    </div>
+  </section>
+</body>
+
+</html>

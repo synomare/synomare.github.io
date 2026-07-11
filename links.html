@@ -2,305 +2,230 @@
 <html lang="ja">
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Links — synomare</title>
-    <meta name="description" content="Mutual links and friends of synomare.">
-    <meta property="og:title" content="Links — synomare">
-    <meta property="og:description" content="Mutual links and friends of synomare.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://your-domain.example/links.html">
-    <meta name="theme-color" content="#0a0a0a">
-    <link rel="preconnect" href="https://use.typekit.net" crossorigin>
-    <style>
-        :root {
-            --bg: oklch(25.11% 0.006 258.36);
-            --fg: oklch(91.87% 0.003 264.54);
-            --muted: color-mix(in oklch, var(--fg) 60%, var(--bg));
-            --accent: var(--fg);
-            --maxw: 160ch;
-            --font-body: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans JP", Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-            --font-brand: var(--font-body);
-            --menu-bg: color-mix(in oklch, black 88%, var(--bg) 12%);
-            --menu-fg: color-mix(in oklch, white 94%, var(--bg) 6%);
-            --menu-divider: color-mix(in oklch, var(--menu-fg) 12%, var(--menu-bg));
-        }
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Links — synomare</title>
+  <meta name="description" content="synomare の相互リンク・交遊録。">
+  <meta property="og:title" content="Links — synomare">
+  <meta property="og:description" content="synomare の相互リンク・交遊録。">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#f4f3ef">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@1,400;1,500&family=Space+Mono:wght@400;700&family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #f4f3ef;
+      --ink: #17140f;
+      --red: #c41f1f;
+      --dim: #8f887a;
+      --line: #d9d5c9;
+      --card: #fdfdfb;
+      --mono: "Space Mono", Menlo, Consolas, monospace;
+      --jp: "Zen Old Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif;
+      --latin: "EB Garamond", "Times New Roman", serif;
+    }
 
-        html,
-        body {
-            height: 100%
-        }
+    html, body { overflow-x: hidden; }
 
-        body {
-            margin: 0;
-            background: var(--bg);
-            color: var(--fg);
-            font: 400 16px/1.5 var(--font-body);
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            display: grid;
-            grid-template-rows: auto 1fr auto;
-            min-height: 100svh;
-        }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--jp);
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      min-height: 100svh;
+    }
 
-        a {
-            color: inherit;
-            text-decoration-line: underline;
-            text-decoration-color: var(--accent);
-            text-decoration-thickness: .05em;
-            text-underline-offset: .08em;
-            text-decoration-skip-ink: auto
-        }
+    ::selection { background: var(--red); color: #fff; }
+    a { color: inherit; text-decoration: none; }
 
-        a:hover {
-            opacity: .9
-        }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 
-        .sr-only {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border: 0
-        }
+    /* topbar */
+    .topbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0.4em 1.6em;
+      padding: 0.7rem 1rem;
+      border-bottom: 1px solid var(--ink);
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      position: sticky;
+      top: 0;
+      background: var(--paper);
+      z-index: 500;
+    }
 
-        header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: clamp(12px, 2.5vw, 24px);
-            border-bottom: 1px solid color-mix(in oklch, var(--fg) 15%, var(--bg))
-        }
+    .topbar .brand { font-weight: 500; }
+    .topbar .brand .jp { font-family: var(--jp); color: var(--dim); letter-spacing: 0.3em; margin-left: 1em; }
+    .topbar .date { color: var(--red); }
+    .topbar nav { margin-left: auto; display: flex; flex-wrap: wrap; gap: 0.4em 1.1em; }
+    .topbar nav a:hover { background: var(--ink); color: var(--paper); }
+    .topbar nav a[aria-current] { background: var(--ink); color: var(--paper); padding: 0 0.35em; }
 
-        .brand {
-            letter-spacing: .02em;
-            font-weight: 400;
-            font-family: var(--font-brand)
-        }
+    /* specimen tag (shared) */
+    .tag {
+      background: var(--card);
+      border: 1px solid var(--ink);
+      box-shadow: 3px 3px 0 rgba(23, 20, 15, 0.22);
+      padding: 0.55rem 0.7rem 0.5rem;
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.12em;
+    }
 
-        details.nav {
-            position: relative
-        }
+    a.tag:hover { background: var(--ink); color: var(--paper); }
+    .tag .no { display: block; color: var(--red); font-size: 0.85em; margin-bottom: 0.35em; }
+    .tag .en { display: block; text-transform: uppercase; font-weight: 500; font-size: 1.05em; }
+    .tag .jp { display: block; font-family: var(--jp); color: var(--dim); margin-top: 0.3em; letter-spacing: 0.3em; }
+    a.tag:hover .jp { color: var(--paper); }
 
-        details.nav>summary {
-            list-style: none;
-            cursor: pointer;
-            user-select: none;
-            padding: .4rem .7rem;
-            border: 1px solid color-mix(in oklch, var(--fg) 20%, var(--bg));
-            border-radius: 999px;
-            font-size: .95rem
-        }
+    /* section head */
+    .sec-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-family: var(--mono);
+      font-size: 0.58rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--red);
+      border-bottom: 1px solid var(--ink);
+      padding-bottom: 0.5em;
+      margin-bottom: 1.2em;
+    }
 
-        details.nav[open]>summary {
-            background: var(--menu-bg);
-            color: var(--menu-fg);
-            border-color: var(--menu-divider)
-        }
+    .sec-head .r { color: var(--dim); }
 
-        details.nav>summary::-webkit-details-marker {
-            display: none
-        }
+    /* red thread */
+    .thread {
+      position: absolute;
+      height: 1px;
+      background: var(--red);
+      transform-origin: 0 0;
+      pointer-events: none;
+      opacity: 0.85;
+      z-index: 4;
+    }
 
-        .menu {
-            position: absolute;
-            right: 0;
-            margin-top: .5rem;
-            z-index: 1000;
-            background: var(--menu-bg);
-            color: var(--menu-fg);
-            border: 1px solid var(--menu-divider);
-            border-radius: 16px;
-            min-width: 260px;
-            padding: .4rem;
-            box-shadow: 0 16px 48px rgba(0, 0, 0, .55)
-        }
+    /* footer caption */
+    footer.caption {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.4em 2em;
+      padding: 0.7rem 1rem;
+      border-top: 1px solid var(--ink);
+      font-family: var(--mono);
+      font-size: 0.56rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink);
+      background: var(--paper);
+    }
 
-        .menu a {
-            display: block;
-            padding: .6rem .9rem;
-            border-radius: 10px;
-            color: inherit;
-            text-decoration: none;
-            letter-spacing: .005em
-        }
+    footer.caption .r { color: var(--red); }
+    footer.caption .d { color: var(--dim); }
 
-        .menu a+a {
-            border-top: 1px solid var(--menu-divider)
-        }
+    @media (max-width: 700px) {
+      .topbar { font-size: 0.56rem; }
+      .topbar nav { margin-left: 0; width: 100%; }
+      .topbar .brand .jp { display: none; }
+    }
 
-        .menu a:hover {
-            background: color-mix(in oklch, var(--menu-bg) 82%, var(--menu-fg))
-        }
+    main { position: relative; padding: clamp(20px, 4vw, 56px) clamp(16px, 3.4vw, 44px) clamp(3rem, 6vw, 4.5rem); }
 
-        main {
-            padding: clamp(24px, 6vw, 80px);
-            width: 100%;
-            box-sizing: border-box;
-            max-width: var(--maxw);
-            margin: 0 auto;
-        }
+    .display-row { display: flex; align-items: baseline; gap: 2rem; flex-wrap: wrap; margin: 0 0 clamp(1.6rem, 4vw, 2.8rem); }
+    .display {
+      margin: 0;
+      font-family: var(--latin);
+      font-style: italic;
+      font-weight: 300;
+      font-size: clamp(3.4rem, 13vw, 10rem);
+      letter-spacing: -0.03em;
+      line-height: 0.8;
+      color: transparent;
+      -webkit-text-stroke: 1.5px var(--ink);
+    }
+    .display-row .jp { font-family: var(--mono); font-size: 0.64rem; letter-spacing: 0.5em; text-transform: uppercase; color: var(--red); }
 
-        h1 {
-            font-weight: 400;
-            font-size: clamp(24px, 4vw, 32px);
-            margin: 0 0 2rem;
-            letter-spacing: -0.02em;
-        }
+    .register { max-width: 72rem; }
 
-        .links-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 2rem;
-        }
+    .link-row { display: flex; align-items: baseline; gap: 1.4em; padding: 1.1em 0.3em; border-bottom: 1px solid var(--line); }
+    a.link-row:hover { background: var(--ink); color: var(--paper); }
+    a.link-row:hover .no, a.link-row:hover .who { color: var(--paper); opacity: 0.75; }
+    .link-row .no { font-family: var(--mono); color: var(--red); flex-shrink: 0; font-size: 0.72rem; letter-spacing: 0.12em; }
+    .link-row .site { font-size: clamp(1rem, 2.4vw, 1.5rem); font-weight: 500; }
+    .link-row .dots { flex: 1; border-bottom: 1px dotted var(--line); transform: translateY(-0.3em); min-width: 2em; }
+    a.link-row:hover .dots { border-bottom-color: var(--paper); }
+    .link-row .who { color: var(--dim); font-size: 0.74rem; letter-spacing: 0.14em; flex-shrink: 0; }
 
-        .link-card {
-            display: block;
-            text-decoration: none;
-            padding: 1.5rem;
-            border: 1px solid color-mix(in oklch, var(--fg) 15%, var(--bg));
-            border-radius: 12px;
-            transition: background 0.2s, transform 0.2s;
-        }
-
-        .link-card:hover {
-            background: color-mix(in oklch, var(--fg) 5%, var(--bg));
-            transform: translateY(-2px);
-            opacity: 1;
-        }
-
-        .link-title {
-            display: block;
-            font-weight: 600;
-            font-size: 1.1rem;
-            margin-bottom: 0.5rem;
-            text-decoration: underline;
-            text-decoration-color: var(--accent);
-            text-decoration-thickness: .05em;
-            text-underline-offset: .08em;
-        }
-
-        .link-desc {
-            display: block;
-            font-size: 0.95rem;
-            color: var(--muted);
-            line-height: 1.5;
-        }
-
-        footer {
-            padding: 24px;
-            color: var(--muted);
-            border-top: 1px solid color-mix(in oklch, var(--fg) 15%, var(--bg))
-        }
-
-        .noise-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 9999;
-            opacity: 0.06;
-            mix-blend-mode: overlay;
-        }
-
-        body::after {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 9998;
-            background: radial-gradient(circle at 50% 50%, transparent 60%, rgba(0, 0, 0, 0.6) 100%);
-        }
-
-        html.wf-active {
-            --font-body: "Hina Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
-            --font-brand: var(--font-body)
-        }
-    </style>
-    <script>
-        (function (d) {
-            var config = { kitId: 'ifg4slm', scriptTimeout: 3000, async: true }, h = d.documentElement, t = setTimeout(function () { h.className = h.className.replace(/\bwf-loading\b/g, "") + " wf-inactive"; }, config.scriptTimeout), tk = d.createElement("script"), f = false, s = d.getElementsByTagName("script")[0], a; h.className += " wf-loading"; tk.src = 'https://use.typekit.net/' + config.kitId + '.js'; tk.async = true; tk.onload = tk.onreadystatechange = function () { a = this.readyState; if (f || a && a != "complete" && a != "loaded") return; f = true; clearTimeout(t); try { Typekit.load(config) } catch (e) { } }; s.parentNode.insertBefore(tk, s)
-        })(document);
-    </script>
+    .note { margin: 2.4rem 0 0; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.16em; color: var(--dim); }
+  </style>
 </head>
 
 <body>
-    <a class="sr-only" href="#content">Skip to Content</a>
-    <header>
-        <div class="brand">synomare</div>
-        <details class="nav">
-            <summary><span id="menuLabel">Open Menu</span></summary>
-            <nav class="menu" aria-label="site">
-                <a href="./">Home</a>
-                <a href="works.html">Works</a>
-                <a href="notes/">Notes / Blog</a>
-                <a href="links.html">Links</a>
-                <a href="about.html">About</a>
-                <a href="mailto:synomare@gmail.com">Contact</a>
-            </nav>
-        </details>
-    </header>
-    <main id="content">
-        <h1>Links</h1>
-        <div class="links-grid">
-            <!-- Example Link (Reference)
-      <a href="https://example.com" class="link-card" target="_blank" rel="noopener">
-        <span class="link-title">Example Site</span>
-        <span class="link-desc">A wonderful place on the internet.</span>
+  <header class="topbar">
+    <a class="brand" href="./">SYNOMARE<span class="jp">標本帖</span></a>
+    <span class="date">JST <span id="d">----.--.--</span></span>
+    <nav aria-label="site">
+        <a href="./">INDEX</a>
+        <a href="works.html">WORKS</a>
+        <a href="notes/">NOTES</a>
+        <a href="links.html" aria-current="page">LINKS</a>
+        <a href="profile.html">PROFILE</a>
+        <a href="about.html">ABOUT</a>
+        <a href="mailto:synomare@gmail.com">CONTACT</a>
+    </nav>
+  </header>
+
+  <main id="content">
+    <section class="display-row">
+      <h1 class="display">Links</h1>
+      <span class="jp">Appendix — 交遊録</span>
+    </section>
+
+    <section class="register" aria-label="相互リンク">
+      <div class="sec-head"><span>Mutual Links — 交遊録</span><span class="r">L-001&ndash;&hellip;</span></div>
+      <!-- リンクを追加するときは、下の行をコピーして書き換えてください。
+      <a href="https://example.com" class="link-row" target="_blank" rel="noopener">
+        <span class="no">SPEC. L-00X</span><span class="site">サイト名</span><span class="dots"></span><span class="who">主宰者</span>
       </a>
       -->
-            <a href="https://mori-chka.github.io/bunko-site/" class="link-card" target="_blank" rel="noopener">
-                <span class="link-title">さなぎのなかから</span>
-                <span class="link-desc">もりちか</span>
-            </a>
-            <!-- Add more links here -->
-        </div>
-        <div class="noise-overlay"></div>
-    </main>
+      <a href="https://mori-chka.github.io/bunko-site/" class="link-row" target="_blank" rel="noopener">
+        <span class="no">SPEC. L-001</span><span class="site">さなぎのなかから</span><span class="dots"></span><span class="who">もりちか</span>
+      </a>
+      <!-- Add more links here -->
+    </section>
 
-    <footer>
-        <small>© <span id="year"></span> synomare — all rights reserved.</small>
-    </footer>
-    <script>
-        (function () {
-            var y = document.getElementById('year');
-            if (y) y.textContent = new Date().getFullYear();
-            var d = document.querySelector('details.nav');
-            var label = document.getElementById('menuLabel');
-            var set = function () { if (d && label) label.textContent = d.open ? 'Close Menu' : 'Open Menu' };
-            if (d && label) { set(); d.addEventListener('toggle', set) }
-            var theme = document.querySelector('meta[name="theme-color"]');
-            if (theme) { var bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim(); theme.setAttribute('content', bg) }
-        })();
-    </script>
-    <script>
-        (function () {
-            var overlay = document.querySelector('.noise-overlay');
-            if (!overlay) return;
-            var canvas = document.createElement('canvas');
-            canvas.width = 128;
-            canvas.height = 128;
-            var ctx = canvas.getContext('2d');
-            var idata = ctx.createImageData(128, 128);
-            var buffer32 = new Uint32Array(idata.data.buffer);
-            var len = buffer32.length;
-            for (var i = 0; i < len; i++) {
-                if (Math.random() < 0.5) buffer32[i] = 0xff000000;
-            }
-            ctx.putImageData(idata, 0, 0);
-            overlay.style.backgroundImage = 'url(' + canvas.toDataURL() + ')';
-            overlay.style.backgroundRepeat = 'repeat';
-        })();
-    </script>
+    <p class="note">相互リンクを希望される方は、奥付の連絡先までお便りください。</p>
+  </main>
+
+  <footer class="caption">
+    <span>SYNOMARE — SPECIMEN SHEET / LINKS — 交遊録</span>
+    <span class="r">観察は変形である</span>
+    <span class="d">&copy; <span id="year"></span> synomare — all rights reserved.</span>
+  </footer>
+  <script>
+    (function () {
+      function pad(n) { return n < 10 ? '0' + n : n; }
+      var d = document.getElementById('d');
+      if (d) {
+        var now = new Date(Date.now() + (9 * 60 + new Date().getTimezoneOffset()) * 60000);
+        d.textContent = now.getFullYear() + '.' + pad(now.getMonth() + 1) + '.' + pad(now.getDate());
+      }
+      var y = document.getElementById('year');
+      if (y) y.textContent = new Date().getFullYear();
+    })();
+  </script>
 </body>
 
 </html>

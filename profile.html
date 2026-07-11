@@ -4,10 +4,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Notes — synomare</title>
-  <meta name="description" content="synomare の雑記・断章。">
-  <meta property="og:title" content="Notes — synomare">
-  <meta property="og:description" content="synomare の雑記・断章。">
+  <title>Profile — synomare</title>
+  <meta name="description" content="synomare のプロフィール。テクスト、デザイン、グラフィック。">
+  <meta property="og:title" content="Profile — synomare">
+  <meta property="og:description" content="synomare のプロフィール。テクスト、デザイン、グラフィック。">
   <meta property="og:type" content="website">
   <meta name="theme-color" content="#f4f3ef">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -141,68 +141,128 @@
       .topbar .brand .jp { display: none; }
     }
 
-    main { position: relative; padding: clamp(20px, 4vw, 56px) clamp(16px, 3.4vw, 44px) clamp(3rem, 6vw, 4.5rem); }
-    .wrap { max-width: 80ch; }
+    main { position: relative; padding: clamp(20px, 4vw, 56px) clamp(16px, 3.4vw, 44px) clamp(3rem, 6vw, 4.5rem); overflow: hidden; }
 
-    .display-row { display: flex; align-items: baseline; gap: 2rem; flex-wrap: wrap; margin: 0 0 clamp(1.2rem, 3vw, 2rem); }
-    .display {
-      margin: 0;
+    .z-side {
+      position: absolute; right: -8vw; top: 0;
+      width: clamp(320px, 42vw, 720px);
+      opacity: 0.85; margin: 0;
+      -webkit-mask-image: radial-gradient(circle at 60% 40%, black 40%, transparent 74%);
+      mask-image: radial-gradient(circle at 60% 40%, black 40%, transparent 74%);
+      pointer-events: none;
+    }
+    .z-side img { width: 100%; height: auto; display: block; mix-blend-mode: multiply; }
+
+    .ghost-name {
+      position: relative; z-index: 2;
+      margin: clamp(0.6rem, 2vw, 1.6rem) 0 0;
+      margin-left: -0.04em;
       font-family: var(--latin);
       font-style: italic;
       font-weight: 300;
-      font-size: clamp(3rem, 11vw, 8rem);
-      letter-spacing: -0.03em;
-      line-height: 0.8;
+      font-size: clamp(4.2rem, 17vw, 15rem);
+      letter-spacing: -0.04em;
+      line-height: 0.85;
       color: transparent;
       -webkit-text-stroke: 1.5px var(--ink);
+      white-space: nowrap;
     }
-    .display-row .jp { font-family: var(--mono); font-size: 0.64rem; letter-spacing: 0.5em; text-transform: uppercase; color: var(--red); }
 
-    .lead { margin: 0 0 1.6rem; font-size: 0.9rem; color: var(--dim); }
+    .bio {
+      position: relative; z-index: 2;
+      max-width: 21em;
+      margin: 2.4rem 0 0;
+      background: var(--card);
+      border: 1px solid var(--ink);
+      box-shadow: 4px 4px 0 rgba(23, 20, 15, 0.22);
+      padding: 1.1rem 1.3rem;
+      font-size: clamp(13px, 1.25vw, 15px);
+      line-height: 2.05;
+    }
+    .bio .muted { color: var(--dim); }
 
-    .post-list { list-style: none; margin: 0; padding: 0; }
-    .post-list li { margin: 0; padding: 1.1em 0.3em; border-bottom: 1px solid var(--line); }
-    .post-list a { display: block; }
-    .post-list a:hover { background: var(--ink); color: var(--paper); }
-    .post-list a:hover time { color: var(--paper); opacity: 0.75; }
-    .post-list a:hover p { color: var(--paper); opacity: 0.75; }
-    .post-list strong { display: inline; font-weight: 500; font-size: clamp(18px, 2.4vw, 26px); letter-spacing: -0.01em; }
-    .post-list time { display: inline-block; color: var(--red); font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.15em; margin-right: 1em; }
-    .post-list p { margin: .4rem 0 0; font-size: 0.82rem; color: var(--dim); }
-    .post-meta { display: inline; }
+    .colophon {
+      position: relative; z-index: 2;
+      margin-top: 2.8rem;
+      max-width: 46em;
+    }
+
+    .colophon dl { margin: 0; }
+    .colophon .kv { display: grid; grid-template-columns: 10em 1fr; gap: 0 2em; padding: 0.75em 0.3em; border-bottom: 1px solid var(--line); align-items: baseline; }
+    .colophon dt { font-family: var(--mono); font-size: 0.56rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--red); }
+    .colophon dd { margin: 0; font-size: 0.85rem; }
+    .colophon dd a { border-bottom: 1px solid var(--dim); }
+    .colophon dd a:hover { background: var(--ink); color: var(--paper); border-bottom-color: var(--ink); }
+    .colophon dd a + a { margin-left: 1.4em; }
+
+    .seal {
+      display: inline-grid; place-items: center;
+      width: 2.4em; height: 2.4em;
+      border: 1.5px solid var(--red); color: var(--red);
+      font-size: 0.85rem;
+      transform: rotate(-4deg);
+      margin-top: 1.6rem;
+    }
+
+    .p-thread { top: 30vh; left: 30vw; width: 34vw; transform: rotate(14deg); }
+
+    @media (max-width: 700px) {
+      .ghost-name { white-space: normal; font-size: clamp(3rem, 17vw, 5rem); }
+      .colophon .kv { grid-template-columns: 1fr; gap: 0.3em; }
+      .z-side { width: 80vw; right: -24vw; opacity: 0.5; }
+      .p-thread { display: none; }
+    }
   </style>
 </head>
 
 <body>
-  <a class="sr-only" href="#main">Skip to Content</a>
   <header class="topbar">
-    <a class="brand" href="../">SYNOMARE<span class="jp">標本帖</span></a>
+    <a class="brand" href="./">SYNOMARE<span class="jp">標本帖</span></a>
     <span class="date">JST <span id="d">----.--.--</span></span>
     <nav aria-label="site">
-        <a href="../">INDEX</a>
-        <a href="../works.html">WORKS</a>
-        <a href="../notes/" aria-current="page">NOTES</a>
-        <a href="../links.html">LINKS</a>
-        <a href="../profile.html">PROFILE</a>
-        <a href="../about.html">ABOUT</a>
+        <a href="./">INDEX</a>
+        <a href="works.html">WORKS</a>
+        <a href="notes/">NOTES</a>
+        <a href="links.html">LINKS</a>
+        <a href="profile.html" aria-current="page">PROFILE</a>
+        <a href="about.html">ABOUT</a>
         <a href="mailto:synomare@gmail.com">CONTACT</a>
     </nav>
   </header>
 
-  <main id="main">
-    <div class="wrap">
-      <section class="display-row">
-        <h1 class="display">Notes</h1>
-        <span class="jp">Journal — 雑記・断章</span>
-      </section>
-      <p class="lead">書いたものやメモをここにまとめています。新しい記事から順に並びます。</p>
-      <div class="sec-head"><span>Field Notes — 採集記録</span><span class="r">N-001&ndash;&hellip;</span></div>
-      <ul class="post-list" id="postList" aria-live="polite"></ul>
+  <main>
+    <figure class="z-side" aria-hidden="true">
+      <img src="assets/images/graphics/angel-anatomy.jpg" alt="" width="1600" height="2263" loading="eager">
+    </figure>
+
+    <div class="thread p-thread" aria-hidden="true"></div>
+
+    <h1 class="ghost-name">synomare</h1>
+
+    <div class="bio">
+      <div class="sec-head"><span>Specimen — 標本</span><span class="r">No. 000</span></div>
+      synomare<span class="muted">っていいます。</span>テクスト<span class="muted">を書いて、</span>デザイン<span class="muted">をして、</span>グラフィック<span class="muted">をつくります。</span>演劇の演出<span class="muted">をすることもあります。</span>
     </div>
+
+    <section class="colophon" aria-label="奥付">
+      <div class="sec-head"><span>Colophon — 奥付</span><span class="r">SPEC. P-001</span></div>
+      <dl>
+        <div class="kv"><dt>名称 / Name</dt><dd>synomare（しのまれ）</dd></div>
+        <div class="kv"><dt>業務 / Field</dt><dd>テクスト・デザイン・グラフィック・演出</dd></div>
+        <div class="kv"><dt>記録 / Records</dt><dd>
+          <a href="https://x.com/synomare" target="_blank" rel="noopener">X / Twitter</a>
+          <a href="https://www.instagram.com/syno_mare/?utm_source=qr" target="_blank" rel="noopener">Instagram</a>
+          <a href="https://note.com/synomare" target="_blank" rel="noopener">note / 日記</a>
+        </dd></div>
+        <div class="kv"><dt>連絡 / Contact</dt><dd><a href="mailto:synomare@gmail.com">synomare@gmail.com</a></dd></div>
+        <div class="kv"><dt>印刷 / Printing</dt><dd>本頁は、閲覧のたびにあなたのブラウザで刷られています。</dd></div>
+      </dl>
+      <span class="seal" aria-hidden="true">印</span>
+    </section>
   </main>
 
   <footer class="caption">
-    <span>SYNOMARE — SPECIMEN SHEET / NOTES — 雑記</span>
+    <span>SYNOMARE — SPECIMEN SHEET / PROFILE — 奥付</span>
     <span class="r">観察は変形である</span>
     <span class="d">&copy; <span id="year"></span> synomare — all rights reserved.</span>
   </footer>
@@ -216,52 +276,6 @@
       }
       var y = document.getElementById('year');
       if (y) y.textContent = new Date().getFullYear();
-    })();
-  </script>
-  <script src="posts.js"></script>
-  <script>
-    (function(){
-      var list=document.getElementById('postList');
-      if(!list) return;
-      var posts=(window.__SYNOMARE_POSTS__||[]).slice();
-      if(!posts.length){
-        var empty=document.createElement('li');
-        empty.textContent='まだ記事がありません。';
-        list.appendChild(empty);
-        return;
-      }
-      posts.sort(function(a,b){
-        var timeA=a&&a.date?Date.parse(a.date):NaN;
-        var timeB=b&&b.date?Date.parse(b.date):NaN;
-        if(timeA===timeB) return 0;
-        if(isNaN(timeA)) return 1;
-        if(isNaN(timeB)) return -1;
-        return timeA<timeB?1:-1;
-      });
-      posts.forEach(function(post, i){
-        var li=document.createElement('li');
-        var link=document.createElement('a');
-        link.href=post.href||post.slug+'.html';
-        var meta=document.createElement('span');
-        meta.className='post-meta';
-        var time=document.createElement('time');
-        if(post.date){ time.setAttribute('datetime',post.date); time.textContent='SPEC. N-'+String(posts.length-i).padStart(3,'0')+' / '+post.date; }
-        meta.appendChild(time);
-        link.appendChild(meta);
-        var title=document.createElement('strong');
-        title.textContent=post.title;
-        link.appendChild(title);
-        if(post.summary){
-          var summary=document.createElement('p');
-          summary.textContent=post.summary;
-          link.appendChild(summary);
-        }
-        if(post.year) li.dataset.year=post.year;
-        if(post.yearMonth) li.dataset.yearMonth=post.yearMonth;
-        if(post.tags && post.tags.length) li.dataset.tags=post.tags.join(',');
-        li.appendChild(link);
-        list.appendChild(li);
-      });
     })();
   </script>
 </body>
