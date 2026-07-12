@@ -182,12 +182,10 @@
     a.work-row:hover .w-desc, a.work-row:hover .w-type, a.work-row:hover .w-year { color: var(--paper); opacity: 0.7; }
 
     .w-no { font-family: var(--mono); color: var(--red); font-size: 0.72rem; letter-spacing: 0.12em; }
-    .w-no .w-year { display: block; color: var(--dim); font-size: 0.85em; letter-spacing: 0.2em; margin-top: 0.4em; }
     .w-title { font-size: clamp(1.2rem, 3vw, 2rem); font-weight: 500; letter-spacing: -0.01em; line-height: 1.2; }
     .w-desc { display: block; margin-top: 0.5em; font-size: 0.78rem; line-height: 1.9; color: var(--dim); max-width: 44em; }
     .w-type { font-family: var(--mono); font-size: 0.56rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--dim); white-space: nowrap; justify-self: end; }
 
-    .errata { margin: 2.6rem 0 0; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.14em; color: var(--red); }
     .more { margin: 0.9rem 0 0; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--dim); }
     .more a:hover { background: var(--ink); color: var(--paper); }
 
@@ -202,7 +200,7 @@
 
 <body>
   <header class="topbar">
-    <a class="brand" href="./">SYNOMARE<span class="jp">標本帖</span></a>
+    <a class="brand" href="./">SYNOMARE</a>
     <span class="date">JST <span id="d">----.--.--</span></span>
     <nav aria-label="site">
         <a href="./">INDEX</a>
@@ -210,7 +208,6 @@
         <a href="notes/">NOTES</a>
         <a href="links.html">LINKS</a>
         <a href="profile.html">PROFILE</a>
-        <a href="about.html">ABOUT</a>
         <a href="mailto:synomare@gmail.com">CONTACT</a>
     </nav>
   </header>
@@ -225,15 +222,15 @@
       <figure class="plate">
         <img src="assets/images/graphics/terpsichora.jpg" alt="Terpsichora — synomare" width="2000" height="1414" loading="eager" fetchpriority="high">
       </figure>
-      <span class="tag plate-tag"><span class="no">FIG. 01</span><span class="en">Terpsichora</span><span class="jp">刷りの平面 二〇二五</span></span>
+      <span class="tag plate-tag"><span class="en">Terpsichora</span><span class="jp">刷りの平面 二〇二五</span></span>
       <div class="thread plate-thread"></div>
     </div>
 
     <section class="register" aria-label="作品一覧">
-      <div class="sec-head"><span>Registered Specimens — 収蔵一覧</span><span class="r">001&ndash;&hellip;</span></div>
+      <div class="sec-head"><span>Registered Works — 収蔵一覧</span></div>
 
       <a class="work-row" href="yugun/index.html">
-        <span class="w-no">SPEC. W-001<span class="w-year">2025</span></span>
+        <span class="w-no">2025</span>
         <span class="w-main">
           <span class="w-title">嶼群（博物館（たち））</span>
           <span class="w-desc">博物館を舞台にした、土地と記憶をめぐる戯曲。テキスト全文、座談会、対談を収録。</span>
@@ -244,7 +241,7 @@
       <!-- 作品を追加するときは、下の行をコピーして書き換えてください。
            リンク先のない作品（記録のみ）は <a> を <div> に変えれば同じ見た目で置けます。
       <a class="work-row" href="作品ページのパス or 外部URL">
-        <span class="w-no">SPEC. W-00X<span class="w-year">20XX</span></span>
+        <span class="w-no">20XX</span>
         <span class="w-main">
           <span class="w-title">作品タイトル</span>
           <span class="w-desc">一行の説明。媒体・会場・共作者など。</span>
@@ -254,13 +251,11 @@
       -->
     </section>
 
-    <p class="errata">ERRATA — 本頁の誤りは、未だ発見されていない。</p>
     <p class="more">その他の制作物 — <a href="https://www.instagram.com/syno_mare/?utm_source=qr" target="_blank" rel="noopener">INSTAGRAM</a></p>
   </main>
 
   <footer class="caption">
-    <span>SYNOMARE — SPECIMEN SHEET / WORKS — 作品目録</span>
-    <span class="r">観察は変形である</span>
+    <span>SYNOMARE / WORKS — 作品目録</span>
     <span class="d">&copy; <span id="year"></span> synomare — all rights reserved.</span>
   </footer>
   <script>
