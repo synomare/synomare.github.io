@@ -80,9 +80,15 @@
       font-family: var(--mono);
       font-size: 0.72rem;
       letter-spacing: 0.12em;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
     }
 
-    a.tag:hover { background: var(--ink); color: var(--paper); }
+    a.tag:hover {
+      background: var(--ink);
+      color: var(--paper);
+      transform: translate(-1px, -2px);
+      box-shadow: 5px 7px 0 rgba(23, 20, 15, 0.28);
+    }
     .tag .no { display: block; color: var(--red); font-size: 0.85em; margin-bottom: 0.35em; }
     .tag .en { display: block; text-transform: uppercase; font-weight: 500; font-size: 1.05em; }
     .tag .jp { display: block; font-family: var(--jp); color: var(--dim); margin-top: 0.3em; letter-spacing: 0.3em; }
@@ -135,6 +141,19 @@
     footer.caption .r { color: var(--red); }
     footer.caption .d { color: var(--dim); }
 
+    /* paper grain */
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 950;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23g)'/%3E%3C/svg%3E");
+      background-size: 260px 260px;
+      mix-blend-mode: multiply;
+      opacity: 0.05;
+    }
+
     @media (max-width: 700px) {
       .topbar { font-size: 0.56rem; }
       .topbar nav { margin-left: 0; width: 100%; }
@@ -151,11 +170,22 @@
     }
 
     .sheet { position: absolute; inset: 0; z-index: 0; margin: 0; }
-    .sheet img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 18%; display: block; }
+    .sheet img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 18%; display: block; filter: contrast(1.05) saturate(0.92); }
+    .sheet::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background-image: radial-gradient(circle, rgba(23, 20, 15, 0.5) 0 0.5px, transparent 0.6px);
+      background-size: 3px 3px;
+      mix-blend-mode: soft-light;
+      opacity: 0.6;
+    }
     .sheet::after {
       content: "";
       position: absolute;
       inset: 0;
+      z-index: 1;
       background: radial-gradient(circle at 50% 40%, transparent 40%, rgba(244, 243, 239, 0.55) 100%);
     }
 
@@ -176,9 +206,48 @@
       white-space: nowrap;
       pointer-events: none;
       mix-blend-mode: multiply;
+      filter: url(#etch);
     }
 
     .field .tag { position: absolute; z-index: 5; min-width: 12em; }
+
+    /* registration crosses */
+    .field::before,
+    .field::after {
+      content: "";
+      position: absolute;
+      width: 9px;
+      height: 9px;
+      z-index: 6;
+      pointer-events: none;
+      opacity: 0.45;
+      background:
+        linear-gradient(var(--ink), var(--ink)) center / 1px 100% no-repeat,
+        linear-gradient(var(--ink), var(--ink)) center / 100% 1px no-repeat;
+    }
+    .field::before { top: 12px; left: 12px; }
+    .field::after { bottom: 12px; right: 12px; }
+
+    /* 録 — decomposition */
+    .kaitai {
+      position: absolute;
+      top: 13vh;
+      left: 31vw;
+      width: 15vw;
+      height: 32vh;
+      z-index: 3;
+      pointer-events: none;
+      mix-blend-mode: multiply;
+      opacity: 0.9;
+      filter: url(#etch);
+    }
+    .kaitai .k { position: absolute; font-family: var(--jp); font-weight: 400; line-height: 1; color: var(--ink); }
+    .kaitai .k1 { top: 0; left: 0; font-size: clamp(2.4rem, 4.6vw, 4.4rem); transform: rotate(-2.5deg); }
+    .kaitai .k2 { bottom: 8%; right: 0; font-size: clamp(2.1rem, 4vw, 3.8rem); transform: rotate(1.8deg); }
+    .kaitai .k0 { bottom: -2.2em; right: 42%; font-size: 0.95rem; color: var(--dim); letter-spacing: 0.4em; }
+    .kaitai .kline { position: absolute; height: 1px; background: var(--ink); opacity: 0.55; transform-origin: 0 0; }
+    .kaitai .l1 { top: 26%; left: 22%; width: 62%; transform: rotate(40deg); }
+    .kaitai .l2 { bottom: -1.2em; right: 34%; width: 24%; transform: rotate(-56deg); }
 
     .intro {
       position: absolute;
@@ -272,12 +341,19 @@
       .intro { position: relative; top: auto; left: auto; margin: 16vh 5vw 1.6rem; }
       .field .tag { position: relative; top: auto !important; left: auto !important; right: auto !important; display: block; width: fit-content; margin: 0.8rem 5vw; }
       .thread { display: none; }
+      .kaitai { display: none; }
       .ghost { position: absolute; font-size: 22vw; }
     }
   </style>
 </head>
 
 <body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <filter id="etch" x="-8%" y="-15%" width="116%" height="130%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.011 0.019" numOctaves="2" seed="7"/>
+      <feDisplacementMap in="SourceGraphic" scale="5" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </svg>
   <a class="sr-only" href="#introduction">Skip to Content</a>
   <header class="topbar">
     <a class="brand" href="./">SYNOMARE</a>
@@ -299,6 +375,14 @@
       </figure>
 
       <div class="ghost" aria-hidden="true">synomare</div>
+
+      <div class="kaitai" aria-hidden="true">
+        <span class="k k1">金</span>
+        <span class="kline l1"></span>
+        <span class="k k2">彔</span>
+        <span class="kline l2"></span>
+        <span class="k k0">録</span>
+      </div>
 
       <div class="intro">
         <div class="sec-head"><span>Hello — こんにちは</span></div>

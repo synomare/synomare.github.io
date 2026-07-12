@@ -135,6 +135,19 @@
     footer.caption .r { color: var(--red); }
     footer.caption .d { color: var(--dim); }
 
+    /* paper grain */
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 950;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23g)'/%3E%3C/svg%3E");
+      background-size: 260px 260px;
+      mix-blend-mode: multiply;
+      opacity: 0.05;
+    }
+
     @media (max-width: 700px) {
       .topbar { font-size: 0.56rem; }
       .topbar nav { margin-left: 0; width: 100%; }
@@ -154,10 +167,14 @@
       line-height: 0.8;
       color: transparent;
       -webkit-text-stroke: 1.5px var(--ink);
+      filter: url(#etch);
     }
     .display-row .jp { font-family: var(--mono); font-size: 0.64rem; letter-spacing: 0.5em; text-transform: uppercase; color: var(--red); }
 
-    .register { max-width: 72rem; }
+    .register {
+      max-width: 72rem;
+      background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(2em - 1px), rgba(23, 20, 15, 0.045) calc(2em - 1px), rgba(23, 20, 15, 0.045) 2em);
+    }
 
     .link-row { display: flex; align-items: baseline; gap: 1.4em; padding: 1.1em 0.3em; border-bottom: 1px solid var(--line); }
     a.link-row:hover { background: var(--ink); color: var(--paper); }
@@ -173,6 +190,12 @@
 </head>
 
 <body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <filter id="etch" x="-8%" y="-15%" width="116%" height="130%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.011 0.019" numOctaves="2" seed="7"/>
+      <feDisplacementMap in="SourceGraphic" scale="5" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </svg>
   <header class="topbar">
     <a class="brand" href="./">SYNOMARE</a>
     <span class="date">JST <span id="d">----.--.--</span></span>
