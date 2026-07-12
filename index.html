@@ -111,7 +111,7 @@
 
     .sec-head .r { color: var(--dim); }
 
-    /* red thread */
+    /* red thread — pins connecting related cards */
     .thread {
       position: absolute;
       height: 1px;
@@ -121,6 +121,18 @@
       opacity: 0.85;
       z-index: 4;
     }
+    .thread::before,
+    .thread::after {
+      content: "";
+      position: absolute;
+      top: -2.5px;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--red);
+    }
+    .thread::before { left: -2.5px; }
+    .thread::after { left: calc(100% - 2.5px); }
 
     /* footer caption */
     footer.caption {
@@ -375,9 +387,9 @@
         <span class="en">Links</span><span class="jp">交遊録</span>
       </a>
 
-      <div class="thread" style="top: 19vh; right: 8vw; width: 26vw; transform: rotate(163deg);"></div>
-      <div class="thread" style="top: 59vh; left: 13vw; width: 30vw; transform: rotate(-12deg);"></div>
-      <div class="thread" style="top: 42vh; right: 24vw; width: 22vw; transform: rotate(24deg);"></div>
+      <div class="thread" style="top: 26.05vh; left: 29.9vw; width: 50.83vw; transform: rotate(-7.81deg);"></div>
+      <div class="thread" style="top: 22.2vh; left: 80.26vw; width: 10.13vw; transform: rotate(102.91deg);"></div>
+      <div class="thread" style="top: 57vh; left: 20.74vw; width: 57.94vw; transform: rotate(6.82deg);"></div>
     </section>
 
     <section class="recital" id="introduction" aria-label="自己紹介">
