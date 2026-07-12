@@ -228,27 +228,6 @@
     .field::before { top: 12px; left: 12px; }
     .field::after { bottom: 12px; right: 12px; }
 
-    /* 録 — decomposition */
-    .kaitai {
-      position: absolute;
-      top: 13vh;
-      left: 31vw;
-      width: 15vw;
-      height: 32vh;
-      z-index: 3;
-      pointer-events: none;
-      mix-blend-mode: multiply;
-      opacity: 0.9;
-      filter: url(#etch);
-    }
-    .kaitai .k { position: absolute; font-family: var(--jp); font-weight: 400; line-height: 1; color: var(--ink); }
-    .kaitai .k1 { top: 0; left: 0; font-size: clamp(2.4rem, 4.6vw, 4.4rem); transform: rotate(-2.5deg); }
-    .kaitai .k2 { bottom: 8%; right: 0; font-size: clamp(2.1rem, 4vw, 3.8rem); transform: rotate(1.8deg); }
-    .kaitai .k0 { bottom: -2.2em; right: 42%; font-size: 0.95rem; color: var(--dim); letter-spacing: 0.4em; }
-    .kaitai .kline { position: absolute; height: 1px; background: var(--ink); opacity: 0.55; transform-origin: 0 0; }
-    .kaitai .l1 { top: 26%; left: 22%; width: 62%; transform: rotate(40deg); }
-    .kaitai .l2 { bottom: -1.2em; right: 34%; width: 24%; transform: rotate(-56deg); }
-
     .intro {
       position: absolute;
       top: 8vh;
@@ -341,7 +320,6 @@
       .intro { position: relative; top: auto; left: auto; margin: 16vh 5vw 1.6rem; }
       .field .tag { position: relative; top: auto !important; left: auto !important; right: auto !important; display: block; width: fit-content; margin: 0.8rem 5vw; }
       .thread { display: none; }
-      .kaitai { display: none; }
       .ghost { position: absolute; font-size: 22vw; }
     }
   </style>
@@ -375,14 +353,6 @@
       </figure>
 
       <div class="ghost" aria-hidden="true">synomare</div>
-
-      <div class="kaitai" aria-hidden="true">
-        <span class="k k1">金</span>
-        <span class="kline l1"></span>
-        <span class="k k2">彔</span>
-        <span class="kline l2"></span>
-        <span class="k k0">録</span>
-      </div>
 
       <div class="intro">
         <div class="sec-head"><span>Hello — こんにちは</span></div>
