@@ -110,3 +110,94 @@ body::after {
   .topbar nav { margin-left: 0; width: 100%; }
   .topbar .brand .jp { display: none; }
 }
+
+/* ============================================================
+   verso chrome — the same objects, printed on the back
+   ============================================================ */
+
+/* realm flip (driven by body.is-ura on index) */
+body.is-ura { background: var(--void); color: var(--bone); }
+body.is-ura::after { mix-blend-mode: screen; opacity: 0.07; }
+
+.topbar {
+  transition: background 0.45s ease, color 0.45s ease, border-color 0.45s ease;
+}
+body.is-ura .topbar { background: var(--void); color: var(--bone); border-bottom-color: var(--seamline); }
+body.is-ura .topbar .brand .jp { color: var(--ash); }
+body.is-ura .topbar .date { color: var(--phosphor); }
+body.is-ura .topbar nav a:hover { background: var(--bone); color: var(--void); }
+body.is-ura .topbar nav a[aria-current] { background: var(--bone); color: var(--void); }
+
+footer.caption { transition: background 0.45s ease, color 0.45s ease, border-color 0.45s ease; }
+footer.caption.ura,
+body.is-ura footer.caption {
+  background: var(--void);
+  color: var(--bone);
+  border-top-color: var(--seamline);
+}
+footer.caption.ura .r, body.is-ura footer.caption .r { color: var(--phosphor); }
+footer.caption.ura .d, body.is-ura footer.caption .d { color: var(--ash); }
+
+/* obsidian tag */
+.ura .tag {
+  background: var(--obsidian);
+  border-color: var(--gilt);
+  color: var(--bone);
+  box-shadow: 3px 3px 0 rgba(201, 164, 92, 0.14), 0 0 16px rgba(255, 59, 35, 0.07);
+}
+.ura .tag .no { color: var(--phosphor); }
+.ura .tag .jp { color: var(--ash); }
+.ura a.tag:hover { background: var(--gilt); color: var(--void); }
+.ura a.tag:hover .jp { color: var(--void); }
+
+/* phosphor filament */
+.ura .thread {
+  background: var(--phosphor);
+  opacity: 1;
+  box-shadow: 0 0 6px 1px rgba(255, 59, 35, 0.5);
+}
+.ura .thread::before,
+.ura .thread::after { background: var(--phosphor); box-shadow: 0 0 5px 1px rgba(255, 59, 35, 0.6); }
+
+/* engraved section head */
+.ura .sec-head { color: var(--phosphor); border-bottom-color: var(--seamline); }
+.ura .sec-head .r { color: var(--ash); }
+
+/* engraved ledger */
+.ura .register {
+  background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(2em - 1px), rgba(228, 219, 200, 0.05) calc(2em - 1px), rgba(228, 219, 200, 0.05) 2em);
+}
+
+/* film-negative grain for standalone dark sections */
+.ura-grain { position: relative; }
+.ura-grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: 260px 260px;
+  mix-blend-mode: screen;
+  opacity: 0.07;
+}
+
+/* engraved monument type — pages using this MUST carry the inline #etch-deep filter */
+.engrave {
+  font-family: var(--gothic);
+  font-weight: 300;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--gilt);
+  filter: url(#etch-deep);
+  text-shadow: 0 0 18px rgba(255, 59, 35, 0.14), 0 0 2px rgba(201, 164, 92, 0.35);
+}
+
+/* hollowed / lit letters (letterwarp wear API) */
+.copy .c.worn {
+  opacity: 0.55;
+  color: transparent;
+  -webkit-text-stroke: 0.2px var(--fg);
+}
+.ura .copy .c.lit,
+.copy .c.lit {
+  text-shadow: 0 0 10px rgba(255, 59, 35, 0.35), 0 0 2px rgba(255, 59, 35, 0.5);
+}

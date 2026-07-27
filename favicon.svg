@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <style>
+    .p { fill: #f4f3ef; }
+    .m { stroke: #17140f; fill: none; }
+    .pin { fill: #c41f1f; }
+    @media (prefers-color-scheme: dark) {
+      .p { fill: #0a0906; }
+      .m { stroke: #c9a45c; }
+      .pin { fill: #ff3b23; }
+    }
+  </style>
+  <rect class="p" width="64" height="64"/>
+  <circle class="m" cx="32" cy="32" r="14" stroke-width="2.5"/>
+  <path class="m" d="M32 8 V56 M8 32 H56" stroke-width="2.5"/>
+  <circle class="pin" cx="32" cy="32" r="3.2"/>
+</svg>
