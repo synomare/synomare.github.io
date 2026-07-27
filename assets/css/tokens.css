@@ -1,0 +1,95 @@
+/* ============================================================
+   synomare — design tokens
+   表 (recto) : 紙・インク・朱 — the specimen room
+   裏 (verso) : 闇・骨・金・燐光 — the vault
+   ============================================================ */
+
+:root {
+  /* recto — physical */
+  --paper: #f4f3ef;
+  --ink: #17140f;
+  --red: #c41f1f;
+  --dim: #8f887a;
+  --line: #d9d5c9;
+  --card: #fdfdfb;
+
+  /* verso — physical */
+  --void: #0a0906;
+  --bone: #e4dbc8;
+  --gilt: #c9a45c;
+  --phosphor: #ff3b23;
+  --ash: #5e5844;
+  --seamline: #2a2517;
+  --obsidian: #121008;
+
+  /* semantic aliases (recto default) */
+  --bg: var(--paper);
+  --fg: var(--ink);
+  --acc: var(--red);
+  --sub: var(--dim);
+  --rule: var(--line);
+  --panel: var(--card);
+
+  /* type */
+  --mono: "Space Mono", Menlo, Consolas, monospace;
+  --jp: "Zen Old Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  --latin: "EB Garamond", "Times New Roman", serif;
+  --gothic: "Grenze Gotisch", "EB Garamond", serif;
+
+  /* z scale */
+  --z-thread: 4;
+  --z-tag: 5;
+  --z-mark: 6;
+  --z-topbar: 500;
+  --z-seam: 600;
+  --z-grain: 950;
+  --z-cursor: 990;
+}
+
+/* verso scope — the reverse side of the sheet */
+.ura {
+  --bg: var(--void);
+  --fg: var(--bone);
+  --acc: var(--phosphor);
+  --sub: var(--ash);
+  --rule: var(--seamline);
+  --panel: var(--obsidian);
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.ura ::selection { background: var(--phosphor); color: var(--void); }
+
+/* base scaffold */
+html, body { overflow-x: hidden; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--jp);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100svh;
+}
+
+::selection { background: var(--red); color: #fff; }
+a { color: inherit; text-decoration: none; }
+
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+.muted { color: var(--dim); }
+.ura .muted { color: var(--ash); }
+
+/* reduced motion — the sheet lies still */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
