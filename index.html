@@ -195,13 +195,230 @@
       pointer-events: auto;
     }
 
+    /* ============================================================
+       seam — the sheet tears through (viewport 3)
+       Two identically-seeded copies of the final paragraph;
+       a jagged clip-path slides up the recto and each glyph
+       appears to burn through the paper, already inverted.
+       ============================================================ */
+    .seam { height: 240vh; position: relative; }
+    .seam-stage { position: sticky; top: 0; height: 100svh; overflow: hidden; }
+
+    .seam-verso,
+    .seam-recto {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      align-content: center;
+      padding: 0 clamp(16px, 4vw, 48px);
+    }
+
+    .seam-verso { background: var(--void); z-index: 1; }
+    .seam-recto {
+      background: var(--paper);
+      z-index: 2;
+      --edge: calc((1 - var(--seamp, 0)) * 124% - 12%);
+      clip-path: polygon(
+        0 0, 100% 0,
+        100% calc(var(--edge) + 0vh),
+        96.6% calc(var(--edge) + 0.7vh),
+        93.2% calc(var(--edge) - 0.8vh),
+        89.8% calc(var(--edge) + 1.5vh),
+        86.4% calc(var(--edge) - 0.4vh),
+        83% calc(var(--edge) + 0.9vh),
+        79.6% calc(var(--edge) - 1.3vh),
+        76.2% calc(var(--edge) + 0.3vh),
+        72.8% calc(var(--edge) - 0.6vh),
+        69.4% calc(var(--edge) + 1.2vh),
+        66% calc(var(--edge) - 0.2vh),
+        62.6% calc(var(--edge) + 0.8vh),
+        59.2% calc(var(--edge) - 1.1vh),
+        55.8% calc(var(--edge) + 0.4vh),
+        52.4% calc(var(--edge) - 0.5vh),
+        49% calc(var(--edge) + 1.4vh),
+        45.6% calc(var(--edge) - 0.9vh),
+        42.2% calc(var(--edge) + 0.2vh),
+        38.8% calc(var(--edge) - 1.2vh),
+        35.4% calc(var(--edge) + 0.6vh),
+        32% calc(var(--edge) - 0.3vh),
+        28.6% calc(var(--edge) + 1vh),
+        25.2% calc(var(--edge) - 0.7vh),
+        21.8% calc(var(--edge) + 0.5vh),
+        18.4% calc(var(--edge) - 1vh),
+        15% calc(var(--edge) + 0.9vh),
+        11.6% calc(var(--edge) - 0.4vh),
+        8.2% calc(var(--edge) + 1.1vh),
+        4.8% calc(var(--edge) - 0.6vh),
+        1.6% calc(var(--edge) + 0.3vh),
+        0 calc(var(--edge) - 0.2vh)
+      );
+    }
+
+    /* torn-fiber lip riding the tear edge */
+    .seam-recto::before {
+      content: "";
+      position: absolute;
+      left: -2%;
+      right: -2%;
+      height: 4vh;
+      top: calc(var(--edge) - 2.4vh);
+      background: linear-gradient(to bottom, rgba(23, 20, 15, 0) 0%, rgba(23, 20, 15, 0.2) 60%, rgba(23, 20, 15, 0.04) 100%);
+      filter: url(#etch);
+      pointer-events: none;
+    }
+
+    .seam .copy { touch-action: auto; }
+    .seam-copy { font-size: clamp(17px, 3.8vw, 38px); }
+
+    .seam-mark {
+      position: absolute;
+      top: 0.9rem;
+      left: 1rem;
+      font-family: var(--mono);
+      font-size: 0.56rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--red);
+    }
+    .seam-verso .seam-mark { color: var(--phosphor); }
+
+    /* verso glyphs smolder as they ignite (lit class via inversion.js) */
+    .seam-verso .copy .c { transition: transform .1s cubic-bezier(.25, .82, .25, 1), text-shadow 0.5s ease; }
+
+    .seam-static { height: 100svh; }
+
+    /* ============================================================
+       vault — the reverse side (収蔵庫)
+       ============================================================ */
+    .vault {
+      position: relative;
+      padding: clamp(56px, 9vw, 130px) clamp(16px, 4vw, 48px) clamp(72px, 10vw, 150px);
+    }
+
+    /* gilt registration crosses */
+    .vault::before,
+    .vault::after {
+      content: "";
+      position: absolute;
+      width: 9px;
+      height: 9px;
+      z-index: var(--z-mark);
+      pointer-events: none;
+      opacity: 0.6;
+      background:
+        linear-gradient(var(--gilt), var(--gilt)) center / 1px 100% no-repeat,
+        linear-gradient(var(--gilt), var(--gilt)) center / 100% 1px no-repeat;
+    }
+    .vault::before { top: 14px; left: 14px; }
+    .vault::after { bottom: 14px; right: 14px; }
+
+    .vault-inner {
+      position: relative;
+      z-index: 2;
+      max-width: 72rem;
+      margin: 0 auto;
+      display: grid;
+      gap: clamp(2.4rem, 6vw, 4.5rem);
+    }
+
+    .vault-title {
+      margin: 0;
+      font-size: clamp(4.5rem, 16vw, 15rem);
+      line-height: 0.85;
+      letter-spacing: 0.02em;
+    }
+
+    .crypt { display: grid; justify-items: center; gap: 1.4rem; }
+    .crypt-arch {
+      margin: 0;
+      width: min(22rem, 68vw);
+      aspect-ratio: 4 / 5;
+      overflow: hidden;
+      border-radius: 50% 50% 0 0 / 36% 36% 0 0;
+      border: 1px solid var(--seamline);
+      box-shadow: 0 0 0 6px var(--void), 0 0 0 7px rgba(201, 164, 92, 0.55), 0 0 44px rgba(255, 59, 35, 0.07);
+      position: relative;
+    }
+    .crypt-arch img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: invert(1) hue-rotate(180deg) grayscale(0.35) contrast(0.95) brightness(0.82);
+      transition: filter 0.6s ease, transform 0.6s ease;
+    }
+    .crypt:hover .crypt-arch img {
+      filter: invert(1) hue-rotate(180deg) grayscale(0.1) contrast(1.02) brightness(0.95);
+      transform: scale(1.03);
+    }
+    .crypt-arch::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(10, 9, 6, 0) 55%, rgba(10, 9, 6, 0.72) 100%);
+    }
+    .crypt-tag { text-align: center; }
+
+    .vault-litany { display: grid; }
+    .vault-row {
+      display: flex;
+      align-items: baseline;
+      gap: 1.6em;
+      padding: 0.9em 0.3em;
+      border-bottom: 1px solid var(--seamline);
+      transition: background 0.25s ease;
+    }
+    .vault-row .v-no { font-family: var(--latin); font-style: italic; color: var(--gilt); font-size: clamp(0.9rem, 2vw, 1.3rem); min-width: 2em; }
+    .vault-row .v-en {
+      font-family: var(--gothic);
+      font-weight: 340;
+      font-size: clamp(1.8rem, 4.6vw, 3.2rem);
+      line-height: 1.1;
+      letter-spacing: 0.04em;
+      transition: color 0.25s ease, text-shadow 0.25s ease;
+    }
+    .vault-row .v-jp { margin-left: auto; font-family: var(--jp); font-size: 0.8rem; color: var(--ash); letter-spacing: 0.5em; transition: color 0.25s ease; }
+    .vault-row:hover { background: rgba(201, 164, 92, 0.05); }
+    .vault-row:hover .v-en { color: var(--phosphor); text-shadow: 0 0 16px rgba(255, 59, 35, 0.4); }
+    .vault-row:hover .v-jp { color: var(--bone); }
+
+    .vault-seal { text-align: center; }
+    .vault-syn {
+      margin: 0;
+      font-size: clamp(3.4rem, 11vw, 9rem);
+      line-height: 1;
+      transform: translate(var(--gpx, 0px), var(--gpy, 0px));
+    }
+
     @media (max-width: 700px) {
       .field { height: auto; min-height: 0; padding-bottom: 2rem; }
       .sheet { position: absolute; }
       .intro { position: relative; top: auto; left: auto; margin: 16vh 5vw 1.6rem; }
       .field .tag { position: relative; top: auto !important; left: auto !important; right: auto !important; display: block; width: fit-content; margin: 0.8rem 5vw; }
-      .thread { display: none; }
+      .field .thread { display: none; }
       .ghost { position: absolute; font-size: 22vw; }
+
+      .seam { height: 180vh; }
+      .seam-recto {
+        clip-path: polygon(
+          0 0, 100% 0,
+          100% calc(var(--edge) + 0vh),
+          91% calc(var(--edge) + 1vh),
+          82% calc(var(--edge) - 0.9vh),
+          73% calc(var(--edge) + 0.6vh),
+          64% calc(var(--edge) - 1.2vh),
+          55% calc(var(--edge) + 0.8vh),
+          45% calc(var(--edge) - 0.5vh),
+          36% calc(var(--edge) + 1.2vh),
+          27% calc(var(--edge) - 0.8vh),
+          18% calc(var(--edge) + 0.4vh),
+          9% calc(var(--edge) - 1vh),
+          0 calc(var(--edge) + 0.5vh)
+        );
+      }
+      .vault-row { flex-wrap: wrap; gap: 0.4em 1.2em; }
+      .vault-row .v-jp { margin-left: 0; width: 100%; letter-spacing: 0.3em; }
+      .vault .thread { display: none; }
     }
   </style>
 </head>
@@ -211,6 +428,10 @@
     <filter id="etch" x="-8%" y="-15%" width="116%" height="130%">
       <feTurbulence type="fractalNoise" baseFrequency="0.011 0.019" numOctaves="2" seed="7"/>
       <feDisplacementMap in="SourceGraphic" scale="5" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="etch-deep" x="-10%" y="-18%" width="120%" height="136%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.011 0.019" numOctaves="2" seed="11"/>
+      <feDisplacementMap in="SourceGraphic" scale="9" xChannelSelector="R" yChannelSelector="G"/>
     </filter>
   </svg>
   <a class="sr-only" href="#introduction">Skip to Content</a>
@@ -284,14 +505,66 @@
           class="muted">がここにまとめられてるんだ。</span><a href="https://note.com/synomare" target="_blank"
           rel="noopener">日記</a><span class="muted">はここに。なるほど。自分のことなのにすいません。みなさん、よろしくね。</span>ばいばい。<br><br>
 
-        名前、えっと、なんだっけ。忘れちゃった。あ、でも、えっと、たしかテクストって書いてたらしいんです。うん。あとデザインもやったことがあったのかな。えーっと、うん、それと、うん。いや、えーグラフィックを作ることがあったって聞いたことがありました。うん。そっか、そうですよね。うん。なんだったっけ、あ、そうだ!
-        たしかsynomareっていう名前でした。そうでしたよね？いやきっとそうだったはずです。あなたが覚えていてくれたんですよね。ありがとう。じゃあ、またね!<br><br>
       </p>
     </div>
     </section>
+
+    <section class="seam" id="seam" aria-label="裏写り">
+      <div class="seam-stage">
+        <div class="seam-verso ura" aria-hidden="true">
+          <span class="seam-mark">Verso — 裏</span>
+          <div class="copy seam-copy">
+            <p>名前、えっと、なんだっけ。忘れちゃった。あ、でも、えっと、たしかテクストって書いてたらしいんです。うん。あとデザインもやったことがあったのかな。えーっと、うん、それと、うん。いや、えーグラフィックを作ることがあったって聞いたことがありました。うん。そっか、そうですよね。うん。なんだったっけ、あ、そうだ!
+        たしかsynomareっていう名前でした。そうでしたよね？いやきっとそうだったはずです。あなたが覚えていてくれたんですよね。ありがとう。じゃあ、またね!</p>
+          </div>
+        </div>
+        <div class="seam-recto">
+          <span class="seam-mark">Recto — 表</span>
+          <div class="copy seam-copy">
+            <p>名前、えっと、なんだっけ。忘れちゃった。あ、でも、えっと、たしかテクストって書いてたらしいんです。うん。あとデザインもやったことがあったのかな。えーっと、うん、それと、うん。いや、えーグラフィックを作ることがあったって聞いたことがありました。うん。そっか、そうですよね。うん。なんだったっけ、あ、そうだ!
+        たしかsynomareっていう名前でした。そうでしたよね？いやきっとそうだったはずです。あなたが覚えていてくれたんですよね。ありがとう。じゃあ、またね!</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ura ura-grain vault" id="vault" aria-label="収蔵庫">
+      <div class="vault-inner">
+        <div class="sec-head"><span>Vault — 収蔵庫</span><span class="r">Verso — 裏写り</span></div>
+
+        <h2 class="vault-title engrave">VAULT</h2>
+
+        <a class="crypt" href="yugun/index.html">
+          <figure class="crypt-arch">
+            <img src="assets/images/嶼群/main-visual.webp" alt="嶼群（博物館（たち）） メインビジュアル"
+              width="819" height="1024" loading="lazy" decoding="async">
+          </figure>
+          <span class="tag crypt-tag">
+            <span class="no">MMXXV</span>
+            <span class="en">嶼群（博物館（たち））</span>
+            <span class="jp">演劇 — 地下聖堂</span>
+          </span>
+        </a>
+
+        <nav class="vault-litany" aria-label="収蔵庫の目録">
+          <a class="vault-row" href="works.html"><span class="v-no">i.</span><span class="v-en">Works</span><span class="v-jp">作品目録</span></a>
+          <a class="vault-row" href="notes/"><span class="v-no">ii.</span><span class="v-en">Notes</span><span class="v-jp">雑記・断章</span></a>
+          <a class="vault-row" href="links.html"><span class="v-no">iii.</span><span class="v-en">Links</span><span class="v-jp">交遊録</span></a>
+          <a class="vault-row" href="profile.html"><span class="v-no">iv.</span><span class="v-en">Profile</span><span class="v-jp">奥付</span></a>
+          <a class="vault-row" href="about.html"><span class="v-no">v.</span><span class="v-en">Appendix</span><span class="v-jp">図版</span></a>
+        </nav>
+
+        <div class="vault-seal">
+          <div class="sec-head"><span>Remembered — 記銘</span></div>
+          <p class="vault-syn engrave" data-parallax="0.35">synomare</p>
+        </div>
+      </div>
+      <div class="thread" style="top: 16%; left: 8vw; width: 42vw; transform: rotate(5deg);"></div>
+      <div class="thread" style="top: 74%; left: 52vw; width: 34vw; transform: rotate(-8deg);"></div>
+    </section>
   </main>
 
-  <footer class="caption">
+  <footer class="caption ura">
     <span>SYNOMARE / INDEX</span>
     <span class="d">&copy; <span id="year"></span> synomare — all rights reserved.</span>
   </footer>
@@ -300,11 +573,15 @@
   <script>
     (function () {
       var main = document.querySelector('main');
-      window.SYN.recital = SYN.letterwarp(document.querySelector('.copy'), {
+      window.SYN.recital = SYN.letterwarp(document.querySelector('.recital .copy'), {
         fit: main, lens: true, velocity: true
       });
+      window.SYN.seamVerso = SYN.letterwarp(document.querySelector('.seam-verso .copy'), { lens: false });
+      window.SYN.seamRecto = SYN.letterwarp(document.querySelector('.seam-recto .copy'), { lens: false });
     })();
   </script>
+  <script src="/assets/vendor/lenis.min.js"></script>
+  <script src="/assets/js/inversion.js"></script>
 </body>
 
 </html>

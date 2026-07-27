@@ -60,8 +60,8 @@
 
 .ura ::selection { background: var(--phosphor); color: var(--void); }
 
-/* base scaffold */
-html, body { overflow-x: hidden; }
+/* base scaffold — overflow-x: clip (not hidden) keeps position:sticky alive */
+html, body { overflow-x: hidden; overflow-x: clip; }
 
 body {
   margin: 0;
