@@ -158,6 +158,14 @@
     <span class="d">&copy; <span id="year"></span> synomare — all rights reserved.</span>
   </footer>
   <script src="/assets/js/site.js"></script>
+  <script src="/assets/js/gl.js"></script>
+  <script>
+    (function () {
+      if (window.SYN.grain) SYN.grain();
+      var plate = document.querySelector('.plate');
+      if (plate && SYN.flowImage) SYN.flowImage(plate.querySelector('img'), plate, { rgbShift: true });
+    })();
+  </script>
 </body>
 
 </html>

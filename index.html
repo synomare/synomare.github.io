@@ -570,6 +570,7 @@
   </footer>
   <script src="/assets/js/site.js"></script>
   <script src="/assets/js/letterwarp.js"></script>
+  <script src="/assets/js/gl.js"></script>
   <script>
     (function () {
       var main = document.querySelector('main');
@@ -578,6 +579,12 @@
       });
       window.SYN.seamVerso = SYN.letterwarp(document.querySelector('.seam-verso .copy'), { lens: false });
       window.SYN.seamRecto = SYN.letterwarp(document.querySelector('.seam-recto .copy'), { lens: false });
+
+      if (SYN.grain) SYN.grain();
+      var sheet = document.querySelector('.sheet');
+      if (sheet && SYN.flowImage) SYN.flowImage(sheet.querySelector('img'), sheet, { objectPosition: [0.5, 0.18] });
+      var stage = document.querySelector('.seam-stage');
+      if (stage && SYN.embers) SYN.embers(stage);
     })();
   </script>
   <script src="/assets/vendor/lenis.min.js"></script>

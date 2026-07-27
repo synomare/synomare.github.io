@@ -191,6 +191,46 @@ footer.caption.ura .d, body.is-ura footer.caption .d { color: var(--ash); }
   text-shadow: 0 0 18px rgba(255, 59, 35, 0.14), 0 0 2px rgba(201, 164, 92, 0.35);
 }
 
+/* ============================================================
+   effects layer (gl.js)
+   ============================================================ */
+
+/* live film grain — supersedes the static ::after grain when running */
+.live-grain {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: var(--z-grain);
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  opacity: 0.055;
+  image-rendering: pixelated;
+}
+body.is-ura .live-grain { mix-blend-mode: screen; opacity: 0.085; }
+body.has-live-grain::after { display: none; }
+
+/* WebGL displacement canvas over plates */
+.gl-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+/* burning tear edge */
+.ember-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 3;
+}
+
 /* hollowed / lit letters (letterwarp wear API) */
 .copy .c.worn {
   opacity: 0.55;
