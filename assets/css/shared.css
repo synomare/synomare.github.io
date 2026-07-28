@@ -224,7 +224,11 @@ footer.caption.ura .d, body.is-ura footer.caption .d { color: var(--ash); }
   image-rendering: pixelated;
 }
 body.is-ura .live-grain { mix-blend-mode: screen; opacity: 0.085; }
+.live-grain[hidden] { display: none; }
 body.has-live-grain::after { display: none; }
+
+/* the paper grain also stands down while the seam burns */
+body.seam-active::after { display: none; }
 
 /* WebGL displacement canvas over plates */
 .gl-canvas {
@@ -236,6 +240,7 @@ body.has-live-grain::after { display: none; }
   opacity: 0;
   transition: opacity 0.4s ease;
 }
+.gl-canvas[hidden] { display: none; }
 
 /* burning tear edge */
 .ember-canvas {

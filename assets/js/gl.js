@@ -14,6 +14,42 @@
   var SYN = window.SYN = window.SYN || {};
   var reduced = SYN.prefersReduced;
 
+  /* ---------- 0. frame budget watchdog ----------
+     A full-viewport blended layer costs a whole-screen recomposite on
+     every frame beneath it changes. That is cheap on a GPU and ruinous
+     without one, so measure the real budget and shed the most expensive
+     ornament rather than shipping a slideshow to weaker machines.
+     Degradation is one-way: no oscillating between modes. */
+  var budget = { degraded: false, cbs: [] };
+  SYN.onDegrade = function (cb) { if (budget.degraded) cb(); else budget.cbs.push(cb); };
+  (function watchdog() {
+    if (reduced) return;
+    var WINDOW = 60, SLOW_MS = 26, RATIO = 0.55;
+    var ring = new Array(WINDOW), n = 0, slow = 0, last = 0;
+    function tick(t) {
+      var dt = last ? t - last : 0;
+      last = t;
+      /* ignore tab-switch stalls and the very first frames after load */
+      if (dt > 0 && dt < 400 && t > 1500) {
+        var isSlow = dt > SLOW_MS ? 1 : 0;
+        var i = n % WINDOW;
+        if (n >= WINDOW) slow -= ring[i];
+        ring[i] = isSlow;
+        slow += isSlow;
+        n++;
+        if (n >= WINDOW && slow / WINDOW > RATIO) {
+          budget.degraded = true;
+          document.documentElement.classList.add('perf-lite');
+          for (var k = 0; k < budget.cbs.length; k++) budget.cbs[k]();
+          budget.cbs.length = 0;
+          return; /* one-way: never oscillate back */
+        }
+      }
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  })();
+
   /* ---------- 1. live grain ---------- */
   SYN.grain = function () {
     if (reduced) return;
@@ -26,15 +62,35 @@
     if (!ctx) { c.remove(); document.body.classList.remove('has-live-grain'); return; }
     var w = 0, h = 0, img = null;
     function resize() {
-      w = c.width = Math.max(1, Math.ceil(window.innerWidth / 5));
-      h = c.height = Math.max(1, Math.ceil(window.innerHeight / 5));
+      w = c.width = Math.max(1, Math.ceil(window.innerWidth / 8));
+      h = c.height = Math.max(1, Math.ceil(window.innerHeight / 8));
       img = null;
     }
     resize();
     window.addEventListener('resize', resize, { passive: true });
+
+    /* on a machine that cannot afford the boil, fall back to the static
+       CSS grain the site has always had — same texture, no per-frame cost */
+    var retired = false;
+    SYN.onDegrade(function () {
+      retired = true;
+      c.remove();
+      document.body.classList.remove('has-live-grain');
+    });
+
     var last = 0;
     function tick(t) {
-      if (!document.hidden && t - last > 85) {
+      if (retired) return;
+      /* a full-viewport blended layer is the most expensive thing on the
+         page whenever anything beneath it animates — stand down during
+         the seam, where the ember canvas supplies the texture anyway */
+      if (document.body.classList.contains('seam-active')) {
+        if (!c.hidden) c.hidden = true;
+        requestAnimationFrame(tick);
+        return;
+      }
+      if (c.hidden) c.hidden = false;
+      if (!document.hidden && t - last > 110) {
         last = t;
         if (!img) img = ctx.createImageData(w, h);
         var d = img.data;
@@ -262,10 +318,10 @@
       canvas.style.opacity = '1';
 
       if (active) idle = 0; else idle++;
-      if (idle < 260) raf = requestAnimationFrame(frame);
+      if (idle < 90) raf = requestAnimationFrame(frame);
     }
 
-    function wake() { if (!raf) raf = requestAnimationFrame(frame); }
+    function wake() { if (!raf) { idle = 0; raf = requestAnimationFrame(frame); } }
 
     container.addEventListener('pointermove', function (e) {
       if (e.pointerType === 'touch') return;
@@ -286,10 +342,13 @@
     if ('IntersectionObserver' in window) {
       new IntersectionObserver(function (en) {
         visible = en[0].isIntersecting;
+        /* an off-screen WebGL layer still costs compositing on every frame
+           the page paints — drop it out of the tree, not just the rAF loop */
+        canvas.hidden = !visible;
         if (visible) wake();
       }).observe(container);
     }
-    document.addEventListener('visibilitychange', function () { if (!document.hidden) wake(); });
+    document.addEventListener('visibilitychange', function () { if (!document.hidden && visible) wake(); });
 
     return { canvas: canvas };
   };
@@ -314,11 +373,14 @@
     var ctx = canvas.getContext('2d');
     if (!ctx) { canvas.remove(); return; }
 
+    /* half-resolution: the ember line is a glow, not a hairline —
+       the canvas is the single most expensive layer on the page */
+    var SCALE = 0.5;
     var W = 0, H = 0;
     function resize() {
       var r = stage.getBoundingClientRect();
-      W = canvas.width = Math.max(1, Math.round(r.width));
-      H = canvas.height = Math.max(1, Math.round(r.height));
+      W = canvas.width = Math.max(1, Math.round(r.width * SCALE));
+      H = canvas.height = Math.max(1, Math.round(r.height * SCALE));
     }
     resize();
     window.addEventListener('resize', resize, { passive: true });
@@ -355,17 +417,20 @@
           vy: -(0.4 + Math.random() * 1.4),
           life: 1,
           decay: 0.006 + Math.random() * 0.016,
-          size: Math.random() < 0.82 ? 1.6 : 2.6,
+          size: (Math.random() < 0.82 ? 1.6 : 2.6) * SCALE + 0.5,
           gold: Math.random() < 0.3
         });
       }
     }
 
-    function frame() {
-      if (!visible || document.hidden) {
-        requestAnimationFrame(frame);
-        return;
-      }
+    var lastFrame = 0;
+    function frame(now) {
+      requestAnimationFrame(frame);
+      if (!visible || document.hidden) return;
+      /* embers are texture, not motion — 30fps is plenty and halves the cost */
+      if (now - lastFrame < 32) return;
+      lastFrame = now;
+
       var p = parseFloat(stage.style.getPropertyValue('--seamp')) || 0;
       var burning = p > 0.002 && p < 0.998;
       var moving = Math.abs(p - lastP);
@@ -386,10 +451,10 @@
           }
           if (pass === 0) {
             ctx.strokeStyle = 'rgba(255,59,35,' + (0.10 * flick).toFixed(3) + ')';
-            ctx.lineWidth = 12;
+            ctx.lineWidth = 12 * SCALE;
           } else {
             ctx.strokeStyle = 'rgba(255,140,60,' + (0.5 * flick).toFixed(3) + ')';
-            ctx.lineWidth = 1.4;
+            ctx.lineWidth = Math.max(1, 1.4 * SCALE);
           }
           ctx.stroke();
         }
@@ -417,7 +482,6 @@
       }
 
       lastP = p;
-      requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);
   };

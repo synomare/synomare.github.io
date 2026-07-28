@@ -113,10 +113,14 @@
   if (!turb.length) return;
   var t = null;
   function tick() {
-    for (var i = 0; i < turb.length; i++) {
-      turb[i].setAttribute('seed', String(2 + ((Math.random() * 9) | 0)));
+    /* reseeding invalidates every element using the filter, so keep it
+       infrequent and skip it while the seam is animating */
+    if (!document.body.classList.contains('seam-active')) {
+      for (var i = 0; i < turb.length; i++) {
+        turb[i].setAttribute('seed', String(2 + ((Math.random() * 9) | 0)));
+      }
     }
-    t = setTimeout(tick, 380 + Math.random() * 420);
+    t = setTimeout(tick, 900 + Math.random() * 900);
   }
   document.addEventListener('visibilitychange', function () {
     if (document.hidden) { clearTimeout(t); t = null; }

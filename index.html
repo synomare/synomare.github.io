@@ -9,6 +9,8 @@
   <meta property="og:title" content="synomare — website">
   <meta property="og:description" content="synomare。テクスト、デザイン、グラフィック。">
   <meta property="og:type" content="website">
+  <meta property="og:image" content="https://synomare.github.io/assets/images/og.png">
+  <meta name="twitter:card" content="summary_large_image">
   <meta name="theme-color" content="#f4f3ef">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -348,7 +350,10 @@
       );
     }
 
-    /* torn-fiber lip riding the tear edge */
+    /* torn-fiber lip riding the tear edge.
+       No SVG filter here — this element moves every frame and an
+       feTurbulence re-render per frame costs ~5fps; the ember canvas
+       supplies the texture instead. */
     .seam-recto::before {
       content: "";
       position: absolute;
@@ -356,9 +361,11 @@
       right: -2%;
       height: 4vh;
       top: calc(var(--edge) - 2.4vh);
-      background: linear-gradient(to bottom, rgba(23, 20, 15, 0) 0%, rgba(23, 20, 15, 0.2) 60%, rgba(23, 20, 15, 0.04) 100%);
-      filter: url(#etch);
+      background:
+        repeating-linear-gradient(to right, rgba(23, 20, 15, 0.07) 0 1px, transparent 1px 4px),
+        linear-gradient(to bottom, rgba(23, 20, 15, 0) 0%, rgba(23, 20, 15, 0.2) 60%, rgba(23, 20, 15, 0.04) 100%);
       pointer-events: none;
+      will-change: top;
     }
 
     .seam .copy { touch-action: auto; }

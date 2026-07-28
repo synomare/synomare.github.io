@@ -482,7 +482,7 @@
     if (opts.velocity && !reduced) {
       (function () {
         var raf = null;
-        var vel = 0, cur = 1;
+        var vel = 0, cur = 1, written = '1';
         var lastY = window.scrollY || 0;
         var lastT = (window.performance && performance.now()) || Date.now();
         function loop(t) {
@@ -493,12 +493,17 @@
           vel += (v - vel) * 0.25;
           var target = 1 + Math.min(0.42, Math.abs(vel) * 0.16);
           cur += (target - cur) * 0.12;
-          if (Math.abs(cur - 1) < 0.002 && Math.abs(vel) < 0.005) {
+          /* --vwarp is inherited by every glyph, so each distinct value
+             re-evaluates ~900 transforms. Quantise hard: the stretch reads
+             the same, and a scroll gesture writes ~10 values, not ~60. */
+          var q = Math.round(cur / 0.03) * 0.03;
+          if (Math.abs(cur - 1) < 0.004 && Math.abs(vel) < 0.005) {
             cur = 1;
-            root.style.setProperty('--vwarp', '1');
+            if (written !== '1') { root.style.setProperty('--vwarp', '1'); written = '1'; }
             return;
           }
-          root.style.setProperty('--vwarp', cur.toFixed(4));
+          var s = q.toFixed(2);
+          if (s !== written) { root.style.setProperty('--vwarp', s); written = s; }
           raf = requestAnimationFrame(loop);
         }
         window.addEventListener('scroll', function () {
@@ -510,7 +515,7 @@
     /* ---------- 5. wear / lit thresholds ---------- */
     var lastWear = -1, lastLit = -1;
     function threshold(cls, amount, last) {
-      var q = Math.round(Math.max(0, Math.min(1, amount)) * 50) / 50;
+      var q = Math.round(Math.max(0, Math.min(1, amount)) * 16) / 16;
       if (q === last) return last;
       for (var i = 0; i < letters.length; i++) {
         var s = parseFloat(letters[i].dataset.wear);

@@ -47,12 +47,26 @@
   }
 
   var current = 0;
+  var written = null;
   var raf = null;
 
-  /* vault strata parallax + monument weight (measured transform-free) */
+  /* Vault strata parallax + monument weight (measured transform-free).
+     Continuous transforms under the grain force a full-screen re-blend
+     every frame. The grain is the site's identity and the parallax is
+     ornament, so on a machine that cannot afford both, the parallax goes. */
   var plx = [];
+  var noParallax = false;
   var vaultTitle = document.querySelector('.vault-title');
+  if (SYN.onDegrade) {
+    SYN.onDegrade(function () {
+      noParallax = true;
+      for (var i = 0; i < plx.length; i++) plx[i].el.style.transform = '';
+      plx.length = 0;
+      if (vaultTitle) vaultTitle.style.fontWeight = '';
+    });
+  }
   function measureParallax() {
+    if (noParallax) return;
     plx = [];
     var els = document.querySelectorAll('#vault [data-depth]');
     for (var i = 0; i < els.length; i++) {
@@ -70,6 +84,19 @@
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(measureParallax).catch(function () { });
   measureParallax();
 
+  /* A fixed full-viewport blended layer (the paper grain) is recomposited
+     on every frame the page paints, so an idle rAF loop is not free — it
+     is the difference between a still page and a 13fps one. Run the loop
+     only while something is actually moving. */
+  var idleFrames = 0;
+  function wake() {
+    idleFrames = 0;
+    if (!raf) raf = requestAnimationFrame(frame);
+  }
+  ['wheel', 'touchmove', 'touchstart', 'keydown', 'scroll', 'pointerdown', 'resize'].forEach(function (ev) {
+    window.addEventListener(ev, wake, { passive: true });
+  });
+
   function frame(t) {
     if (lenis) lenis.raf(t);
 
@@ -81,9 +108,16 @@
     /* lag = choreography: the tear trails the scroll slightly */
     current += (p - current) * 0.16;
     if (Math.abs(current - p) < 0.0008) current = p;
-    stage.style.setProperty('--seamp', current.toFixed(4));
+    /* only write when it actually moved: --seamp feeds a 32-point
+       clip-path, so a redundant write costs a style recalc every frame */
+    var next = current.toFixed(4);
+    if (next !== written) {
+      stage.style.setProperty('--seamp', next);
+      written = next;
+    }
 
     setUra(p > 0.55);
+    body.classList.toggle('seam-active', p > 0.001 && p < 0.999);
 
     /* the recital erodes as the seam approaches */
     if (SYN.recital) {
@@ -107,12 +141,14 @@
       }
     }
 
-    raf = requestAnimationFrame(frame);
+    /* settled? let the page go quiet. A few grace frames absorb the
+       tail of Lenis's easing and any layout that lands late. */
+    var moving = (current !== p) || (lenis && lenis.isScrolling);
+    idleFrames = moving ? 0 : idleFrames + 1;
+    raf = idleFrames > 20 ? null : requestAnimationFrame(frame);
   }
-  raf = requestAnimationFrame(frame);
+  wake();
 
   /* keep the loop honest across bfcache restores */
-  window.addEventListener('pageshow', function (e) {
-    if (e.persisted && !raf) raf = requestAnimationFrame(frame);
-  });
+  window.addEventListener('pageshow', function (e) { if (e.persisted) wake(); });
 })();
