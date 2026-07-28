@@ -120,7 +120,7 @@
        ============================================================ */
     .recital {
       position: relative;
-      padding: clamp(40px, 8vw, 96px) clamp(16px, 4vw, 48px) clamp(16px, 2.4vw, 28px);
+      padding: clamp(40px, 8vw, 96px) clamp(16px, 4vw, 48px) clamp(40px, 7vw, 88px);
     }
 
     .recital .desig { margin-bottom: clamp(2rem, 5vw, 3.6rem); }
@@ -202,178 +202,6 @@
     }
     .erosion .n { color: var(--red); font-variant-numeric: tabular-nums; }
 
-    /* ============================================================
-       §03 SLAB — no transition. the paper stops and the mass begins.
-       Text as a solid: justified, broken anywhere, edge to edge.
-       ============================================================ */
-    .slab {
-      position: relative;
-      overflow: hidden;
-      border-top: 4px solid var(--red);
-      padding: 0;
-    }
-
-    /* the header is a strip, not a heading — packed, ruled, no air */
-    .slab-strip {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0 2.4em;
-      padding: 0.55rem clamp(12px, 2.6vw, 26px);
-      border-bottom: 2px solid var(--bone);
-      font-family: var(--mono);
-      font-size: 0.56rem;
-      letter-spacing: 0.28em;
-      text-transform: uppercase;
-      color: var(--bone);
-    }
-    .slab-strip .r { color: var(--phosphor); }
-    .slab-strip .push { margin-left: auto; }
-    .slab-strip .n { font-variant-numeric: tabular-nums; }
-
-    /* the wall — the paragraph set as a block of matter */
-    .slab-mass {
-      position: relative;
-      z-index: 2;
-      margin: 0;
-      padding: clamp(14px, 2.6vw, 26px) clamp(12px, 2.6vw, 26px) clamp(20px, 4vw, 40px);
-      font-size: clamp(19px, 3.5vw, 40px);
-      line-height: 1.24;
-      letter-spacing: -0.035em;
-      text-align: justify;
-      word-break: break-all;
-      font-feature-settings: "palt" 1, "kern" 1;
-      color: var(--bone);
-    }
-    .slab-mass .muted { color: var(--ash); }
-
-    /* the block signs off against a second thick rule */
-    .slab-foot {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0 2.4em;
-      padding: 0.5rem clamp(12px, 2.6vw, 26px);
-      border-top: 2px solid var(--bone);
-      font-family: var(--mono);
-      font-size: 0.54rem;
-      letter-spacing: 0.28em;
-      text-transform: uppercase;
-      color: var(--ash);
-      position: relative;
-      z-index: 2;
-    }
-    .slab-foot .push { margin-left: auto; }
-
-    /* ============================================================
-       §04 REGISTER — the catalogue as a bolted frame.
-       Thick rules, no gutters, rows that invert whole.
-       ============================================================ */
-    .register-verso {
-      position: relative;
-      padding: 0;
-      border-top: 4px solid var(--bone);
-    }
-
-    .rv-strip {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0 2.4em;
-      padding: 0.55rem clamp(12px, 2.6vw, 26px);
-      border-bottom: 2px solid var(--bone);
-      font-family: var(--mono);
-      font-size: 0.56rem;
-      letter-spacing: 0.28em;
-      text-transform: uppercase;
-      color: var(--bone);
-    }
-    .rv-strip .r { color: var(--phosphor); }
-    .rv-strip .push { margin-left: auto; }
-    .rv-strip .n { font-variant-numeric: tabular-nums; }
-
-    .rv-rows { display: grid; }
-
-    /* rows butt directly: no padding around the block, 2px between them */
-    .rv-row {
-      display: grid;
-      grid-template-columns: 4.2em minmax(0, 1fr) auto;
-      gap: 0 clamp(1em, 2.4vw, 2em);
-      align-items: baseline;
-      padding: clamp(0.28em, 1vw, 0.5em) clamp(12px, 2.6vw, 26px);
-      border-bottom: 2px solid var(--bone);
-      transition: background 0.12s steps(1), color 0.12s steps(1);
-    }
-
-    .rv-no {
-      font-family: var(--mono);
-      font-size: 0.62rem;
-      letter-spacing: 0.2em;
-      color: var(--ash);
-      font-variant-numeric: tabular-nums;
-    }
-
-    .rv-name {
-      font-family: var(--latin);
-      font-weight: 400;
-      font-size: var(--t-large);
-      line-height: 1;
-      letter-spacing: -0.045em;
-      /* the names run to the edge of the sheet and are cut by it */
-      white-space: nowrap;
-    }
-
-    .rv-meta {
-      font-family: var(--mono);
-      font-size: 0.56rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--ash);
-      white-space: nowrap;
-    }
-
-    /* hard invert — no easing, the whole row flips */
-    a.rv-row:hover { background: var(--bone); color: var(--void); }
-    a.rv-row:hover .rv-no,
-    a.rv-row:hover .rv-meta { color: var(--void); }
-
-    /* the closing block: plate bolted into the left column, nothing centred */
-    .rv-tail {
-      display: grid;
-      grid-template-columns: minmax(0, 22rem) minmax(0, 1fr);
-      align-items: stretch;
-    }
-    .rv-plate { display: block; border-right: 2px solid var(--bone); }
-    .rv-plate img {
-      width: 100%;
-      height: auto;
-      display: block;
-      filter: grayscale(1) contrast(1.2) brightness(0.8);
-      transition: filter 0.12s steps(1);
-    }
-    a.rv-plate:hover img { filter: grayscale(1) contrast(1.6) brightness(1.05) invert(1); }
-    .rv-plate .desig { padding: 0.5rem clamp(12px, 2.6vw, 26px); border-top: 2px solid var(--bone); }
-
-    /* the record, packed. no poetry at the end — just the entry. */
-    .rv-data { display: grid; align-content: start; }
-    .rv-kv {
-      display: grid;
-      grid-template-columns: 7.5em minmax(0, 1fr);
-      gap: 0 1.6em;
-      padding: 0.5em clamp(12px, 2.6vw, 26px);
-      border-bottom: 2px solid var(--bone);
-      align-items: baseline;
-    }
-    .rv-kv:first-child { border-top: 0; }
-    .rv-kv dt {
-      font-family: var(--mono);
-      font-size: 0.54rem;
-      letter-spacing: 0.28em;
-      text-transform: uppercase;
-      color: var(--phosphor);
-    }
-    .rv-kv dd { margin: 0; font-size: 0.86rem; line-height: 1.7; }
-    .rv-kv dd a { border-bottom: 1px solid var(--ash); }
-    .rv-kv dd a:hover { background: var(--bone); color: var(--void); border-bottom-color: var(--bone); }
-    .rv-kv dd a + a { margin-left: 1.2em; }
-
     @media (max-width: 700px) {
       .field { height: auto; min-height: 0; padding-bottom: 2rem; }
       .intro { position: relative; top: auto; left: auto; margin: 16vh 5vw 1.6rem; }
@@ -381,11 +209,6 @@
       .field .thread { display: none; }
       .field .desig { position: relative; left: auto; bottom: auto; margin: 1.4rem 5vw 0; }
       .ghost { position: absolute; font-size: 22vw; }
-      .rv-row { grid-template-columns: 2.8em minmax(0, 1fr); }
-      .rv-meta { grid-column: 2; margin-top: 0.3em; white-space: normal; }
-      .rv-tail { grid-template-columns: minmax(0, 1fr); }
-      .rv-plate { border-right: none; border-bottom: 2px solid var(--bone); }
-      .rv-kv { grid-template-columns: 1fr; gap: 0.15em; }
     }
   </style>
 </head>
@@ -486,6 +309,9 @@
             href="https://www.instagram.com/syno_mare/?utm_source=qr">過去の制作物</a><span
             class="muted">がここにまとめられてるんだ。</span><a href="https://note.com/synomare" target="_blank"
             rel="noopener">日記</a><span class="muted">はここに。なるほど。自分のことなのにすいません。みなさん、よろしくね。</span>ばいばい。<br><br>
+
+          名前、えっと、なんだっけ。忘れちゃった。あ、でも、えっと、たしかテクストって書いてたらしいんです。うん。あとデザインもやったことがあったのかな。えーっと、うん、それと、うん。いや、えーグラフィックを作ることがあったって聞いたことがありました。うん。そっか、そうですよね。うん。なんだったっけ、あ、そうだ!
+          たしかsynomareっていう名前でした。そうでしたよね？いやきっとそうだったはずです。あなたが覚えていてくれたんですよね。ありがとう。じゃあ、またね!<br><br>
         </p>
       </div>
 
@@ -495,72 +321,9 @@
       </p>
     </section>
 
-    <section class="ura slab" id="slab" data-sec="§03 裏" aria-label="裏">
-      <div class="slab-strip">
-        <span class="r">§03</span>
-        <span>裏 / VERSO</span>
-        <span class="push"><span class="n">147</span> 字</span>
-        <span class="n" data-stamp>----.--.--</span>
-      </div>
-
-      <p class="slab-mass">名前、えっと、なんだっけ。忘れちゃった。あ、でも、えっと、たしかテクストって書いてたらしいんです。うん。あとデザインもやったことがあったのかな。えーっと、うん、それと、うん。いや、えーグラフィックを作ることがあったって聞いたことがありました。うん。そっか、そうですよね。うん。なんだったっけ、あ、そうだ! たしかsynomareっていう名前でした。そうでしたよね？いやきっとそうだったはずです。あなたが覚えていてくれたんですよね。ありがとう。じゃあ、またね!</p>
-
-      <div class="slab-foot">
-        <span>End of recto</span>
-        <span class="push">表はここで終わる</span>
-      </div>
-    </section>
-
-    <section class="ura register-verso" id="register" data-sec="§04 目録" aria-label="目録">
-      <div class="rv-strip">
-        <span class="r">§04</span>
-        <span>目録 / REGISTER</span>
-        <span class="push"><span class="n">05</span> 件</span>
-        <span class="n" data-stamp>----.--.--</span>
-      </div>
-
-      <nav class="rv-rows" aria-label="目録">
-        <a class="rv-row" href="works.html">
-          <span class="rv-no">01</span><span class="rv-name">Works</span><span class="rv-meta">作品目録</span>
-        </a>
-        <a class="rv-row" href="notes/">
-          <span class="rv-no">02</span><span class="rv-name">Notes</span><span class="rv-meta">雑記・断章</span>
-        </a>
-        <a class="rv-row" href="links.html">
-          <span class="rv-no">03</span><span class="rv-name">Links</span><span class="rv-meta">交遊録</span>
-        </a>
-        <a class="rv-row" href="profile.html">
-          <span class="rv-no">04</span><span class="rv-name">Profile</span><span class="rv-meta">奥付</span>
-        </a>
-        <a class="rv-row" href="about.html">
-          <span class="rv-no">05</span><span class="rv-name">Appendix</span><span class="rv-meta">図版</span>
-        </a>
-      </nav>
-
-      <div class="rv-tail">
-        <a class="rv-plate" href="yugun/index.html">
-          <img src="assets/images/嶼群/main-visual.webp" alt="嶼群（博物館（たち）） メインビジュアル"
-            width="819" height="1024" loading="lazy" decoding="async">
-          <span class="desig">
-            <span class="k">2025</span> 嶼群（博物館（たち））
-            <span class="s">/</span> 演劇
-          </span>
-        </a>
-        <dl class="rv-data">
-          <div class="rv-kv"><dt>名称 / Name</dt><dd>synomare（しのめあ）</dd></div>
-          <div class="rv-kv"><dt>業務 / Field</dt><dd>テクスト・デザイン・グラフィック</dd></div>
-          <div class="rv-kv"><dt>記録 / Records</dt><dd>
-            <a href="https://x.com/synomare" target="_blank" rel="noopener">X</a>
-            <a href="https://www.instagram.com/syno_mare/?utm_source=qr" target="_blank" rel="noopener">Instagram</a>
-            <a href="https://note.com/synomare" target="_blank" rel="noopener">note</a>
-          </dd></div>
-          <div class="rv-kv"><dt>連絡 / Contact</dt><dd><a href="mailto:synomare@gmail.com">synomare@gmail.com</a></dd></div>
-        </dl>
-      </div>
-    </section>
   </main>
 
-  <footer class="caption ura">
+  <footer class="caption">
     <span>SYNOMARE / INDEX</span>
     <span class="d">&copy; <span id="year"></span> synomare — all rights reserved.</span>
   </footer>
@@ -582,7 +345,7 @@
     })();
   </script>
   <script src="/assets/vendor/lenis.min.js"></script>
-  <script src="/assets/js/inversion.js"></script>
+  <script src="/assets/js/rail.js"></script>
 </body>
 
 </html>

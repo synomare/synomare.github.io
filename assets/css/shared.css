@@ -20,7 +20,6 @@
   top: 0;
   background: var(--paper);
   z-index: var(--z-topbar);
-  transition: background 0.4s ease, color 0.4s ease, border-color 0.4s ease;
 }
 
 .topbar .brand { font-weight: 500; }
@@ -30,11 +29,6 @@
 .topbar nav a:hover { background: var(--ink); color: var(--paper); }
 .topbar nav a[aria-current] { background: var(--ink); color: var(--paper); padding: 0 0.35em; }
 
-body.is-ura .topbar { background: var(--void); color: var(--bone); border-bottom-color: var(--seamline); }
-body.is-ura .topbar .brand .jp { color: var(--ash); }
-body.is-ura .topbar .date { color: var(--phosphor); }
-body.is-ura .topbar nav a:hover,
-body.is-ura .topbar nav a[aria-current] { background: var(--bone); color: var(--void); }
 
 /* ---------- designation — the metadata line that names a thing ----------
    catalogue apparatus, set at the smallest register. */
@@ -162,8 +156,6 @@ a.tag:hover .jp { color: var(--paper); }
   color: var(--ink);
 }
 .rail-pos { color: var(--red); font-variant-numeric: tabular-nums; }
-body.is-ura .rail { background: var(--void); color: var(--bone); border-color: var(--bone); }
-body.is-ura .rail-pos { color: var(--phosphor); }
 
 @media (max-width: 700px) { .rail { display: none; } }
 
@@ -181,19 +173,17 @@ footer.caption {
   text-transform: uppercase;
   color: var(--ink);
   background: var(--paper);
-  transition: background 0.4s ease, color 0.4s ease, border-color 0.4s ease;
 }
 footer.caption .r { color: var(--red); }
 footer.caption .d { color: var(--dim); }
 
-footer.caption.ura,
-body.is-ura footer.caption {
+footer.caption.ura {
   background: var(--void);
   color: var(--bone);
   border-top-color: var(--seamline);
 }
-footer.caption.ura .r, body.is-ura footer.caption .r { color: var(--phosphor); }
-footer.caption.ura .d, body.is-ura footer.caption .d { color: var(--ash); }
+footer.caption.ura .r { color: var(--phosphor); }
+footer.caption.ura .d { color: var(--ash); }
 
 /* ---------- paper grain ---------- */
 body::after {
@@ -207,7 +197,6 @@ body::after {
   mix-blend-mode: multiply;
   opacity: 0.05;
 }
-body.is-ura::after { mix-blend-mode: screen; opacity: 0.06; }
 
 /* ---------- ledger ---------- */
 .register {
