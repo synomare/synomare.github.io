@@ -62,6 +62,15 @@ a.tag:hover .jp { color: var(--paper); }
 
 .sec-head .r { color: var(--dim); }
 
+/* ruler draws itself left → right on entrance */
+.js .sec-head {
+  border-bottom-color: transparent;
+  background: linear-gradient(var(--ink), var(--ink)) left bottom / 0% 1px no-repeat;
+  transition: background-size 0.9s cubic-bezier(0.6, 0, 0.2, 1);
+}
+.js .sec-head.drawn { background-size: 100% 1px; }
+.js .ura .sec-head { background-image: linear-gradient(var(--seamline), var(--seamline)); }
+
 /* red thread */
 .thread {
   position: absolute;
@@ -72,6 +81,13 @@ a.tag:hover .jp { color: var(--paper); }
   opacity: 0.85;
   z-index: var(--z-thread);
 }
+
+/* thread strings itself on entrance */
+.js .thread {
+  clip-path: inset(-4px 100% -4px 0);
+  transition: clip-path 1.2s cubic-bezier(0.6, 0, 0.2, 1);
+}
+.js .thread.drawn { clip-path: inset(-4px 0 -4px 0); }
 
 /* footer caption */
 footer.caption {

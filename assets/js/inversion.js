@@ -49,6 +49,27 @@
   var current = 0;
   var raf = null;
 
+  /* vault strata parallax + monument weight (measured transform-free) */
+  var plx = [];
+  var vaultTitle = document.querySelector('.vault-title');
+  function measureParallax() {
+    plx = [];
+    var els = document.querySelectorAll('#vault [data-depth]');
+    for (var i = 0; i < els.length; i++) {
+      els[i].style.transform = '';
+      var r = els[i].getBoundingClientRect();
+      plx.push({
+        el: els[i],
+        depth: parseFloat(els[i].getAttribute('data-depth')) || 1,
+        center: r.top + window.scrollY + r.height / 2
+      });
+    }
+  }
+  window.addEventListener('load', measureParallax);
+  window.addEventListener('resize', measureParallax, { passive: true });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(measureParallax).catch(function () { });
+  measureParallax();
+
   function frame(t) {
     if (lenis) lenis.raf(t);
 
@@ -71,6 +92,19 @@
     /* the verso copy ignites, seed order, as the tear crosses */
     if (SYN.seamVerso) {
       SYN.seamVerso.lit(clamp01(current * 1.35));
+    }
+
+    /* vault strata drift at different depths; the monument gains weight */
+    var sy = window.scrollY;
+    for (var i = 0; i < plx.length; i++) {
+      var d = plx[i].center - sy - vh / 2;
+      if (d > -vh * 1.6 && d < vh * 1.6) {
+        plx[i].el.style.transform = 'translateY(' + (d * (plx[i].depth - 1)).toFixed(1) + 'px)';
+        if (plx[i].el === vaultTitle) {
+          var wp = clamp01(1 - (d + vh * 0.5) / (vh * 1.1));
+          vaultTitle.style.fontWeight = Math.round(300 + 200 * wp);
+        }
+      }
     }
 
     raf = requestAnimationFrame(frame);

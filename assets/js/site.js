@@ -18,6 +18,52 @@
   if (y) y.textContent = new Date().getFullYear();
 })();
 
+/* scroll-entrance choreography — rulers draw, threads string themselves */
+(function () {
+  document.documentElement.classList.add('js');
+  var targets = document.querySelectorAll('.sec-head, [data-flicker]');
+  var threads = document.querySelectorAll('.thread');
+  if (!targets.length && !threads.length) return;
+  function markAll() {
+    for (var i = 0; i < targets.length; i++) targets[i].classList.add('drawn');
+    for (var j = 0; j < threads.length; j++) threads[j].classList.add('drawn');
+  }
+  if (!('IntersectionObserver' in window) || window.SYN.prefersReduced) {
+    markAll();
+    return;
+  }
+  var io = new IntersectionObserver(function (entries) {
+    for (var i = 0; i < entries.length; i++) {
+      if (entries[i].isIntersecting) {
+        entries[i].target.classList.add('drawn');
+        io.unobserve(entries[i].target);
+      }
+    }
+  }, { threshold: 0.1 });
+  for (var k = 0; k < targets.length; k++) io.observe(targets[k]);
+
+  /* threads are clipped to zero width, which zeroes their intersection
+     area too — observe their parent section instead */
+  var parents = [];
+  for (var m = 0; m < threads.length; m++) {
+    var parent = threads[m].parentElement;
+    if (parents.indexOf(parent) === -1) parents.push(parent);
+  }
+  var tio = new IntersectionObserver(function (entries) {
+    for (var i = 0; i < entries.length; i++) {
+      if (!entries[i].isIntersecting) continue;
+      var kids = entries[i].target.children;
+      for (var j = 0; j < kids.length; j++) {
+        if (kids[j].classList && kids[j].classList.contains('thread')) {
+          kids[j].classList.add('drawn');
+        }
+      }
+      tio.unobserve(entries[i].target);
+    }
+  }, { threshold: 0.12 });
+  for (var n = 0; n < parents.length; n++) tio.observe(parents[n]);
+})();
+
 /* hover scramble — latin chrome text flickers through katakana/marks, then settles */
 (function () {
   if (window.SYN.prefersReduced) return;
