@@ -39,14 +39,33 @@
       background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(2em - 1px), rgba(23, 20, 15, 0.045) calc(2em - 1px), rgba(23, 20, 15, 0.045) 2em);
     }
 
-    .link-row { display: flex; align-items: baseline; gap: 1.4em; padding: 1.1em 0.3em; border-bottom: 1px solid var(--line); }
-    a.link-row:hover { background: var(--ink); color: var(--paper); }
-    a.link-row:hover .no, a.link-row:hover .who { color: var(--paper); opacity: 0.75; }
+    .link-row { display: flex; align-items: baseline; gap: 1.4em; padding: 1.1em 0.3em; border-bottom: 1px solid var(--line); transition: color 0.25s ease; }
+    a.link-row:hover .no, a.link-row:hover .who { color: var(--red); }
     .link-row .no { font-family: var(--mono); color: var(--red); flex-shrink: 0; font-size: 0.72rem; letter-spacing: 0.12em; }
     .link-row .site { font-size: clamp(1rem, 2.4vw, 1.5rem); font-weight: 500; }
-    .link-row .dots { flex: 1; border-bottom: 1px dotted var(--line); transform: translateY(-0.3em); min-width: 2em; }
-    a.link-row:hover .dots { border-bottom-color: var(--paper); }
-    .link-row .who { color: var(--dim); font-size: 0.74rem; letter-spacing: 0.14em; flex-shrink: 0; }
+    .link-row .who { color: var(--dim); font-size: 0.74rem; letter-spacing: 0.14em; flex-shrink: 0; transition: color 0.25s ease; }
+
+    /* the leader ignites and runs to the other name — a filament between us */
+    .link-row .dots {
+      flex: 1;
+      position: relative;
+      min-width: 2em;
+      transform: translateY(-0.3em);
+      border-bottom: 1px dotted var(--line);
+    }
+    .link-row .dots::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 1px;
+      background: var(--phosphor);
+      box-shadow: 0 0 7px 1px rgba(255, 59, 35, 0.55);
+      clip-path: inset(-4px 100% -4px 0);
+      transition: clip-path 0.5s cubic-bezier(0.5, 0, 0.2, 1);
+    }
+    a.link-row:hover .dots::after { clip-path: inset(-4px 0 -4px 0); }
 
     .note { margin: 2.4rem 0 0; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.16em; color: var(--dim); }
   </style>

@@ -44,11 +44,11 @@
           d[i + 3] = 255;
         }
         /* occasional one-frame vertical scratch — film damage */
-        if (Math.random() < 0.05) {
+        if (Math.random() < 0.035) {
           var x = (Math.random() * w) | 0;
           for (var y = 0; y < h; y++) {
             var k = (y * w + x) * 4;
-            d[k] = d[k + 1] = d[k + 2] = 20;
+            d[k] = d[k + 1] = d[k + 2] = 150;
           }
         }
         ctx.putImageData(img, 0, 0);

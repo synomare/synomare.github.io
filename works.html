@@ -67,11 +67,38 @@
       border-bottom: 1px solid var(--line);
     }
 
-    a.work-row:hover { background: var(--ink); color: var(--paper); }
-    a.work-row:hover .w-no { color: var(--paper); }
-    a.work-row:hover .w-desc, a.work-row:hover .w-type, a.work-row:hover .w-year { color: var(--paper); opacity: 0.7; }
+    /* the row turns over and shows its back */
+    a.work-row {
+      position: relative;
+      transition: background 0.3s ease, color 0.3s ease, transform 0.4s cubic-bezier(0.2, 1, 0.3, 1);
+      transform-origin: left center;
+    }
+    a.work-row:hover {
+      background: var(--void);
+      color: var(--bone);
+      transform: perspective(900px) rotateY(-1.6deg);
+    }
+    a.work-row:hover .w-no { color: var(--phosphor); }
+    a.work-row:hover .w-title { color: transparent; -webkit-text-stroke: 0.7px var(--gilt); }
+    a.work-row:hover .w-desc, a.work-row:hover .w-type, a.work-row:hover .w-year { color: var(--ash); opacity: 1; }
+
+    /* the accession stamp gets pressed on */
+    a.work-row::after {
+      content: "✳";
+      position: absolute;
+      top: 0.9em;
+      left: -0.05em;
+      color: var(--phosphor);
+      font-size: 0.9rem;
+      opacity: 0;
+      transform: scale(2.4) rotate(-18deg);
+      pointer-events: none;
+      transition: opacity 0.16s ease, transform 0.22s cubic-bezier(0.2, 1.5, 0.4, 1);
+    }
+    a.work-row:hover::after { opacity: 0.9; transform: scale(1) rotate(-8deg); }
 
     .w-no { font-family: var(--mono); color: var(--red); font-size: 0.72rem; letter-spacing: 0.12em; }
+    .w-title { transition: color 0.3s ease, -webkit-text-stroke 0.3s ease; }
     .w-title { font-size: clamp(1.2rem, 3vw, 2rem); font-weight: 500; letter-spacing: -0.01em; line-height: 1.2; }
     .w-desc { display: block; margin-top: 0.5em; font-size: 0.78rem; line-height: 1.9; color: var(--dim); max-width: 44em; }
     .w-type { font-family: var(--mono); font-size: 0.56rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--dim); white-space: nowrap; justify-self: end; }
@@ -79,11 +106,40 @@
     .more { margin: 0.9rem 0 0; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--dim); }
     .more a:hover { background: var(--ink); color: var(--paper); }
 
+    /* 裏目録 — the catalogue ends on its reverse */
+    .verso-register {
+      position: relative;
+      margin: clamp(3rem, 7vw, 5rem) calc(-1 * clamp(16px, 3.4vw, 44px)) calc(-1 * clamp(3rem, 6vw, 4.5rem));
+      padding: clamp(2.4rem, 5vw, 3.6rem) clamp(16px, 3.4vw, 44px) clamp(3rem, 6vw, 4.4rem);
+    }
+    .verso-register .inner { max-width: 72rem; }
+    .verso-row {
+      display: flex;
+      align-items: baseline;
+      gap: 1.4em;
+      padding: 0.9em 0.3em;
+      border-bottom: 1px solid var(--seamline);
+      transition: background 0.25s ease;
+    }
+    .verso-row .v-en {
+      font-family: var(--gothic);
+      font-weight: 340;
+      font-size: clamp(1.5rem, 3.6vw, 2.4rem);
+      letter-spacing: 0.04em;
+      transition: color 0.25s ease, text-shadow 0.25s ease;
+    }
+    .verso-row .v-jp { margin-left: auto; font-size: 0.76rem; color: var(--ash); letter-spacing: 0.4em; }
+    .verso-row:hover { background: rgba(201, 164, 92, 0.05); }
+    .verso-row:hover .v-en { color: var(--phosphor); text-shadow: 0 0 16px rgba(255, 59, 35, 0.35); }
+
     @media (max-width: 700px) {
       .work-row { grid-template-columns: 1fr; gap: 0.4em; }
       .w-type { justify-self: start; }
       .plate-tag { position: relative; right: auto; bottom: auto; display: inline-block; margin-top: 0.9rem; }
       .plate-thread { display: none; }
+      a.work-row:hover { transform: none; }
+      .verso-row { flex-wrap: wrap; gap: 0.3em 1.2em; }
+      .verso-row .v-jp { margin-left: 0; width: 100%; letter-spacing: 0.3em; }
     }
   </style>
 </head>
@@ -93,6 +149,10 @@
     <filter id="etch" x="-8%" y="-15%" width="116%" height="130%">
       <feTurbulence type="fractalNoise" baseFrequency="0.011 0.019" numOctaves="2" seed="7"/>
       <feDisplacementMap in="SourceGraphic" scale="5" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="etch-deep" x="-10%" y="-18%" width="120%" height="136%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.011 0.019" numOctaves="2" seed="11"/>
+      <feDisplacementMap in="SourceGraphic" scale="9" xChannelSelector="R" yChannelSelector="G"/>
     </filter>
   </svg>
   <header class="topbar">
@@ -151,6 +211,22 @@
     </section>
 
     <p class="more">その他の制作物 — <a href="https://www.instagram.com/syno_mare/?utm_source=qr" target="_blank" rel="noopener">INSTAGRAM</a></p>
+
+    <section class="ura ura-grain verso-register" aria-label="裏目録">
+      <div class="inner">
+        <div class="sec-head"><span>Verso — 裏目録</span><span class="r">収蔵されなかったもの</span></div>
+        <a class="verso-row" href="https://www.instagram.com/syno_mare/?utm_source=qr" target="_blank" rel="noopener">
+          <span class="v-en">Instagram</span><span class="v-jp">その他の制作物</span>
+        </a>
+        <a class="verso-row" href="https://note.com/synomare" target="_blank" rel="noopener">
+          <span class="v-en">note</span><span class="v-jp">日記</span>
+        </a>
+        <a class="verso-row" href="about.html">
+          <span class="v-en">Appendix</span><span class="v-jp">図版</span>
+        </a>
+      </div>
+      <div class="thread" style="top: 22%; left: 6vw; width: 30vw; transform: rotate(4deg);"></div>
+    </section>
   </main>
 
   <footer class="caption">

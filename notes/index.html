@@ -42,10 +42,35 @@
       background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(2em - 1px), rgba(23, 20, 15, 0.045) calc(2em - 1px), rgba(23, 20, 15, 0.045) 2em);
     }
     .post-list li { margin: 0; padding: 1.1em 0.3em; border-bottom: 1px solid var(--line); }
-    .post-list a { display: block; }
-    .post-list a:hover { background: var(--ink); color: var(--paper); }
-    .post-list a:hover time { color: var(--paper); opacity: 0.75; }
-    .post-list a:hover p { color: var(--paper); opacity: 0.75; }
+    .post-list a {
+      display: block;
+      transition: background 0.3s ease, color 0.3s ease, transform 0.4s cubic-bezier(0.2, 1, 0.3, 1);
+      transform-origin: left center;
+    }
+    .post-list a:hover {
+      background: var(--void);
+      color: var(--bone);
+      transform: perspective(900px) rotateY(-1.6deg);
+    }
+    .post-list a:hover time { color: var(--phosphor); opacity: 1; }
+    .post-list a:hover strong { color: transparent; -webkit-text-stroke: 0.7px var(--gilt); }
+    .post-list a:hover p { color: var(--ash); opacity: 1; }
+    .post-list strong { transition: color 0.3s ease, -webkit-text-stroke 0.3s ease; }
+
+    /* the journal that has not been remembered yet */
+    .post-list li.empty {
+      border-bottom: none;
+      padding: 2.4em 0.3em;
+      font-size: clamp(1.1rem, 3vw, 1.9rem);
+      letter-spacing: 0.14em;
+      color: transparent;
+      -webkit-text-stroke: 0.5px var(--dim);
+      filter: url(#etch);
+    }
+
+    @media (max-width: 700px) {
+      .post-list a:hover { transform: none; }
+    }
     .post-list strong { display: inline; font-weight: 500; font-size: clamp(18px, 2.4vw, 26px); letter-spacing: -0.01em; }
     .post-list time { display: inline-block; color: var(--red); font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.15em; margin-right: 1em; }
     .post-list p { margin: .4rem 0 0; font-size: 0.82rem; color: var(--dim); }
@@ -99,6 +124,7 @@
       var posts=(window.__SYNOMARE_POSTS__||[]).slice();
       if(!posts.length){
         var empty=document.createElement('li');
+        empty.className='empty';
         empty.textContent='まだ記事がありません。';
         list.appendChild(empty);
         return;

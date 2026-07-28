@@ -125,6 +125,76 @@
   tick();
 })();
 
+/* registration-cross cursor — expands and magnetises over links */
+(function () {
+  if (window.SYN.prefersReduced) return;
+  if (!(window.matchMedia && window.matchMedia('(pointer: fine)').matches)) return;
+
+  var cur = document.createElement('div');
+  cur.className = 'syn-cursor';
+  cur.setAttribute('aria-hidden', 'true');
+  cur.innerHTML = '<span class="cx-h"></span><span class="cx-v"></span><span class="cx-ring"></span>';
+  document.body.appendChild(cur);
+  document.documentElement.classList.add('has-cursor');
+
+  var tx = window.innerWidth / 2, ty = window.innerHeight / 2, cx = tx, cy = ty;
+  var magnet = null, raf = null;
+
+  function step() {
+    raf = null;
+    var gx = tx, gy = ty;
+    if (magnet) {
+      var r = magnet.getBoundingClientRect();
+      var mx = r.left + r.width / 2, my = r.top + r.height / 2;
+      gx += (mx - tx) * 0.22;
+      gy += (my - ty) * 0.22;
+    }
+    cx += (gx - cx) * 0.28;
+    cy += (gy - cy) * 0.28;
+    cur.style.transform = 'translate3d(' + cx.toFixed(1) + 'px,' + cy.toFixed(1) + 'px,0) translate(-50%,-50%)';
+    if (Math.abs(gx - cx) > 0.1 || Math.abs(gy - cy) > 0.1) raf = requestAnimationFrame(step);
+  }
+  function wake() { if (!raf) raf = requestAnimationFrame(step); }
+
+  window.addEventListener('pointermove', function (e) {
+    if (e.pointerType !== 'mouse') return;
+    tx = e.clientX; ty = e.clientY;
+    cur.classList.add('on');
+    var hit = e.target.closest && e.target.closest('a, button, .tag, .work-row, .vault-row, .link-row');
+    if (hit !== magnet) {
+      magnet = hit && hit.getBoundingClientRect().width < 420 ? hit : null;
+      cur.classList.toggle('over', !!hit);
+    }
+    wake();
+  }, { passive: true });
+
+  document.addEventListener('pointerleave', function () { cur.classList.remove('on'); });
+  window.addEventListener('blur', function () { cur.classList.remove('on'); });
+})();
+
+/* page transition — the sheet lifts, the next one is already printed */
+(function () {
+  if (window.SYN.prefersReduced) return;
+  if (!document.startViewTransition) return;
+  document.documentElement.classList.add('has-vt');
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href]');
+    if (!a || a.target === '_blank' || a.hasAttribute('download')) return;
+    var url;
+    try { url = new URL(a.href, location.href); } catch (err) { return; }
+    if (url.origin !== location.origin) return;
+    if (url.pathname === location.pathname && url.hash) return;
+    if (!/\.html?$|\/$/.test(url.pathname)) return;
+
+    e.preventDefault();
+    var toDark = !!a.closest('.ura');
+    document.documentElement.dataset.vt = toDark ? 'dark' : 'paper';
+    document.startViewTransition(function () { location.href = url.href; });
+  });
+})();
+
 /* pointer parallax for [data-parallax] ghosts */
 (function () {
   if (window.SYN.prefersReduced) return;
