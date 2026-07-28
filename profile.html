@@ -15,7 +15,7 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@1,400;1,500&family=Space+Mono:wght@400;700&family=Zen+Old+Mincho:wght@400;700&family=Grenze+Gotisch:wght@300..500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@1,400;1,500&family=Space+Mono:wght@400;700&family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/tokens.css">
   <link rel="stylesheet" href="/assets/css/shared.css">
   <style>
@@ -54,7 +54,6 @@
       -webkit-text-stroke: 1.5px var(--ink);
       white-space: nowrap;
       filter: url(#etch);
-      transform: translate(var(--gpx, 0px), var(--gpy, 0px));
     }
 
     .bio {
@@ -115,15 +114,20 @@
       -webkit-text-stroke: 1px var(--bone);
       opacity: 0.08;
       pointer-events: none;
-      filter: url(#etch-deep);
+      filter: url(#etch);
     }
 
     .bc-inner { position: relative; z-index: 2; max-width: 46em; }
     .bc-name {
       margin: 0 0 1.4rem;
-      font-size: clamp(2.6rem, 9vw, 7rem);
+      font-family: var(--latin);
+      font-style: italic;
+      font-weight: 300;
+      font-size: var(--t-large);
       line-height: 1;
-      transform: translate(var(--gpx, 0px), var(--gpy, 0px));
+      letter-spacing: -0.03em;
+      color: transparent;
+      -webkit-text-stroke: 1px var(--bone);
     }
     .bc-records { display: flex; flex-wrap: wrap; gap: 0.8rem; }
     .bc-note { margin: 1.8rem 0 0; font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--ash); }
@@ -142,10 +146,6 @@
     <filter id="etch" x="-8%" y="-15%" width="116%" height="130%">
       <feTurbulence type="fractalNoise" baseFrequency="0.011 0.019" numOctaves="2" seed="7"/>
       <feDisplacementMap in="SourceGraphic" scale="5" xChannelSelector="R" yChannelSelector="G"/>
-    </filter>
-    <filter id="etch-deep" x="-10%" y="-18%" width="120%" height="136%">
-      <feTurbulence type="fractalNoise" baseFrequency="0.011 0.019" numOctaves="2" seed="11"/>
-      <feDisplacementMap in="SourceGraphic" scale="9" xChannelSelector="R" yChannelSelector="G"/>
     </filter>
   </svg>
   <header class="topbar">
@@ -170,14 +170,14 @@
 
     <div class="thread p-thread" aria-hidden="true"></div>
 
-    <h1 class="ghost-name" data-parallax="0.6">synomare</h1>
+    <h1 class="ghost-name">synomare</h1>
 
     <div class="bio">
       <p>テクスト/グラフィックデザイン。2002年生まれ。anon press編集部。分断された図像やテクスト、記号的断片をコラージュ的に接続し、新たな全体を立ち上げる制作を行う。複数のレイヤーの干渉や混線を通して、視覚と言語、記録と感覚、身体と制度のあいだにある不安定な関係を探っている。主な作品に「Barricade Ventriloquism」「Before Constructed」（anon press）。</p>
     </div>
 
     <section class="colophon" aria-label="奥付">
-      <div class="sec-head"><span>Colophon — 奥付</span></div>
+      <div class="rule-head"><span>Colophon — 奥付</span></div>
       <dl>
         <div class="kv"><dt>名称 / Name</dt><dd>synomare（しのめあ）</dd></div>
         <div class="kv"><dt>業務 / Field</dt><dd>テクスト・デザイン・グラフィック</dd></div>
@@ -193,8 +193,8 @@
     <section class="ura ura-grain back-cover" aria-label="裏表紙">
       <p class="bleed" aria-hidden="true">synomare</p>
       <div class="bc-inner">
-        <div class="sec-head"><span>Back Cover — 裏表紙</span><span class="r">裏写り</span></div>
-        <p class="bc-name engrave" data-parallax="0.4">synomare</p>
+        <div class="rule-head"><span>Back Cover — 裏表紙</span><span class="r">裏写り</span></div>
+        <p class="bc-name">synomare</p>
         <div class="bc-records">
           <a class="tag" href="https://x.com/synomare" target="_blank" rel="noopener"><span class="en">X</span><span class="jp">記録</span></a>
           <a class="tag" href="https://www.instagram.com/syno_mare/?utm_source=qr" target="_blank" rel="noopener"><span class="en">Instagram</span><span class="jp">制作物</span></a>

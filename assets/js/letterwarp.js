@@ -10,10 +10,12 @@
        tight: true,        // tighter leading/tracking
        fit: mainEl,        // binary-search font fitter (<=520px) against this container
        lens: true,         // pointer lens interaction
-       velocity: true      // scroll-velocity vertical stretch (--vwarp on root)
+       velocity: true,     // scroll-velocity vertical stretch (--vwarp on root)
+       erode: true         // handling the text wears the ink off it, permanently
      });
      warp.wear(0..1);      // hollow out characters below threshold (deterministic order)
-     warp.lit(0..1);       // phosphor-light characters below threshold
+     warp.lit(0..1);       // light characters below threshold
+     warp.onErode(fn);     // called with the running count of lost characters
    ============================================================ */
 (function () {
   'use strict';
@@ -155,6 +157,10 @@
         span.dataset.lensStepY = stepY.toFixed(3);
         span.dataset.lensBlend = blendSeed.toFixed(3);
         span.dataset.wear = r5.toFixed(3);
+        /* offset into the shared dry-brush field, so no two adjacent
+           glyphs break up along the same grain */
+        span.style.setProperty('--mx', (-((r1 * 90) | 0)) + 'px');
+        span.style.setProperty('--my', (-((r5 * 90) | 0)) + 'px');
         span.style.setProperty('--i', globalIndex++);
         var cn = 'c'; if (isPunct) cn += ' punct'; if (cls === 'latin') cn += ' latin'; span.className = cn;
         span.textContent = ch; frag.appendChild(span);
@@ -163,6 +169,10 @@
     }
 
     var letters = Array.prototype.slice.call(root.querySelectorAll('.c'));
+
+    /* erosion tally — how many characters have been handled out of existence */
+    var gone = 0;
+    var onErode = null;
 
     /* ---------- 2. binary-search font fitter (<=520px) ---------- */
     if (opts.fit) {
@@ -245,6 +255,7 @@
     if (opts.lens && !reduced && letters.length) {
       (function () {
         var copy = root;
+        var erode = !!opts.erode;
         var metrics = [];
         var metricsDirty = true;
         var raf = null;
@@ -269,7 +280,9 @@
               active: false,
               toggled: false,
               hovered: false,
-              currentIntensity: 0
+              currentIntensity: 0,
+              handled: parseInt(el.getAttribute('data-h') || '0', 10),
+              stage: parseInt(el.getAttribute('data-w') || '0', 10)
             };
           });
           metricsDirty = false;
@@ -331,6 +344,18 @@
               if (!info.hovered) {
                 info.toggled = !info.toggled;
                 info.hovered = true;
+                /* handling the text wears the ink off it — six stages of
+                   dry brush, and then the character is gone for good */
+                if (erode && info.stage < 6) {
+                  info.handled++;
+                  info.el.setAttribute('data-h', info.handled);
+                  var next = Math.min(6, Math.floor(info.handled / 2));
+                  if (next !== info.stage) {
+                    info.stage = next;
+                    if (next > 0) info.el.setAttribute('data-w', next);
+                    if (next === 6) { gone++; if (onErode) onErode(gone); }
+                  }
+                }
               }
             } else {
               info.hovered = false;
@@ -528,6 +553,8 @@
     return {
       root: root,
       letters: letters,
+      eroded: function () { return gone; },
+      onErode: function (cb) { onErode = cb; },
       wear: function (amount) { lastWear = threshold('worn', amount, lastWear); },
       lit: function (amount) { lastLit = threshold('lit', amount, lastLit); }
     };

@@ -15,7 +15,7 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@1,400;1,500&family=Space+Mono:wght@400;700&family=Zen+Old+Mincho:wght@400;700&family=Grenze+Gotisch:wght@300..500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@1,400;1,500&family=Space+Mono:wght@400;700&family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/tokens.css">
   <link rel="stylesheet" href="/assets/css/shared.css">
   <style>
@@ -58,7 +58,7 @@
       max-width: 72rem;
       background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(2em - 1px), rgba(23, 20, 15, 0.045) calc(2em - 1px), rgba(23, 20, 15, 0.045) 2em);
     }
-    .register .sec-head { margin-bottom: 0; }
+    .register .rule-head { margin-bottom: 0; }
 
     .work-row {
       display: grid;
@@ -69,35 +69,14 @@
       border-bottom: 1px solid var(--line);
     }
 
-    /* the row turns over and shows its back */
+    /* the row shows its reverse */
     a.work-row {
       position: relative;
-      transition: background 0.3s ease, color 0.3s ease, transform 0.4s cubic-bezier(0.2, 1, 0.3, 1);
-      transform-origin: left center;
+      transition: background 0.24s ease, color 0.24s ease;
     }
-    a.work-row:hover {
-      background: var(--void);
-      color: var(--bone);
-      transform: perspective(900px) rotateY(-1.6deg);
-    }
+    a.work-row:hover { background: var(--void); color: var(--bone); }
     a.work-row:hover .w-no { color: var(--phosphor); }
-    a.work-row:hover .w-title { color: transparent; -webkit-text-stroke: 0.7px var(--gilt); }
-    a.work-row:hover .w-desc, a.work-row:hover .w-type, a.work-row:hover .w-year { color: var(--ash); opacity: 1; }
-
-    /* the accession stamp gets pressed on */
-    a.work-row::after {
-      content: "✳";
-      position: absolute;
-      top: 0.9em;
-      left: -0.05em;
-      color: var(--phosphor);
-      font-size: 0.9rem;
-      opacity: 0;
-      transform: scale(2.4) rotate(-18deg);
-      pointer-events: none;
-      transition: opacity 0.16s ease, transform 0.22s cubic-bezier(0.2, 1.5, 0.4, 1);
-    }
-    a.work-row:hover::after { opacity: 0.9; transform: scale(1) rotate(-8deg); }
+    a.work-row:hover .w-desc, a.work-row:hover .w-type { color: var(--ash); opacity: 1; }
 
     .w-no { font-family: var(--mono); color: var(--red); font-size: 0.72rem; letter-spacing: 0.12em; }
     .w-title { font-size: clamp(1.2rem, 3vw, 2rem); font-weight: 500; letter-spacing: -0.01em; line-height: 1.2; transition: color 0.3s ease, -webkit-text-stroke 0.3s ease; }
@@ -123,22 +102,20 @@
       transition: background 0.25s ease;
     }
     .verso-row .v-en {
-      font-family: var(--gothic);
-      font-weight: 340;
+      font-family: var(--latin);
+      font-weight: 400;
       font-size: clamp(1.5rem, 3.6vw, 2.4rem);
       letter-spacing: 0.04em;
       transition: color 0.25s ease, text-shadow 0.25s ease;
     }
     .verso-row .v-jp { margin-left: auto; font-size: 0.76rem; color: var(--ash); letter-spacing: 0.4em; }
-    .verso-row:hover { background: rgba(201, 164, 92, 0.05); }
-    .verso-row:hover .v-en { color: var(--phosphor); text-shadow: 0 0 16px rgba(255, 59, 35, 0.35); }
+    .verso-row:hover .v-en { color: var(--phosphor); }
 
     @media (max-width: 700px) {
       .work-row { grid-template-columns: 1fr; gap: 0.4em; }
       .w-type { justify-self: start; }
       .plate-tag { position: relative; right: auto; bottom: auto; display: inline-block; margin-top: 0.9rem; }
       .plate-thread { display: none; }
-      a.work-row:hover { transform: none; }
       .verso-row { flex-wrap: wrap; gap: 0.3em 1.2em; }
       .verso-row .v-jp { margin-left: 0; width: 100%; letter-spacing: 0.3em; }
     }
@@ -150,10 +127,6 @@
     <filter id="etch" x="-8%" y="-15%" width="116%" height="130%">
       <feTurbulence type="fractalNoise" baseFrequency="0.011 0.019" numOctaves="2" seed="7"/>
       <feDisplacementMap in="SourceGraphic" scale="5" xChannelSelector="R" yChannelSelector="G"/>
-    </filter>
-    <filter id="etch-deep" x="-10%" y="-18%" width="120%" height="136%">
-      <feTurbulence type="fractalNoise" baseFrequency="0.011 0.019" numOctaves="2" seed="11"/>
-      <feDisplacementMap in="SourceGraphic" scale="9" xChannelSelector="R" yChannelSelector="G"/>
     </filter>
   </svg>
   <header class="topbar">
@@ -187,7 +160,7 @@
     </div>
 
     <section class="register" aria-label="作品一覧">
-      <div class="sec-head"><span>Registered Works — 収蔵一覧</span></div>
+      <div class="rule-head"><span>Registered Works — 収蔵一覧</span></div>
 
       <a class="work-row" href="yugun/index.html">
         <span class="w-no">2025</span>
@@ -215,7 +188,7 @@
 
     <section class="ura ura-grain verso-register" aria-label="裏目録">
       <div class="inner">
-        <div class="sec-head"><span>Verso — 裏目録</span><span class="r">収蔵されなかったもの</span></div>
+        <div class="rule-head"><span>Verso — 裏目録</span><span class="r">収蔵されなかったもの</span></div>
         <a class="verso-row" href="https://www.instagram.com/syno_mare/?utm_source=qr" target="_blank" rel="noopener">
           <span class="v-en">Instagram</span><span class="v-jp">その他の制作物</span>
         </a>
@@ -235,14 +208,6 @@
     <span class="d">&copy; <span id="year"></span> synomare — all rights reserved.</span>
   </footer>
   <script src="/assets/js/site.js"></script>
-  <script src="/assets/js/gl.js"></script>
-  <script>
-    (function () {
-      if (window.SYN.grain) SYN.grain();
-      var plate = document.querySelector('.plate');
-      if (plate && SYN.flowImage) SYN.flowImage(plate.querySelector('img'), plate, { rgbShift: true });
-    })();
-  </script>
 </body>
 
 </html>

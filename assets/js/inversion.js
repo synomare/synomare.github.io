@@ -1,21 +1,23 @@
 /* ============================================================
-   synomare — inversion controller (裏写り)
-   Drives the seam: scroll progress → --seamp (torn-edge
-   clip-path uniform), realm flip (body.is-ura + theme-color),
-   recital wear (forgetting) and verso lighting (phosphor).
-   Lenis provides inertial time; native scroll is the fallback.
+   synomare — inversion controller
+   The seam is not an event, it is a measurement: a rule travels
+   the sheet and reports its position. --seamp drives the clip,
+   the rule, the readout, and the realm flip. Lenis supplies the
+   inertia; native scroll is the fallback.
    ============================================================ */
 (function () {
   'use strict';
 
   var SYN = window.SYN = window.SYN || {};
   var reduced = SYN.prefersReduced;
-  var seam = document.getElementById('seam');
-  if (!seam) return;
-  var stage = seam.querySelector('.seam-stage');
-  if (!stage) return;
   var body = document.body;
   var themeMeta = document.querySelector('meta[name="theme-color"]');
+
+  var seam = document.getElementById('seam');
+  var stage = seam && seam.querySelector('.seam-stage');
+  var scanVal = document.getElementById('scanVal');
+  var railSec = document.getElementById('railSec');
+  var railPos = document.getElementById('railPos');
 
   function clamp01(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
 
@@ -27,14 +29,42 @@
     if (themeMeta) themeMeta.setAttribute('content', v ? '#0a0906' : '#f4f3ef');
   }
 
-  /* static fallback — the sheet is already torn */
+  /* ---------- the rail reports which section holds the viewport ---------- */
+  var sections = [].slice.call(document.querySelectorAll('[data-sec]'));
+  var railText = '';
+  function reportSection() {
+    if (!railSec || !sections.length) return;
+    var mid = window.innerHeight * 0.42;
+    var name = sections[0].getAttribute('data-sec');
+    for (var i = 0; i < sections.length; i++) {
+      if (sections[i].getBoundingClientRect().top <= mid) name = sections[i].getAttribute('data-sec');
+    }
+    if (name !== railText) { railText = name; railSec.textContent = name; }
+  }
+
+  var posText = '';
+  function reportPosition() {
+    if (!railPos) return;
+    var max = document.documentElement.scrollHeight - window.innerHeight;
+    var f = max > 0 ? clamp01(window.scrollY / max) : 0;
+    var s = f.toFixed(3);
+    if (s !== posText) { posText = s; railPos.textContent = s; }
+  }
+
+  /* ---------- static fallback: the sheet is already turned ---------- */
   if (reduced) {
-    stage.style.setProperty('--seamp', '1');
-    seam.classList.add('seam-static');
+    if (stage) {
+      stage.style.setProperty('--seamp', '1');
+      seam.classList.add('seam-static');
+      if (scanVal) scanVal.textContent = '1.0000';
+    }
     if (SYN.seamVerso) SYN.seamVerso.lit(1);
-    if ('IntersectionObserver' in window) {
-      new IntersectionObserver(function (entries) {
-        setUra(entries[0].isIntersecting);
+    reportSection();
+    reportPosition();
+    window.addEventListener('scroll', function () { reportSection(); reportPosition(); }, { passive: true });
+    if (seam && 'IntersectionObserver' in window) {
+      new IntersectionObserver(function (e) {
+        setUra(e[0].isIntersecting);
       }, { rootMargin: '-40% 0px -40% 0px' }).observe(seam);
     }
     return;
@@ -48,47 +78,13 @@
 
   var current = 0;
   var written = null;
+  var scanText = null;
   var raf = null;
-
-  /* Vault strata parallax + monument weight (measured transform-free).
-     Continuous transforms under the grain force a full-screen re-blend
-     every frame. The grain is the site's identity and the parallax is
-     ornament, so on a machine that cannot afford both, the parallax goes. */
-  var plx = [];
-  var noParallax = false;
-  var vaultTitle = document.querySelector('.vault-title');
-  if (SYN.onDegrade) {
-    SYN.onDegrade(function () {
-      noParallax = true;
-      for (var i = 0; i < plx.length; i++) plx[i].el.style.transform = '';
-      plx.length = 0;
-      if (vaultTitle) vaultTitle.style.fontWeight = '';
-    });
-  }
-  function measureParallax() {
-    if (noParallax) return;
-    plx = [];
-    var els = document.querySelectorAll('#vault [data-depth]');
-    for (var i = 0; i < els.length; i++) {
-      els[i].style.transform = '';
-      var r = els[i].getBoundingClientRect();
-      plx.push({
-        el: els[i],
-        depth: parseFloat(els[i].getAttribute('data-depth')) || 1,
-        center: r.top + window.scrollY + r.height / 2
-      });
-    }
-  }
-  window.addEventListener('load', measureParallax);
-  window.addEventListener('resize', measureParallax, { passive: true });
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(measureParallax).catch(function () { });
-  measureParallax();
-
-  /* A fixed full-viewport blended layer (the paper grain) is recomposited
-     on every frame the page paints, so an idle rAF loop is not free — it
-     is the difference between a still page and a 13fps one. Run the loop
-     only while something is actually moving. */
   var idleFrames = 0;
+
+  /* A fixed full-viewport blended layer (the grain) recomposites on every
+     frame the page paints, so an idle rAF loop is not free. Run only while
+     something is actually moving. */
   function wake() {
     idleFrames = 0;
     if (!raf) raf = requestAnimationFrame(frame);
@@ -100,55 +96,39 @@
   function frame(t) {
     if (lenis) lenis.raf(t);
 
-    var r = seam.getBoundingClientRect();
-    var vh = window.innerHeight;
-    var total = r.height - vh;
-    var p = total > 0 ? clamp01(-r.top / total) : 0;
+    reportSection();
+    reportPosition();
 
-    /* lag = choreography: the tear trails the scroll slightly */
-    current += (p - current) * 0.16;
-    if (Math.abs(current - p) < 0.0008) current = p;
-    /* only write when it actually moved: --seamp feeds a 32-point
-       clip-path, so a redundant write costs a style recalc every frame */
-    var next = current.toFixed(4);
-    if (next !== written) {
-      stage.style.setProperty('--seamp', next);
-      written = next;
-    }
+    var p = 0;
+    if (stage) {
+      var r = seam.getBoundingClientRect();
+      var vh = window.innerHeight;
+      var total = r.height - vh;
+      p = total > 0 ? clamp01(-r.top / total) : 0;
 
-    setUra(p > 0.55);
-    body.classList.toggle('seam-active', p > 0.001 && p < 0.999);
+      /* the rule trails the scroll slightly — that lag is the choreography */
+      current += (p - current) * 0.16;
+      if (Math.abs(current - p) < 0.0008) current = p;
 
-    /* the recital erodes as the seam approaches */
-    if (SYN.recital) {
-      SYN.recital.wear(clamp01((vh * 1.7 - r.top) / (vh * 1.5)) * 0.8);
-    }
-    /* the verso copy ignites, seed order, as the tear crosses */
-    if (SYN.seamVerso) {
-      SYN.seamVerso.lit(clamp01(current * 1.35));
-    }
-
-    /* vault strata drift at different depths; the monument gains weight */
-    var sy = window.scrollY;
-    for (var i = 0; i < plx.length; i++) {
-      var d = plx[i].center - sy - vh / 2;
-      if (d > -vh * 1.6 && d < vh * 1.6) {
-        plx[i].el.style.transform = 'translateY(' + (d * (plx[i].depth - 1)).toFixed(1) + 'px)';
-        if (plx[i].el === vaultTitle) {
-          var wp = clamp01(1 - (d + vh * 0.5) / (vh * 1.1));
-          vaultTitle.style.fontWeight = Math.round(300 + 200 * wp);
-        }
+      /* --seamp feeds a clip and a position, so only write on change */
+      var next = current.toFixed(4);
+      if (next !== written) {
+        stage.style.setProperty('--seamp', next);
+        written = next;
+        if (scanVal && next !== scanText) { scanVal.textContent = next; scanText = next; }
       }
+
+      setUra(p > 0.5);
+      body.classList.toggle('seam-active', p > 0.001 && p < 0.999);
+
+      if (SYN.seamVerso) SYN.seamVerso.lit(clamp01(current * 1.3));
     }
 
-    /* settled? let the page go quiet. A few grace frames absorb the
-       tail of Lenis's easing and any layout that lands late. */
-    var moving = (current !== p) || (lenis && lenis.isScrolling);
+    var moving = (stage && current !== p) || (lenis && lenis.isScrolling);
     idleFrames = moving ? 0 : idleFrames + 1;
     raf = idleFrames > 20 ? null : requestAnimationFrame(frame);
   }
   wake();
 
-  /* keep the loop honest across bfcache restores */
   window.addEventListener('pageshow', function (e) { if (e.persisted) wake(); });
 })();
