@@ -141,35 +141,31 @@ a.tag:hover .jp { color: var(--paper); }
 .ura .thread::before, .ura .thread::after { background: var(--phosphor); }
 
 /* ---------- instrumentation rail ----------
-   the sheet reports its own position, always. */
+   bolted into the corner of the sheet. reports section and position,
+   always, and never sits on the content. */
 .rail {
   position: fixed;
-  right: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
+  left: 0;
+  bottom: 0;
   z-index: var(--z-rail);
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.9em;
+  gap: 1.8em;
   pointer-events: none;
+  padding: 0.42rem 0.9rem 0.45rem;
+  background: var(--paper);
+  border-top: 2px solid var(--ink);
+  border-right: 2px solid var(--ink);
   font-family: var(--mono);
   font-size: 0.52rem;
-  letter-spacing: 0.34em;
+  letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: var(--dim);
-  writing-mode: vertical-rl;
-  transition: color 0.4s ease;
+  color: var(--ink);
 }
 .rail-pos { color: var(--red); font-variant-numeric: tabular-nums; }
-body.is-ura .rail { color: var(--ash); }
+body.is-ura .rail { background: var(--void); color: var(--bone); border-color: var(--bone); }
 body.is-ura .rail-pos { color: var(--phosphor); }
 
-/* the instrument gets its own gutter — it never sits on the content */
-@media (min-width: 901px) {
-  body { padding-right: 2.4rem; }
-}
-@media (max-width: 900px) { .rail { display: none; } }
+@media (max-width: 700px) { .rail { display: none; } }
 
 /* ---------- footer ---------- */
 footer.caption {
@@ -212,9 +208,6 @@ body::after {
   opacity: 0.05;
 }
 body.is-ura::after { mix-blend-mode: screen; opacity: 0.06; }
-/* the grain is a full-screen blended layer; it stands down while the
-   seam is travelling so the wipe stays cheap */
-body.seam-active::after { display: none; }
 
 /* ---------- ledger ---------- */
 .register {
@@ -225,25 +218,16 @@ body.seam-active::after { display: none; }
   background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(2em - 1px), rgba(228, 219, 200, 0.045) calc(2em - 1px), rgba(228, 219, 200, 0.045) 2em);
 }
 
-/* ---------- erosion states (letterwarp) ----------
-   Repeated handling wears the ink off. Five stages of dry brush,
-   then the character is gone. */
-.copy .c[data-w] {
-  -webkit-mask-image: var(--dry);
-  mask-image: var(--dry);
-  -webkit-mask-size: 90px 90px;
-  mask-size: 90px 90px;
-  -webkit-mask-position: var(--mx, 0) var(--my, 0);
-  mask-position: var(--mx, 0) var(--my, 0);
-}
-.copy .c[data-w="1"] { --dry: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='d'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.42' numOctaves='3' seed='3'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='discrete' tableValues='1 1 1 1 1 1 1 1 1 0'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='90' height='90' filter='url(%23d)'/%3E%3C/svg%3E"); opacity: 0.92; }
-.copy .c[data-w="2"] { --dry: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='d'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.42' numOctaves='3' seed='3'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='discrete' tableValues='1 1 1 1 1 1 1 0 0 0'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='90' height='90' filter='url(%23d)'/%3E%3C/svg%3E"); opacity: 0.8; }
-.copy .c[data-w="3"] { --dry: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='d'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.42' numOctaves='3' seed='3'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='discrete' tableValues='1 1 1 1 1 0 0 0 0 0'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='90' height='90' filter='url(%23d)'/%3E%3C/svg%3E"); opacity: 0.66; }
-.copy .c[data-w="4"] { --dry: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='d'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.42' numOctaves='3' seed='3'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='discrete' tableValues='1 1 1 0 0 0 0 0 0 0'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='90' height='90' filter='url(%23d)'/%3E%3C/svg%3E"); opacity: 0.5; }
-.copy .c[data-w="5"] { --dry: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='d'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.42' numOctaves='3' seed='3'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='discrete' tableValues='1 0 0 0 0 0 0 0 0 0'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='90' height='90' filter='url(%23d)'/%3E%3C/svg%3E"); opacity: 0.3; }
+/* ---------- erosion (letterwarp) ----------
+   Handling the text wears the ink off it. Opacity only —
+   six steps down, and then the character is gone for good. */
+.copy .c[data-w] { transition: opacity 0.55s ease, transform .1s cubic-bezier(.25, .82, .25, 1); }
+.copy .c[data-w="1"] { opacity: 0.80; }
+.copy .c[data-w="2"] { opacity: 0.62; }
+.copy .c[data-w="3"] { opacity: 0.45; }
+.copy .c[data-w="4"] { opacity: 0.29; }
+.copy .c[data-w="5"] { opacity: 0.14; }
 .copy .c[data-w="6"] { opacity: 0; pointer-events: none; }
-
-.copy .c[data-w] { transition: opacity 0.5s ease, transform .1s cubic-bezier(.25, .82, .25, 1); }
 
 /* ---------- page transition — the plate is exchanged ---------- */
 @media (prefers-reduced-motion: no-preference) {

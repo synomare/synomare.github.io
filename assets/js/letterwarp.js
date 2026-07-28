@@ -157,10 +157,6 @@
         span.dataset.lensStepY = stepY.toFixed(3);
         span.dataset.lensBlend = blendSeed.toFixed(3);
         span.dataset.wear = r5.toFixed(3);
-        /* offset into the shared dry-brush field, so no two adjacent
-           glyphs break up along the same grain */
-        span.style.setProperty('--mx', (-((r1 * 90) | 0)) + 'px');
-        span.style.setProperty('--my', (-((r5 * 90) | 0)) + 'px');
         span.style.setProperty('--i', globalIndex++);
         var cn = 'c'; if (isPunct) cn += ' punct'; if (cls === 'latin') cn += ' latin'; span.className = cn;
         span.textContent = ch; frag.appendChild(span);
