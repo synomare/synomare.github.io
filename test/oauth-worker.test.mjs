@@ -18,6 +18,10 @@ test('OAuth開始時にstate cookieと限定scopeを設定する', async () => {
   assert.match(response.headers.get('set-cookie'), /HttpOnly; Secure; SameSite=Lax/);
   const location = new URL(response.headers.get('location'));
   assert.ok(location.searchParams.get('state').length >= 64);
+  assert.equal(
+    location.searchParams.get('redirect_uri'),
+    'https://oauth.example/callback'
+  );
 });
 
 test('OAuth callbackで不一致stateを拒否する', async () => {
@@ -37,7 +41,7 @@ test('OAuth tokenを許可したoriginだけへ返す', async t => {
   globalThis.fetch = async () => Response.json({ access_token: 'test-token' });
 
   const response = await worker.fetch(
-    new Request('https://oauth.example/callback?provider=github&code=abc&state=expected', {
+    new Request('https://oauth.example/callback?code=abc&state=expected', {
       headers: { Cookie: 'decap_oauth_state=expected' }
     }),
     env

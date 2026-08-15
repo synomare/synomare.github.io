@@ -27,7 +27,7 @@ function readCookie(request, name) {
 }
 
 function callbackUrl(url) {
-  return `${url.origin}/callback?provider=github`;
+  return `${url.origin}/callback`;
 }
 
 function errorResponse(message, status) {
@@ -109,7 +109,8 @@ function callbackPage(token, allowedOrigin) {
 }
 
 async function handleCallback(request, env, url) {
-  if (url.searchParams.get('provider') !== 'github') {
+  const provider = url.searchParams.get('provider');
+  if (provider && provider !== 'github') {
     return errorResponse('Invalid provider', 400);
   }
   const code = url.searchParams.get('code');
