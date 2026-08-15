@@ -3,6 +3,25 @@
 `notes/` 以下は Markdown 原稿から記事 HTML と一覧データを生成する簡易な仕組みです。
 生成は `scripts/new-post.mjs` が担当し、依存は `gray-matter` と `marked` のみです。
 
+## 管理画面から更新する（通常はこちら）
+
+1. `https://synomare.github.io/admin/` を直接開きます。公開サイト上には管理画面へのリンクを置いていません。
+2. **Login with GitHub** を選び、`synomare/synomare.github.io` へ push できる GitHub アカウントでログインします。
+3. **Notes → New Note** から slug、タイトル、公開日、概要、タグ、本文を入力します。
+   - slug は英小文字・数字・ハイフンだけを使用します。公開URLになるため、公開後は変更しません。
+   - 本文内の画像ボタンからアップロードした画像は `assets/images/notes/` に保存されます。
+   - 編集画面の Preview で本文の見え方を確認できます。
+4. **Publish** を押すと Markdown と画像が `main` へ保存され、GitHub Actions が記事HTMLと一覧を自動生成します。
+5. 数分後に `https://synomare.github.io/notes/` と記事URLを確認します。
+
+v1では誤操作防止のため、管理画面からの記事削除、下書き承認、予約公開は無効です。
+
+### 公開に失敗した場合
+
+- GitHub Actions の `Build and deploy GitHub Pages` が失敗した場合、公開中のサイトは直前の成功版のまま維持されます。
+- 原稿の修正は管理画面から行い、再度 Publish します。
+- 誤った更新を戻す必要がある場合は、GitHub のコミット履歴から該当ファイルを復元します。OAuth ID、secret、アクセストークンはリポジトリへ保存しません。
+
 ## 記事を新規作成する
 1. ターミナルでリポジトリ直下に移動します。
 2. 次のコマンドで記事を生成します。
@@ -22,7 +41,7 @@
 5. 編集後は `node scripts/new-post.mjs --rebuild` を実行し、HTML と `posts.js` を最新化します。
 
 ## 既存記事の編集
-- 公開済み記事は `notes/content/<slug>.md` を編集します。
+- 通常は管理画面から編集します。ローカル作業が必要な場合は `notes/content/<slug>.md` を編集します。
 - 編集後に `node scripts/new-post.mjs --rebuild` を実行すると、HTML と一覧データが最新状態になります。
 
 ## 再生成のみ行うとき
@@ -30,6 +49,16 @@
   ```
   node scripts/new-post.mjs --rebuild
   ```
+
+## 検証
+
+```text
+npm test
+npm run check:notes
+```
+
+- `npm test` は一時フォルダ内のfixtureでHTML生成、記事順、画像、YouTube/X埋め込み、不正slug、必須項目、壊れたfrontmatterを検証します。
+- `npm run check:notes` は公開原稿を変更せず、現在の `notes/content/` 全体を検証します。
 
 ## Markdown の埋め込み記法
 - 段落中に YouTube のリンク（`youtube.com/watch?v=...` または `youtu.be/...`）だけを置くと、`--rebuild` 時に自動でプレイヤーの iframe に変換されます。

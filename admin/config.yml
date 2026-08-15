@@ -1,0 +1,65 @@
+backend:
+  name: github
+  repo: synomare/synomare.github.io
+  branch: main
+  base_url: https://synomare-notes-oauth.decap-oauth.workers.dev
+  auth_endpoint: /auth
+
+site_url: https://synomare.github.io
+display_url: https://synomare.github.io
+publish_mode: simple
+
+media_folder: assets/images/notes
+public_folder: /assets/images/notes
+
+slug:
+  encoding: ascii
+  clean_accents: true
+  sanitize_replacement: "-"
+
+collections:
+  - name: notes
+    label: Notes
+    label_singular: Note
+    folder: notes/content
+    create: true
+    delete: false
+    identifier_field: slug
+    slug: "{{slug}}"
+    summary: "{{date}} — {{title}}"
+    sortable_fields: [date, title]
+    fields:
+      - label: URL Slug
+        name: slug
+        widget: string
+        hint: 英小文字・数字・ハイフンのみ。公開後はURL維持のため変更しないでください。
+        pattern:
+          - "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          - 英小文字・数字・ハイフンのみで入力してください。
+      - label: タイトル
+        name: title
+        widget: string
+      - label: 公開日
+        name: date
+        widget: datetime
+        format: YYYY-MM-DD
+        date_format: YYYY-MM-DD
+        time_format: false
+      - label: 概要
+        name: summary
+        widget: text
+        hint: Notes一覧と検索結果に表示する1〜2文です。
+      - label: タグ
+        name: tags
+        widget: list
+        required: true
+        allow_add: true
+        collapsed: false
+        field:
+          label: タグ
+          name: tag
+          widget: string
+      - label: 本文
+        name: body
+        widget: markdown
+        required: true

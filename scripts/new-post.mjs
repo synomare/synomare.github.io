@@ -7,7 +7,9 @@ import { marked } from 'marked';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const repoRoot = path.resolve(__dirname, '..');
+const repoRoot = process.env.SYNOMARE_REPO_ROOT
+  ? path.resolve(process.env.SYNOMARE_REPO_ROOT)
+  : path.resolve(__dirname, '..');
 const notesDir = path.join(repoRoot, 'notes');
 const contentDir = path.join(notesDir, 'content');
 const postsJsonPath = path.join(notesDir, 'posts.json');
@@ -21,9 +23,11 @@ function logError(message) {
 function usage() {
   console.log(`Usage:\n` +
     `  node scripts/new-post.mjs <slug> <title> [--date=YYYY-MM-DD] [--summary="テキスト"] [--tags=タグ1,タグ2] [--tag=タグ]...\n` +
-    `  node scripts/new-post.mjs --rebuild\n\n` +
+    `  node scripts/new-post.mjs --rebuild\n` +
+    `  node scripts/new-post.mjs --check\n\n` +
     `Options:\n` +
     `  --rebuild             Markdown ファイルから HTML とメタデータを再生成します。\n` +
+    `  --check               Markdown 原稿のメタデータを検証します。\n` +
     `  --date=YYYY-MM-DD     新規作成時の日付を指定します。\n` +
     `  --summary="テキスト"  新規作成時のサマリーを指定します。\n` +
     `  --tags=タグ1,タグ2    新規作成時のタグをカンマ区切りで指定します。\n` +
@@ -121,6 +125,38 @@ function validateDate(value) {
   if (Number.isNaN(time)) {
     throw new Error('date の値を解釈できませんでした。');
   }
+}
+
+function validatePost({ slug, data, markdownBody, file }) {
+  validateSlug(slug);
+
+  if (typeof data.title !== 'string' || !data.title.trim()) {
+    throw new Error(`${file}: title は必須です。`);
+  }
+  if (typeof data.date !== 'string' && !(data.date instanceof Date)) {
+    throw new Error(`${file}: date は必須です。`);
+  }
+  const date = data.date instanceof Date
+    ? data.date.toISOString().slice(0, 10)
+    : String(data.date);
+  validateDate(date);
+
+  if (typeof data.summary !== 'string' || !data.summary.trim()) {
+    throw new Error(`${file}: summary は必須です。`);
+  }
+  if (!Array.isArray(data.tags) || data.tags.some(tag => typeof tag !== 'string' || !tag.trim())) {
+    throw new Error(`${file}: tags は文字列の配列で指定してください。`);
+  }
+  if (typeof markdownBody !== 'string' || !markdownBody.trim()) {
+    throw new Error(`${file}: 本文は必須です。`);
+  }
+
+  return {
+    title: data.title.trim(),
+    date,
+    summary: data.summary.trim(),
+    tags: data.tags.map(tag => tag.trim())
+  };
 }
 
 async function writeJson(posts) {
@@ -229,7 +265,7 @@ function findThumbnail(tokens) {
   return null;
 }
 
-async function rebuildPosts() {
+async function readPosts() {
   const files = await fs.readdir(contentDir);
   const mdFiles = files.filter(f => f.endsWith('.md'));
   const posts = [];
@@ -240,10 +276,12 @@ async function rebuildPosts() {
     const { data, content: markdownBody } = matter(content);
 
     const slug = path.basename(file, '.md');
-    const title = data.title || 'No Title';
-    const date = data.date ? (data.date instanceof Date ? data.date.toISOString().slice(0, 10) : String(data.date)) : '';
-    const summary = data.summary || '';
-    const tags = Array.isArray(data.tags) ? data.tags : [];
+    const { title, date, summary, tags } = validatePost({
+      slug,
+      data,
+      markdownBody,
+      file: path.relative(repoRoot, filePath)
+    });
 
     // Markdown processing
     const tokens = marked.lexer(markdownBody);
@@ -259,7 +297,16 @@ async function rebuildPosts() {
     posts.push({ slug, title, date, summary, tags, image, contentHtml });
   }
 
-  sortPosts(posts);
+  return sortPosts(posts);
+}
+
+async function checkPosts() {
+  const posts = await readPosts();
+  console.log(`Notes の検証に成功しました（記事数: ${posts.length}）。`);
+}
+
+async function rebuildPosts() {
+  const posts = await readPosts();
 
   // メタデータ保存用（HTMLを含まない）
   const metaPosts = posts.map(({ contentHtml, ...meta }) => meta);
@@ -279,6 +326,7 @@ async function rebuildPosts() {
 (async function main() {
   const { positional, options } = parseArgs(process.argv.slice(2));
   const rebuildMode = Object.prototype.hasOwnProperty.call(options, 'rebuild');
+  const checkMode = Object.prototype.hasOwnProperty.call(options, 'check');
 
   try {
     await ensureTemplate();
@@ -287,6 +335,10 @@ async function rebuildPosts() {
 
     if (rebuildMode) {
       await rebuildPosts();
+      return;
+    }
+    if (checkMode) {
+      await checkPosts();
       return;
     }
 

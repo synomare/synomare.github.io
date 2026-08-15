@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build:notes": "node scripts/new-post.mjs --rebuild",
+    "check:notes": "node scripts/new-post.mjs --check",
+    "test": "node --test"
   },
   "keywords": [],
   "author": "",
@@ -13,5 +15,8 @@
   "dependencies": {
     "gray-matter": "^4.0.3",
     "marked": "^17.0.1"
+  },
+  "overrides": {
+    "js-yaml": "3.15.1"
   }
 }

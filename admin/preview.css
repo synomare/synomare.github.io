@@ -1,0 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Serif+JP:wght@400;500;600&display=swap');
+
+:root {
+  color: #171713;
+  background: #f4f3ef;
+  font-family: "Noto Serif JP", serif;
+  line-height: 2;
+}
+
+body {
+  box-sizing: border-box;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: clamp(32px, 7vw, 80px);
+  color: #171713;
+  background: #f4f3ef;
+}
+
+h1, h2, h3 {
+  line-height: 1.45;
+  letter-spacing: .02em;
+}
+
+h1 { font-size: clamp(28px, 5vw, 46px); }
+h2 { margin-top: 2.5em; font-size: 1.35em; }
+h3 { margin-top: 2em; font-size: 1.1em; }
+
+p, ul, ol, blockquote { margin: 1.35em 0; }
+a { color: #a62720; }
+
+img {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  margin: 2em auto;
+}
+
+blockquote {
+  margin-left: 0;
+  padding-left: 1.4em;
+  border-left: 1px solid #a62720;
+}
+
+code, pre {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: .88em;
+}
+
+pre {
+  overflow-x: auto;
+  padding: 1em;
+  border: 1px solid rgba(23, 23, 19, .22);
+}
