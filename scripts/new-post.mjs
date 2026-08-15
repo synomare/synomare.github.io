@@ -186,6 +186,28 @@ async function writePostsJs(posts) {
   await fs.writeFile(postsJsPath, content, 'utf8');
 }
 
+async function readPreviouslyGeneratedSlugs() {
+  try {
+    const content = await fs.readFile(postsJsonPath, 'utf8');
+    const posts = JSON.parse(content);
+    if (!Array.isArray(posts)) return [];
+    return posts
+      .map(post => post && post.slug)
+      .filter(slug => typeof slug === 'string' && /^[a-z0-9-]+$/.test(slug));
+  } catch (error) {
+    if (error && error.code === 'ENOENT') return [];
+    throw new Error(`既存の投稿一覧を読み込めません: ${path.relative(repoRoot, postsJsonPath)}`);
+  }
+}
+
+async function removeDeletedPostHtml(previousSlugs, currentSlugs) {
+  const current = new Set(currentSlugs);
+  for (const slug of previousSlugs) {
+    if (current.has(slug)) continue;
+    await fs.rm(path.join(notesDir, `${slug}.html`), { force: true });
+  }
+}
+
 async function writeHtml({ slug, title, date, summary, contentHtml }) {
   const tpl = await fs.readFile(templatePath, 'utf8');
   const replacements = new Map([
@@ -306,6 +328,7 @@ async function checkPosts() {
 }
 
 async function rebuildPosts() {
+  const previousSlugs = await readPreviouslyGeneratedSlugs();
   const posts = await readPosts();
 
   // メタデータ保存用（HTMLを含まない）
@@ -317,6 +340,8 @@ async function rebuildPosts() {
   for (const post of posts) {
     await writeHtml(post);
   }
+
+  await removeDeletedPostHtml(previousSlugs, posts.map(post => post.slug));
 
   console.log('\nサイトを再生成しました。');
   console.log(`- 記事数: ${posts.length}`);

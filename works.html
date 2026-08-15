@@ -204,6 +204,11 @@
       border-bottom: 1px solid var(--line);
     }
 
+    .work-row.has-image { grid-template-columns: 8em minmax(8rem, 14rem) 1fr auto; align-items: center; }
+    .w-thumb { display: block; border: 1px solid var(--ink); overflow: hidden; aspect-ratio: 4 / 3; background: var(--card); }
+    .w-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 180ms ease; }
+    a.work-row:hover .w-thumb img { transform: scale(1.025); }
+
     a.work-row:hover { background: var(--ink); color: var(--paper); }
     a.work-row:hover .w-no { color: var(--paper); }
     a.work-row:hover .w-desc, a.work-row:hover .w-type, a.work-row:hover .w-year { color: var(--paper); opacity: 0.7; }
@@ -215,9 +220,11 @@
 
     .more { margin: 0.9rem 0 0; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--dim); }
     .more a:hover { background: var(--ink); color: var(--paper); }
+    .works-empty { margin: 1.6rem 0; color: var(--dim); }
 
     @media (max-width: 700px) {
-      .work-row { grid-template-columns: 1fr; gap: 0.4em; }
+      .work-row, .work-row.has-image { grid-template-columns: 1fr; gap: 0.6em; }
+      .w-thumb { width: min(100%, 24rem); }
       .w-type { justify-self: start; }
       .plate-tag { position: relative; right: auto; bottom: auto; display: inline-block; margin-top: 0.9rem; }
       .plate-thread { display: none; }
@@ -265,7 +272,8 @@
     <section class="register" aria-label="作品一覧">
       <div class="sec-head"><span>Registered Works — 収蔵一覧</span></div>
 
-      <a class="work-row" href="yugun/index.html">
+      <!-- WORKS:START -->
+      <a class="work-row" href="/yugun/">
         <span class="w-no">2025</span>
         <span class="w-main">
           <span class="w-title">嶼群（博物館（たち））</span>
@@ -273,18 +281,7 @@
         </span>
         <span class="w-type">演劇 / Theatre</span>
       </a>
-
-      <!-- 作品を追加するときは、下の行をコピーして書き換えてください。
-           リンク先のない作品（記録のみ）は <a> を <div> に変えれば同じ見た目で置けます。
-      <a class="work-row" href="作品ページのパス or 外部URL">
-        <span class="w-no">20XX</span>
-        <span class="w-main">
-          <span class="w-title">作品タイトル</span>
-          <span class="w-desc">一行の説明。媒体・会場・共作者など。</span>
-        </span>
-        <span class="w-type">テクスト / Text</span>
-      </a>
-      -->
+      <!-- WORKS:END -->
     </section>
 
     <p class="more">その他の制作物 — <a href="https://www.instagram.com/syno_mare/?utm_source=qr" target="_blank" rel="noopener">INSTAGRAM</a></p>

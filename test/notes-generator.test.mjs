@@ -136,3 +136,30 @@ tags: [test]
   assert.notEqual(result.code, 0);
   assert.match(result.stderr, /Error:/);
 });
+
+test('Markdownを削除した記事の生成済みHTMLも削除する', async t => {
+  const root = await makeSite({
+    'delete-me.md': `---
+title: 削除する記事
+date: 2026-08-15
+summary: 削除確認用です。
+tags: [test]
+---
+
+本文です。
+`
+  });
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+
+  const first = await runGenerator(root);
+  assert.equal(first.code, 0, first.stderr);
+  const generatedPath = path.join(root, 'notes', 'delete-me.html');
+  await fs.access(generatedPath);
+
+  await fs.rm(path.join(root, 'notes', 'content', 'delete-me.md'));
+  const second = await runGenerator(root);
+  assert.equal(second.code, 0, second.stderr);
+  await assert.rejects(fs.access(generatedPath), error => error.code === 'ENOENT');
+  const posts = JSON.parse(await fs.readFile(path.join(root, 'notes', 'posts.json'), 'utf8'));
+  assert.deepEqual(posts, []);
+});

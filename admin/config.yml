@@ -23,7 +23,7 @@ collections:
     label_singular: Note
     folder: notes/content
     create: true
-    delete: false
+    delete: true
     identifier_field: slug
     slug: "{{slug}}"
     summary: "{{date}} — {{title}}"
@@ -53,13 +53,73 @@ collections:
         name: tags
         widget: list
         required: true
+        min: 1
+        max: 20
+        default: [未分類]
         allow_add: true
         collapsed: false
         field:
           label: タグ
           name: tag
           widget: string
+          required: true
       - label: 本文
         name: body
         widget: markdown
         required: true
+
+  - name: works
+    label: Works
+    label_singular: Work
+    folder: works/content
+    create: true
+    delete: true
+    extension: md
+    format: frontmatter
+    identifier_field: slug
+    slug: "{{slug}}"
+    summary: "{{year}} — {{title}}"
+    sortable_fields: [year, title]
+    fields:
+      - label: URL Slug
+        name: slug
+        widget: string
+        hint: 英小文字・数字・ハイフンのみ。管理用ファイル名になります。
+        pattern:
+          - "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          - 英小文字・数字・ハイフンのみで入力してください。
+      - label: 作品名
+        name: title
+        widget: string
+      - label: 制作年
+        name: year
+        widget: string
+        pattern:
+          - "^[0-9]{4}(?:[–-][0-9]{2,4})?$"
+          - 2025 または 2024-2025 の形式で入力してください。
+      - label: 説明
+        name: summary
+        widget: text
+      - label: 種別
+        name: type
+        widget: string
+        hint: 例：演劇 / Theatre、グラフィック / Graphic
+      - label: リンク先
+        name: url
+        widget: string
+        required: false
+        hint: サイト内ページは /yugun/ のように、外部ページは https:// から入力します。未入力ならリンクなしで表示します。
+      - label: 一覧画像
+        name: image
+        widget: image
+        required: false
+        media_folder: /assets/images/works
+        public_folder: /assets/images/works
+        hint: 未入力なら現在と同じテキスト行として表示します。
+      - label: 表示優先度
+        name: priority
+        widget: number
+        required: false
+        default: 0
+        value_type: int
+        hint: 数字が大きい作品ほど上に表示します。同じ場合は制作年の新しい順です。

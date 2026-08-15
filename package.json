@@ -4,8 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "npm run build:notes && npm run build:works",
     "build:notes": "node scripts/new-post.mjs --rebuild",
+    "build:works": "node scripts/build-works.mjs --rebuild",
+    "check": "npm run check:notes && npm run check:works",
     "check:notes": "node scripts/new-post.mjs --check",
+    "check:works": "node scripts/build-works.mjs --check",
     "test": "node --test"
   },
   "keywords": [],

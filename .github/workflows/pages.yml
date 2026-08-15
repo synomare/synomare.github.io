@@ -31,8 +31,8 @@ jobs:
       - name: Test Notes generator
         run: npm test
 
-      - name: Generate Notes pages
-        run: npm run build:notes
+      - name: Generate site content
+        run: npm run build
 
       - name: Remove build dependencies
         run: rm -rf node_modules
