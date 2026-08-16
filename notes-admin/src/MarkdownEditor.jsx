@@ -1,22 +1,75 @@
-import { useEffect, useRef } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import { EditorState } from '@codemirror/state';
 import { EditorView, keymap, placeholder } from '@codemirror/view';
-import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
-import { autocompletion, startCompletion } from '@codemirror/autocomplete';
+import { defaultKeymap, history, historyKeymap, indentWithTab, redo, undo } from '@codemirror/commands';
+import { autocompletion, closeBrackets, closeBracketsKeymap, startCompletion } from '@codemirror/autocomplete';
 import { markdown } from '@codemirror/lang-markdown';
 
-export default function MarkdownEditor({ value, onChange, notes, onPublish }) {
+function replaceSelection(view, before, after = before, placeholderText = '') {
+  const { from, to } = view.state.selection.main;
+  const selected = view.state.sliceDoc(from, to) || placeholderText;
+  const insert = `${before}${selected}${after}`;
+  view.dispatch({ changes: { from, to, insert }, selection: { anchor: from + before.length, head: from + before.length + selected.length }, scrollIntoView: true });
+  view.focus();
+}
+
+function prefixLines(view, prefix) {
+  const { from, to } = view.state.selection.main;
+  const start = view.state.doc.lineAt(from).from;
+  const end = view.state.doc.lineAt(to).to;
+  const selected = view.state.sliceDoc(start, end);
+  const insert = selected.split('\n').map((line, index) => typeof prefix === 'function' ? prefix(line, index) : `${prefix}${line}`).join('\n');
+  view.dispatch({ changes: { from: start, to: end, insert }, selection: { anchor: start, head: start + insert.length }, scrollIntoView: true });
+  view.focus();
+}
+
+function runCommand(view, command) {
+  if (!view) return;
+  if (command === 'h2') prefixLines(view, '## ');
+  else if (command === 'h3') prefixLines(view, '### ');
+  else if (command === 'bold') replaceSelection(view, '**', '**', '太字');
+  else if (command === 'link') replaceSelection(view, '[', '](https://)', 'リンク');
+  else if (command === 'wikilink') replaceSelection(view, '[[', ']]', '記事名');
+  else if (command === 'quote') prefixLines(view, '> ');
+  else if (command === 'bullet') prefixLines(view, '- ');
+  else if (command === 'ordered') prefixLines(view, (line, index) => `${index + 1}. ${line}`);
+  else if (command === 'task') prefixLines(view, '- [ ] ');
+  else if (command === 'code') {
+    const { from, to } = view.state.selection.main; const selected = view.state.sliceDoc(from, to);
+    replaceSelection(view, selected.includes('\n') ? '```\n' : '`', selected.includes('\n') ? '\n```' : '`', 'code');
+  } else if (command === 'divider') replaceSelection(view, '\n\n---\n\n', '', '');
+  else if (command === 'undo') undo(view);
+  else if (command === 'redo') redo(view);
+}
+
+const MarkdownEditor = forwardRef(function MarkdownEditor({ value, onChange, notes, onPublish, onFiles }, forwardedRef) {
   const host = useRef(null);
   const viewRef = useRef(null);
   const publishRef = useRef(onPublish);
+  const changeRef = useRef(onChange);
+  const filesRef = useRef(onFiles);
+  const notesRef = useRef(notes);
   publishRef.current = onPublish;
+  changeRef.current = onChange;
+  filesRef.current = onFiles;
+  notesRef.current = notes;
+
+  useImperativeHandle(forwardedRef, () => ({
+    command: command => runCommand(viewRef.current, command),
+    focus: () => viewRef.current?.focus(),
+    goToLine: lineNumber => {
+      const view = viewRef.current; if (!view) return;
+      const line = view.state.doc.line(Math.max(1, Math.min(lineNumber, view.state.doc.lines)));
+      view.dispatch({ selection: { anchor: line.from }, effects: EditorView.scrollIntoView(line.from, { y: 'center' }) }); view.focus();
+    }
+  }), []);
 
   useEffect(() => {
     const source = context => {
       const before = context.matchBefore(/\[\[[^\]\n]*/);
       if (!before) return null;
       const query = before.text.slice(2).normalize('NFKC').toLocaleLowerCase('ja');
-      const options = notes
+      const options = notesRef.current
         .filter(note => !query || [note.slug, note.title, ...(note.aliases || [])].join(' ').normalize('NFKC').toLocaleLowerCase('ja').includes(query))
         .slice(0, 12)
         .map(note => ({ label: note.title, detail: note.slug, apply: `${note.title}]]` }));
@@ -24,7 +77,7 @@ export default function MarkdownEditor({ value, onChange, notes, onPublish }) {
     };
     const updateListener = EditorView.updateListener.of(update => {
       if (!update.docChanged) return;
-      onChange(update.state.doc.toString());
+      changeRef.current(update.state.doc.toString());
       const cursor = update.state.selection.main.head;
       const tail = update.state.sliceDoc(Math.max(0, cursor - 100), cursor);
       if (/\[\[[^\]\n]*$/.test(tail)) queueMicrotask(() => startCompletion(update.view));
@@ -34,9 +87,19 @@ export default function MarkdownEditor({ value, onChange, notes, onPublish }) {
       state: EditorState.create({
         doc: value,
         extensions: [
-          history(), markdown(), autocompletion({ override: [source], activateOnTyping: true }),
+          history(), markdown(), closeBrackets(), autocompletion({ override: [source], activateOnTyping: true }),
           placeholder('本文を書く。[[ で別の記事につなぐ。'),
-          keymap.of([{ key: 'Mod-Enter', run: editor => { if (!editor.composing) publishRef.current(); return true; } }, ...defaultKeymap, ...historyKeymap]),
+          keymap.of([
+            { key: 'Mod-Enter', run: editor => { if (!editor.composing) publishRef.current(); return true; } },
+            { key: 'Mod-b', run: editor => { runCommand(editor, 'bold'); return true; } },
+            { key: 'Mod-k', run: editor => { runCommand(editor, 'link'); return true; } },
+            { key: 'Mod-Shift-k', run: editor => { runCommand(editor, 'wikilink'); return true; } },
+            indentWithTab, ...closeBracketsKeymap, ...defaultKeymap, ...historyKeymap
+          ]),
+          EditorView.domEventHandlers({
+            paste: event => { const files = [...(event.clipboardData?.files || [])].filter(file => file.type.startsWith('image/') || /\.(?:heic|heif|jpe?g|png|gif|webp|avif|bmp|svg)$/i.test(file.name)); if (!files.length) return false; event.preventDefault(); filesRef.current?.(files); return true; },
+            drop: event => { const files = [...(event.dataTransfer?.files || [])].filter(file => file.type.startsWith('image/') || /\.(?:heic|heif|jpe?g|png|gif|webp|avif|bmp|svg)$/i.test(file.name)); if (!files.length) return false; event.preventDefault(); filesRef.current?.(files); return true; }
+          }),
           updateListener, EditorView.lineWrapping
         ]
       })
@@ -51,4 +114,6 @@ export default function MarkdownEditor({ value, onChange, notes, onPublish }) {
   }, [value]);
 
   return <div className="editor-host" ref={host} />;
-}
+});
+
+export default MarkdownEditor;

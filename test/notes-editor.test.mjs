@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { generateSlug, newNote, parseDocument, parseOAuthMessage, serializeDocument } from '../notes-admin/src/lib.js';
+import { documentStats, outlineFromBody, preflightIssues } from '../notes-admin/src/editorTools.js';
+import { previewHtml } from '../notes-admin/src/preview.js';
 import { publishAtomic } from '../notes-admin/src/github.js';
 import { detectImageType, IMAGE_ACCEPT } from '../notes-admin/src/images.js';
 
@@ -90,8 +92,53 @@ test('iPhone編集画面は記事選択、本文、固定公開操作を優先�
   assert.match(app, /<details className="inspector"/);
   assert.match(styles, /@media \(max-width: 560px\)/);
   assert.match(styles, /safe-area-inset-bottom/);
-  assert.match(styles, /grid-template-columns: 1fr 1fr 1\.25fr/);
+  assert.match(styles, /grid-template-columns: repeat\(4, minmax\(0, 1fr\)\)/);
   assert.match(styles, /font-size: 16px !important/);
+});
+
+test('本文統計と見出しアウトラインを生成する', () => {
+  const body = '導入です。\n\n## 最初の見出し\n\n本文です。\n\n### 小見出し';
+  assert.deepEqual(outlineFromBody(body), [
+    { level: 2, text: '最初の見出し', line: 3 },
+    { level: 3, text: '小見出し', line: 7 }
+  ]);
+  const stats = documentStats(body);
+  assert.equal(stats.headings, 2);
+  assert.equal(stats.minutes, 1);
+  assert.ok(stats.characters > 10);
+});
+
+test('公開前チェックは必須項目と未解決リンクを区別する', () => {
+  const note = { ...newNote([]), title: '', body: '[[まだない記事]]' };
+  const issues = preflightIssues(note, [], false);
+  assert.ok(issues.some(issue => issue.level === 'error' && /タイトル/.test(issue.text)));
+  assert.ok(issues.some(issue => issue.level === 'warning' && /未解決リンク/.test(issue.text)));
+  const valid = { ...note, title: '記事', body: '[[既存]]' };
+  assert.deepEqual(preflightIssues(valid, [{ slug: 'known', title: '既存', aliases: [] }], false), []);
+});
+
+test('Markdownプレビューは生HTMLを実行せず内部リンクを表示する', () => {
+  const html = previewHtml('<script>alert(1)</script>\n\n[[記事|表示名]]');
+  assert.doesNotMatch(html, /<script>/);
+  assert.match(html, /&lt;script&gt;/);
+  assert.match(html, />表示名<\/a>/);
+});
+
+test('エディターは書式、プレビュー、貼り付け画像、コピーを提供する', async () => {
+  const [app, editor, tools] = await Promise.all([
+    readFile(new URL('../notes-admin/src/App.jsx', import.meta.url), 'utf8'),
+    readFile(new URL('../notes-admin/src/MarkdownEditor.jsx', import.meta.url), 'utf8'),
+    readFile(new URL('../notes-admin/src/EditorTools.jsx', import.meta.url), 'utf8')
+  ]);
+  assert.match(app, /COPY MD/);
+  assert.match(app, /<MarkdownPreview/);
+  assert.match(app, /<PublishCheck/);
+  assert.match(editor, /paste: event/);
+  assert.match(editor, /drop: event/);
+  assert.match(editor, /Mod-Shift-k/);
+  assert.match(tools, /\['edit', 'split', 'preview'\]/);
+  assert.match(tools, /toUpperCase\(\)/);
+  assert.match(tools, /OUTLINE/);
 });
 
 test('画像は拡張子やMIME表記だけに頼らずファイル内容から判別する', async () => {

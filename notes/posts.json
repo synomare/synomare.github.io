@@ -20,83 +20,16 @@
     "path": "notes/20260816-200548.html",
     "outgoing": [],
     "incoming": [],
-    "related": [
-      {
-        "slug": "20260816-163440",
-        "title": "test",
-        "href": "20260816-163440.html",
-        "shared": 1
-      }
-    ],
+    "related": [],
     "graph": {
       "nodes": [
         {
           "slug": "20260816-200548",
           "title": "はじめに",
           "kind": "current"
-        },
-        {
-          "slug": "20260816-163440",
-          "title": "test",
-          "kind": "note"
         }
       ],
-      "edges": [
-        {
-          "from": "20260816-200548",
-          "to": "20260816-163440"
-        }
-      ]
-    }
-  },
-  {
-    "slug": "20260816-163440",
-    "postType": "text",
-    "title": "test",
-    "displayTitle": "test",
-    "date": "2026-08-16",
-    "summary": "これはテスト投稿でございます",
-    "cardExcerpt": "これはテスト投稿でございます",
-    "cardSize": "s",
-    "cardSizeMode": "s",
-    "tags": [
-      "未分類"
-    ],
-    "aliases": [],
-    "image": "/assets/images/notes/generated/1786865741293-img_0203-acd8bb1ba875.jpg",
-    "href": "20260816-163440.html",
-    "year": "2026",
-    "yearMonth": "2026-08",
-    "path": "notes/20260816-163440.html",
-    "outgoing": [],
-    "incoming": [],
-    "related": [
-      {
-        "slug": "20260816-200548",
-        "title": "はじめに",
-        "href": "20260816-200548.html",
-        "shared": 1
-      }
-    ],
-    "graph": {
-      "nodes": [
-        {
-          "slug": "20260816-163440",
-          "title": "test",
-          "kind": "current"
-        },
-        {
-          "slug": "20260816-200548",
-          "title": "はじめに",
-          "kind": "note"
-        }
-      ],
-      "edges": [
-        {
-          "from": "20260816-163440",
-          "to": "20260816-200548"
-        }
-      ]
+      "edges": []
     }
   }
 ]
