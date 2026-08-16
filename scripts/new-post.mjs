@@ -27,7 +27,7 @@ function normalizeKey(value) { return String(value || '').normalize('NFKC').trim
 function unique(values) { return [...new Set(values)]; }
 function todayJst() { return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()); }
 function stripMarkdown(value) {
-  return String(value || '').replace(/```[\s\S]*?```/g, ' ').replace(/!\[([^\]]*)\]\([^)]*\)/g, '$1')
+  return String(value || '').replace(/```[\s\S]*?```/g, ' ').replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
     .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').replace(WIKILINK_RE, (_, target, label) => label || target)
     .replace(/^#{1,6}\s+/gm, '').replace(/[*_>`~#]/g, '').replace(/\s+/g, ' ').trim();
 }

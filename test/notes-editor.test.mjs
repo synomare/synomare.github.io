@@ -61,6 +61,12 @@ test('OAuth tokenを永続ストレージへ書き込むコードを含めない
   assert.doesNotMatch(sources.join('\n'), /(?:localStorage|sessionStorage)[\s\S]{0,80}token/i);
 });
 
+test('画像追加時のMarkdownへ元ファイル名を表示用テキストとして入れない', async () => {
+  const source = await readFile(new URL('../notes-admin/src/App.jsx', import.meta.url), 'utf8');
+  assert.match(source, /prepared\.images\.map\(image => `!\[\]\(\/\$\{image\.path\}\)`\)/);
+  assert.doesNotMatch(source, /!\[\$\{image\.originalName/);
+});
+
 test('画像は拡張子やMIME表記だけに頼らずファイル内容から判別する', async () => {
   const asFile = (bytes, name, type = '') => Object.assign(new Blob([Uint8Array.from(bytes)], { type }), { name });
   assert.equal(await detectImageType(asFile([0xff, 0xd8, 0xff, 0x00], '写真.BIN')), 'image/jpeg');

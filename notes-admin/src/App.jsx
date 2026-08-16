@@ -72,7 +72,7 @@ export default function App() {
     try {
       const prepared = await prepareImageFiles(files);
       setImages(current => [...current, ...prepared.images]);
-      setNote(current => ({ ...current, body: `${current.body}${current.body.endsWith('\n') || !current.body ? '' : '\n'}\n${prepared.images.map(image => `![${image.originalName.replace(/[\[\]]/g, '')}](/${image.path})`).join('\n\n')}\n` }));
+      setNote(current => ({ ...current, body: `${current.body}${current.body.endsWith('\n') || !current.body ? '' : '\n'}\n${prepared.images.map(image => `![](/${image.path})`).join('\n\n')}\n` }));
       setStatus(prepared.messages.length ? prepared.messages.join(' ') : `${prepared.images.length}件の画像を公開待ちへ追加しました。`);
     } catch (error) { setStatus(`ERROR — ${error.message}`); }
     finally { setImageProcessing(false); }

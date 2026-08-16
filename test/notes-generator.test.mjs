@@ -86,6 +86,31 @@ tags:
   assert.match(html, /<h1>本文<\/h1>/);
   assert.match(html, /og:image/);
   assert.match(html, /twitter:card" content="summary_large_image/);
+  assert.match(html, /caption\.textContent=img\.title\|\|''/);
+  assert.doesNotMatch(html, /caption\.textContent=img\.title\|\|img\.alt/);
+});
+
+test('画像ファイル名を概要や画面上のキャプションとして扱わない', async t => {
+  const root = await makeSite({
+    'photo-note.md': `---
+title: 写真の記事
+date: 2026-08-16
+---
+
+![IMG_0203.HEIC](/assets/images/notes/photo.jpg)
+
+写真のあとに続く本文です。
+`
+  }, { 'assets/images/notes/photo.jpg': Buffer.from([0xff, 0xd8, 0xff, 0xd9]) });
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+
+  const result = await runGenerator(root);
+  assert.equal(result.code, 0, result.stderr);
+  const posts = JSON.parse(await fs.readFile(path.join(root, 'notes', 'posts.json'), 'utf8'));
+  assert.equal(posts[0].summary, '写真のあとに続く本文です。');
+  const html = await fs.readFile(path.join(root, 'notes', 'photo-note.html'), 'utf8');
+  assert.match(html, /alt="IMG_0203\.HEIC"/);
+  assert.match(html, /caption\.textContent=img\.title\|\|''/);
 });
 
 test('HEIC画像を公開用JPEGへ変換し記事と一覧の参照を差し替える', async t => {
