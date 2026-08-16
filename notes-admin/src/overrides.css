@@ -52,3 +52,150 @@
 .upload.is-busy { opacity: .58; cursor: progress; }
 .document-head { padding-top: clamp(20px, 3vw, 38px); }
 .editor-loading { min-height: 420px; padding: 2rem clamp(18px, 4vw, 56px); color: var(--dim); font: 400 .55rem var(--mono); letter-spacing: .1em; }
+
+@media (max-width: 560px) {
+  button,
+  .upload,
+  summary { touch-action: manipulation; }
+
+  .login { padding: 14px; }
+  .login > div {
+    padding: 28px 22px;
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+  .login h1 { margin-top: 2rem; }
+  .login .primary { width: 100%; min-height: 48px; }
+
+  .editor-top {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    height: auto;
+    min-height: 91px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 7px 10px;
+    padding: calc(8px + env(safe-area-inset-top)) 12px 8px;
+    background: rgba(244, 243, 239, .97);
+    backdrop-filter: blur(10px);
+  }
+  .editor-brand { gap: .65rem; }
+  .editor-brand > span { display: inline; }
+  .editor-session { gap: 5px; }
+  .editor-top select {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: 100%;
+    max-width: none;
+    height: 40px;
+    margin: 0;
+    padding: 0 10px;
+    font-size: 16px;
+  }
+  .editor-top button {
+    min-width: 52px;
+    height: 32px;
+    padding: 0 6px;
+  }
+
+  .workspace {
+    min-height: calc(100svh - 91px);
+    padding-bottom: calc(85px + env(safe-area-inset-bottom));
+  }
+  .document-head { padding: 18px 16px 14px; }
+  .title-input {
+    font-size: clamp(1.8rem, 9vw, 2.45rem);
+    line-height: 1.2;
+  }
+  .document-meta { margin-top: .65rem; }
+  .document-meta span:nth-child(n + 2) { display: none; }
+
+  .editor-host,
+  .cm-editor { min-height: calc(100svh - 258px); }
+  .cm-scroller {
+    min-height: calc(100svh - 258px);
+    padding: 1.15rem 16px 7.5rem;
+    font-size: 16px !important;
+    line-height: 1.9 !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  .cm-content { max-width: none; }
+  .cm-tooltip {
+    max-width: calc(100vw - 24px) !important;
+    font-size: .62rem !important;
+  }
+
+  .image-queue {
+    grid-auto-flow: column;
+    grid-template-columns: none;
+    grid-auto-columns: minmax(180px, 72vw);
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    padding: 10px 16px;
+    scroll-snap-type: x proximity;
+  }
+  .image-queue figure { scroll-snap-align: start; }
+  .image-queue strong { display: none; }
+
+  .details {
+    position: fixed;
+    z-index: 35;
+    left: 0;
+    right: 0;
+    bottom: calc(85px + env(safe-area-inset-bottom));
+    max-height: min(62dvh, 560px);
+    overflow-y: auto;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 10px;
+    padding: 18px 16px 24px;
+    border-top: 1px solid var(--ink);
+    box-shadow: 0 -8px 22px rgba(23, 20, 15, .12);
+    -webkit-overflow-scrolling: touch;
+  }
+  .details .wide { grid-column: 1 / -1; }
+  .details input,
+  .details select {
+    min-height: 42px;
+    font-size: 16px;
+  }
+
+  .editor-actions {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 36;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.25fr;
+    gap: 6px;
+    min-height: 85px;
+    padding: 6px 10px calc(7px + env(safe-area-inset-bottom));
+  }
+  .save-status {
+    grid-column: 1 / -1;
+    min-width: 0;
+    min-height: 16px;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: .48rem;
+  }
+  .editor-actions > button,
+  .editor-actions .upload {
+    display: grid;
+    place-items: center;
+    min-width: 0;
+    min-height: 44px;
+    padding: 7px 5px;
+    text-align: center;
+    white-space: nowrap;
+  }
+  .editor-actions .primary { min-height: 44px; padding-inline: 8px; }
+  .editor-actions .primary span { display: none; }
+
+  .inspector > summary { min-height: 48px; align-items: center; }
+  .inspector > summary span:nth-child(2) { margin-left: auto; color: var(--dim); }
+  .inspector-content { padding: 20px 16px 32px; }
+  .inspector section + section { margin-top: 2rem; }
+}

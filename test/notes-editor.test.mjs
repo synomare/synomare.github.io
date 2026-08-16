@@ -67,6 +67,21 @@ test('画像追加時のMarkdownへ元ファイル名を表示用テキストと
   assert.doesNotMatch(source, /!\[\$\{image\.originalName/);
 });
 
+test('iPhone編集画面は記事選択、本文、固定公開操作を優先する', async () => {
+  const [app, styles] = await Promise.all([
+    readFile(new URL('../notes-admin/src/App.jsx', import.meta.url), 'utf8'),
+    readFile(new URL('../notes-admin/src/overrides.css', import.meta.url), 'utf8')
+  ]);
+  assert.match(app, /className="editor-brand"/);
+  assert.match(app, /className="editor-session"/);
+  assert.ok(app.indexOf('className="details"') < app.indexOf('className="editor-actions"'));
+  assert.match(app, /<details className="inspector"/);
+  assert.match(styles, /@media \(max-width: 560px\)/);
+  assert.match(styles, /safe-area-inset-bottom/);
+  assert.match(styles, /grid-template-columns: 1fr 1fr 1\.25fr/);
+  assert.match(styles, /font-size: 16px !important/);
+});
+
 test('画像は拡張子やMIME表記だけに頼らずファイル内容から判別する', async () => {
   const asFile = (bytes, name, type = '') => Object.assign(new Blob([Uint8Array.from(bytes)], { type }), { name });
   assert.equal(await detectImageType(asFile([0xff, 0xd8, 0xff, 0x00], '写真.BIN')), 'image/jpeg');
