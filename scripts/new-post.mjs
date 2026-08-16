@@ -75,7 +75,9 @@ function validatePost({ slug, data, markdownBody, rawDate, file }) {
   return { title: data.title.trim(), date, summary, tags: explicitTags.length ? explicitTags : (detectedTags.length ? detectedTags : ['未分類']), aliases,
     cardSize, cardExcerpt: data.card_excerpt?.trim() || summary, draft: data.draft === true };
 }
-function sortPosts(posts) { return posts.sort((a, b) => b.date.localeCompare(a.date) || a.slug.localeCompare(b.slug)); }
+// Keep the newest publication first. New Notes use a JST timestamp slug, so
+// descending slug order gives same-day posts the same order as their creation.
+function sortPosts(posts) { return posts.sort((a, b) => b.date.localeCompare(a.date) || b.slug.localeCompare(a.slug)); }
 function addIndex(map, key, post) {
   const normalized = normalizeKey(key); if (!normalized) return; const list = map.get(normalized) || [];
   if (!list.some(item => item.slug === post.slug)) list.push(post); map.set(normalized, list);

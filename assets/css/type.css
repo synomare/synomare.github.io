@@ -1,0 +1,11 @@
+@font-face {
+  font-family: "OTTO ATTACTYPE";
+  src: url("/assets/fonts/OTTOATTACTYPE.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+:root {
+  --display: "OTTO ATTACTYPE", "EB Garamond", "Times New Roman", serif;
+}

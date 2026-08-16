@@ -90,6 +90,31 @@ tags:
   assert.doesNotMatch(html, /caption\.textContent=img\.title\|\|img\.alt/);
 });
 
+test('同じ公開日の記事はタイムスタンプslugの新しい順に並べる', async t => {
+  const root = await makeSite({
+    '20260816-090000.md': `---
+title: 朝の記事
+date: 2026-08-16
+---
+
+朝の本文です。
+`,
+    '20260816-163440.md': `---
+title: 夜の記事
+date: 2026-08-16
+---
+
+夜の本文です。
+`
+  });
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+
+  const result = await runGenerator(root);
+  assert.equal(result.code, 0, result.stderr);
+  const posts = JSON.parse(await fs.readFile(path.join(root, 'notes', 'posts.json'), 'utf8'));
+  assert.deepEqual(posts.map(post => post.slug), ['20260816-163440', '20260816-090000']);
+});
+
 test('画像ファイル名を概要や画面上のキャプションとして扱わない', async t => {
   const root = await makeSite({
     'photo-note.md': `---
