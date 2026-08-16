@@ -140,7 +140,7 @@ tags: [test]
   assert.match(result.stderr, /date の値を解釈/);
 });
 
-test('空のタグ配列を拒否する', async t => {
+test('空のタグ配列は本文タグまたは未分類で補完する', async t => {
   const root = await makeSite({
     'no-tags.md': `---
 title: タグなし
@@ -154,9 +154,10 @@ tags: []
   });
   t.after(() => fs.rm(root, { recursive: true, force: true }));
 
-  const result = await runGenerator(root, '--check');
-  assert.notEqual(result.code, 0);
-  assert.match(result.stderr, /tags は1〜20個/);
+  const result = await runGenerator(root);
+  assert.equal(result.code, 0, result.stderr);
+  const posts = JSON.parse(await fs.readFile(path.join(root, 'notes', 'posts.json'), 'utf8'));
+  assert.deepEqual(posts[0].tags, ['未分類']);
 });
 
 test('必須メタデータ不足を拒否する', async t => {
@@ -243,4 +244,60 @@ draft: true
   await assert.rejects(fs.access(path.join(root, 'notes', 'draft-post.html')), error => error.code === 'ENOENT');
   const posts = JSON.parse(await fs.readFile(path.join(root, 'notes', 'posts.json'), 'utf8'));
   assert.deepEqual(posts, []);
+});
+
+test('カード情報、内部リンク、バックリンク、関連記事を二段階で生成する', async t => {
+  const root = await makeSite({
+    'source-note.md': `---
+title: 出発点
+date: 2026-08-16
+tags: [思考, web]
+card_size: l
+card_excerpt: カード専用の文章
+---
+
+[[destination|別の記事]]と[[まだない記事]]へ進みます。
+`,
+    'destination.md': `---
+title: 到着点
+aliases: [目的地]
+date: 2026-08-15
+tags: [思考]
+---
+
+リンク先の本文です。
+`
+  });
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+  const result = await runGenerator(root);
+  assert.equal(result.code, 0, result.stderr);
+  const posts = JSON.parse(await fs.readFile(path.join(root, 'notes', 'posts.json'), 'utf8'));
+  const source = posts.find(post => post.slug === 'source-note');
+  const destination = posts.find(post => post.slug === 'destination');
+  assert.equal(source.cardSize, 'l');
+  assert.equal(source.cardExcerpt, 'カード専用の文章');
+  assert.equal(source.outgoing[0].slug, 'destination');
+  assert.equal(destination.incoming[0].slug, 'source-note');
+  assert.equal(source.related[0].slug, 'destination');
+  const html = await fs.readFile(path.join(root, 'notes', 'source-note.html'), 'utf8');
+  assert.match(html, /class="wikilink" href="destination\.html"/);
+  assert.match(html, /is-unresolved/);
+  assert.match(html, /LOCAL GRAPH/);
+});
+
+test('不正なカードサイズを拒否する', async t => {
+  const root = await makeSite({
+    'bad-card.md': `---
+title: 不正カード
+date: 2026-08-16
+card_size: huge
+---
+
+本文です。
+`
+  });
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+  const result = await runGenerator(root, '--check');
+  assert.notEqual(result.code, 0);
+  assert.match(result.stderr, /card_size は s、m、l/);
 });

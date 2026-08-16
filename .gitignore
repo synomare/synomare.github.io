@@ -5,3 +5,5 @@ works/works.json
 notes/*.html
 !notes/index.html
 !notes/post-template.html
+admin/notes/
+build-info.json

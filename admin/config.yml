@@ -54,12 +54,13 @@ collections:
       - label: 概要
         name: summary
         widget: text
+        required: false
         hint: Notes一覧と検索結果に表示する1〜2文です。
       - label: タグ
         name: tags
         widget: list
-        required: true
-        min: 1
+        required: false
+        min: 0
         max: 20
         default: [未分類]
         allow_add: true
@@ -69,6 +70,25 @@ collections:
           name: tag
           widget: string
           required: true
+      - label: 別名
+        name: aliases
+        widget: list
+        required: false
+        default: []
+        hint: 内部リンクで使いたい別名がある場合だけ追加します。
+      - label: カードサイズ
+        name: card_size
+        widget: select
+        options:
+          - { label: S / 小, value: s }
+          - { label: M / 中, value: m }
+          - { label: L / 大, value: l }
+        default: m
+      - label: カード用抜粋
+        name: card_excerpt
+        widget: text
+        required: false
+        hint: 未入力なら概要、概要も未入力なら本文冒頭を使用します。
       - label: 本文
         name: body
         widget: markdown

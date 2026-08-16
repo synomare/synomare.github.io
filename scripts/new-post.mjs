@@ -5,443 +5,181 @@ import { fileURLToPath } from 'node:url';
 import matter from 'gray-matter';
 import { marked } from 'marked';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const repoRoot = process.env.SYNOMARE_REPO_ROOT
-  ? path.resolve(process.env.SYNOMARE_REPO_ROOT)
-  : path.resolve(__dirname, '..');
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const repoRoot = process.env.SYNOMARE_REPO_ROOT ? path.resolve(process.env.SYNOMARE_REPO_ROOT) : path.resolve(__dirname, '..');
 const notesDir = path.join(repoRoot, 'notes');
 const contentDir = path.join(notesDir, 'content');
 const postsJsonPath = path.join(notesDir, 'posts.json');
 const postsJsPath = path.join(notesDir, 'posts.js');
 const templatePath = path.join(notesDir, 'post-template.html');
+const WIKILINK_RE = /\[\[([^\]|]+?)(?:\|([^\]]+?))?\]\]/g;
+const CARD_SIZES = new Set(['s', 'm', 'l']);
 
-function logError(message) {
-  console.error(`\n\x1b[31mError:\x1b[0m ${message}\n`);
+function logError(message) { console.error(`\n\x1b[31mError:\x1b[0m ${message}\n`); }
+function escapeHtml(value = '') { return String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]); }
+function escapeRegExp(value) { return value.replace(/[\^$.*+?()[\]{}|]/g, '\\$&'); }
+function normalizeKey(value) { return String(value || '').normalize('NFKC').trim().toLocaleLowerCase('ja'); }
+function unique(values) { return [...new Set(values)]; }
+function todayJst() { return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()); }
+function stripMarkdown(value) {
+  return String(value || '').replace(/```[\s\S]*?```/g, ' ').replace(/!\[([^\]]*)\]\([^)]*\)/g, '$1')
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').replace(WIKILINK_RE, (_, target, label) => label || target)
+    .replace(/^#{1,6}\s+/gm, '').replace(/[*_>`~#]/g, '').replace(/\s+/g, ' ').trim();
 }
-
-function usage() {
-  console.log(`Usage:\n` +
-    `  node scripts/new-post.mjs <slug> <title> [--date=YYYY-MM-DD] [--summary="テキスト"] [--tags=タグ1,タグ2] [--tag=タグ]...\n` +
-    `  node scripts/new-post.mjs --rebuild\n` +
-    `  node scripts/new-post.mjs --check\n\n` +
-    `Options:\n` +
-    `  --rebuild             Markdown ファイルから HTML とメタデータを再生成します。\n` +
-    `  --check               Markdown 原稿のメタデータを検証します。\n` +
-    `  --date=YYYY-MM-DD     新規作成時の日付を指定します。\n` +
-    `  --summary="テキスト"  新規作成時のサマリーを指定します。\n` +
-    `  --tags=タグ1,タグ2    新規作成時のタグをカンマ区切りで指定します。\n` +
-    `  --tag=タグ            --tags を複数回指定する書式です。\n\n` +
-    `例:\n` +
-    `  node scripts/new-post.mjs my-new-post "新しい記事" --summary="概要文" --tags=diary,update\n`);
+function autoExcerpt(markdownBody, max = 180) {
+  const paragraphs = String(markdownBody).split(/\r?\n\s*\r?\n/).map(stripMarkdown).filter(text => text && !/^https?:\/\/\S+$/.test(text));
+  const text = paragraphs[0] || '本文を読む';
+  return text.length > max ? `${text.slice(0, max - 1)}…` : text;
 }
-
-function parseArgs(argv) {
-  const options = {};
-  const positional = [];
-  for (let i = 0; i < argv.length; i++) {
-    const arg = argv[i];
-    if (!arg.startsWith('--')) {
-      positional.push(arg);
-      continue;
-    }
-    const eqIndex = arg.indexOf('=');
-    let key;
-    let value;
-    if (eqIndex !== -1) {
-      key = arg.slice(2, eqIndex);
-      value = arg.slice(eqIndex + 1);
-    } else {
-      key = arg.slice(2);
-      if (i + 1 < argv.length && !argv[i + 1].startsWith('--')) {
-        value = argv[i + 1];
-        i++;
-      } else {
-        value = '';
-      }
-    }
-    if (key === 'tag' || key === 'tags') {
-      if (!options.tags) options.tags = [];
-      if (value !== '') options.tags.push(value);
-    } else {
-      options[key] = value;
-    }
-  }
-  return { positional, options };
+function autoTags(markdownBody) {
+  const found = [];
+  for (const match of String(markdownBody).matchAll(/(?:^|\s)#([^\s#.,!?、。]+)/gu)) found.push(match[1]);
+  return unique(found).slice(0, 20);
 }
-
-function today() {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function escapeHtml(str) {
-  return str.replace(/[&<>"']/g, c => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;'
-  })[c]);
-}
-
-function escapeRegExp(str) {
-  return str.replace(/[\^$.*+?()[\]{}|]/g, '\\$&');
-}
-
 function readFrontmatterValue(source, name) {
   const block = source.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/);
   if (!block) return undefined;
-  const key = escapeRegExp(name);
-  const line = block[1].match(new RegExp(`^${key}:\\s*(?:"([^"]*)"|'([^']*)'|([^\\s#]+))\\s*(?:#.*)?$`, 'm'));
-  if (!line) return undefined;
-  return line.slice(1).find(value => value !== undefined);
+  const line = block[1].match(new RegExp(`^${escapeRegExp(name)}:\\s*(?:"([^"]*)"|'([^']*)'|([^\\s#]+))\\s*(?:#.*)?$`, 'm'));
+  return line ? line.slice(1).find(value => value !== undefined) : undefined;
 }
-
-async function ensureTemplate() {
-  try {
-    await fs.access(templatePath);
-  } catch {
-    throw new Error(`テンプレートが見つかりません: ${path.relative(repoRoot, templatePath)}`);
-  }
-}
-
-function sortPosts(posts) {
-  posts.sort((a, b) => {
-    const aDate = typeof a.date === 'string' ? a.date : '';
-    const bDate = typeof b.date === 'string' ? b.date : '';
-    if (aDate === bDate) {
-      const aSlug = typeof a.slug === 'string' ? a.slug : '';
-      const bSlug = typeof b.slug === 'string' ? b.slug : '';
-      return aSlug.localeCompare(bSlug);
-    }
-    return aDate < bDate ? 1 : -1;
-  });
-  return posts;
-}
-
-function validateSlug(slug) {
-  if (!slug) throw new Error('slug が指定されていません。');
-  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
-    throw new Error('slug は英小文字・数字・ハイフンのみで指定してください。');
-  }
-}
-
+function validateSlug(slug) { if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug || '')) throw new Error('slug は英小文字・数字・ハイフンのみで指定してください。'); }
 function validateDate(value) {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-    throw new Error('date は YYYY-MM-DD 形式で指定してください。');
-  }
-  const [year, month, day] = value.split('-').map(Number);
-  const parsed = new Date(Date.UTC(year, month - 1, day));
-  if (
-    Number.isNaN(parsed.getTime()) ||
-    parsed.getUTCFullYear() !== year ||
-    parsed.getUTCMonth() !== month - 1 ||
-    parsed.getUTCDate() !== day
-  ) {
-    throw new Error('date の値を解釈できませんでした。');
-  }
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value || '')) throw new Error('date は YYYY-MM-DD 形式で指定してください。');
+  const [year, month, day] = value.split('-').map(Number); const parsed = new Date(Date.UTC(year, month - 1, day));
+  if (parsed.getUTCFullYear() !== year || parsed.getUTCMonth() !== month - 1 || parsed.getUTCDate() !== day) throw new Error('date の値を解釈できませんでした。');
 }
-
-function imageMeta(image) {
-  if (!image) return '';
-  const absolute = /^https?:\/\//i.test(image)
-    ? image
-    : `https://synomare.github.io${image.startsWith('/') ? image : `/${image}`}`;
-  const content = escapeHtml(absolute);
-  return `<meta property="og:image" content="${content}">\n  <meta name="twitter:image" content="${content}">`;
-}
-
-function validateDraft(value, file) {
-  if (value !== undefined && typeof value !== 'boolean') {
-    throw new Error(`${file}: draft は true または false で指定してください。`);
+function validateStringList(value, name, file, { min = 0, max = 20 } = {}) {
+  if (value === undefined && min === 0) return [];
+  if (!Array.isArray(value) || value.length < min || value.length > max || value.some(item => typeof item !== 'string' || !item.trim())) {
+    throw new Error(`${file}: ${name} は${min ? `${min}〜` : ''}${max}個までの文字列の配列で指定してください。`);
   }
-  return value === true;
+  return unique(value.map(item => item.trim()));
 }
-
 function validatePost({ slug, data, markdownBody, rawDate, file }) {
   validateSlug(slug);
-
-  if (typeof data.title !== 'string' || !data.title.trim()) {
-    throw new Error(`${file}: title は必須です。`);
-  }
-  if (typeof data.date !== 'string' && !(data.date instanceof Date)) {
-    throw new Error(`${file}: date は必須です。`);
-  }
-  const date = rawDate || (data.date instanceof Date
-    ? data.date.toISOString().slice(0, 10)
-    : String(data.date));
-  validateDate(date);
-
-  if (typeof data.summary !== 'string' || !data.summary.trim()) {
-    throw new Error(`${file}: summary は必須です。`);
-  }
-  if (
-    !Array.isArray(data.tags) ||
-    data.tags.length < 1 ||
-    data.tags.length > 20 ||
-    data.tags.some(tag => typeof tag !== 'string' || !tag.trim())
-  ) {
-    throw new Error(`${file}: tags は1〜20個の文字列の配列で指定してください。`);
-  }
-  if (typeof markdownBody !== 'string' || !markdownBody.trim()) {
-    throw new Error(`${file}: 本文は必須です。`);
-  }
-  const draft = validateDraft(data.draft, file);
-
-  return {
-    title: data.title.trim(),
-    date,
-    summary: data.summary.trim(),
-    tags: data.tags.map(tag => tag.trim()),
-    draft
+  if (typeof data.title !== 'string' || !data.title.trim()) throw new Error(`${file}: title は必須です。`);
+  if (typeof markdownBody !== 'string' || !markdownBody.trim()) throw new Error(`${file}: 本文は必須です。`);
+  const date = rawDate || (data.date instanceof Date ? data.date.toISOString().slice(0, 10) : String(data.date || '')); validateDate(date);
+  if (data.draft !== undefined && typeof data.draft !== 'boolean') throw new Error(`${file}: draft は true または false で指定してください。`);
+  const explicitTags = validateStringList(data.tags, 'tags', file); const aliases = validateStringList(data.aliases, 'aliases', file);
+  const cardSize = data.card_size === undefined ? 'm' : String(data.card_size);
+  if (!CARD_SIZES.has(cardSize)) throw new Error(`${file}: card_size は s、m、l のいずれかで指定してください。`);
+  if (data.summary !== undefined && (typeof data.summary !== 'string' || !data.summary.trim())) throw new Error(`${file}: summary は空にできません。`);
+  if (data.card_excerpt !== undefined && (typeof data.card_excerpt !== 'string' || !data.card_excerpt.trim())) throw new Error(`${file}: card_excerpt は空にできません。`);
+  const summary = data.summary?.trim() || autoExcerpt(markdownBody, 160); const detectedTags = autoTags(markdownBody);
+  return { title: data.title.trim(), date, summary, tags: explicitTags.length ? explicitTags : (detectedTags.length ? detectedTags : ['未分類']), aliases,
+    cardSize, cardExcerpt: data.card_excerpt?.trim() || summary, draft: data.draft === true };
+}
+function sortPosts(posts) { return posts.sort((a, b) => b.date.localeCompare(a.date) || a.slug.localeCompare(b.slug)); }
+function addIndex(map, key, post) {
+  const normalized = normalizeKey(key); if (!normalized) return; const list = map.get(normalized) || [];
+  if (!list.some(item => item.slug === post.slug)) list.push(post); map.set(normalized, list);
+}
+function buildLinkResolver(posts) {
+  const slug = new Map(); const title = new Map(); const alias = new Map();
+  for (const post of posts) { addIndex(slug, post.slug, post); addIndex(title, post.title, post); for (const value of post.aliases) addIndex(alias, value, post); }
+  return target => {
+    const key = normalizeKey(target);
+    for (const map of [slug, title, alias]) { const matches = map.get(key) || []; if (matches.length === 1) return { status: 'resolved', post: matches[0] }; if (matches.length > 1) return { status: 'ambiguous', matches }; }
+    return { status: 'unresolved', matches: [] };
   };
 }
-
-async function writeJson(posts) {
-  const json = JSON.stringify(posts, null, 2) + '\n';
-  await fs.writeFile(postsJsonPath, json, 'utf8');
+function wikilinkContexts(markdownBody, resolver) {
+  const outgoing = [];
+  for (const paragraph of String(markdownBody).split(/\r?\n\s*\r?\n/)) {
+    for (const match of paragraph.matchAll(WIKILINK_RE)) {
+      const result = resolver(match[1]); if (result.status !== 'resolved') continue;
+      outgoing.push({ slug: result.post.slug, title: result.post.title, label: (match[2] || match[1]).trim(), href: `${result.post.slug}.html`, context: autoExcerpt(paragraph, 140) });
+    }
+  }
+  return outgoing.filter((item, index) => outgoing.findIndex(other => other.slug === item.slug) === index);
 }
-
-async function writePostsJs(posts) {
-  const postsForJs = posts.map(post => {
-    const year = (post.date || '').slice(0, 4);
-    const yearMonth = (post.date || '').slice(0, 7);
-    return {
-      slug: post.slug,
-      title: post.title,
-      date: post.date,
-      summary: post.summary || '',
-      tags: Array.isArray(post.tags) ? post.tags : [],
-      image: post.image || '',
-      href: post.href || `${post.slug}.html`,
-      year,
-      yearMonth,
-      path: `notes/${post.slug}.html`
-    };
+function replaceWikilinks(markdownBody, resolver) {
+  return String(markdownBody).replace(WIKILINK_RE, (_, targetRaw, labelRaw) => {
+    const target = targetRaw.trim(); const label = (labelRaw || target).trim(); const result = resolver(target);
+    if (result.status === 'resolved') return `<a class="wikilink" href="${escapeHtml(result.post.slug)}.html" data-note="${escapeHtml(result.post.slug)}">${escapeHtml(label)}</a>`;
+    return `<span class="wikilink is-${result.status}" title="${result.status === 'ambiguous' ? '同名の候補が複数あります' : 'リンク先がまだありません'}">${escapeHtml(label)}</span>`;
   });
-  const literal = JSON.stringify(postsForJs, null, 2);
-  const content = `(function(){\n  window.__SYNOMARE_POSTS__ = ${literal};\n})();\n`;
-  await fs.writeFile(postsJsPath, content, 'utf8');
 }
-
-async function readPreviouslyGeneratedSlugs() {
-  try {
-    const content = await fs.readFile(postsJsonPath, 'utf8');
-    const posts = JSON.parse(content);
-    if (!Array.isArray(posts)) return [];
-    return posts
-      .map(post => post && post.slug)
-      .filter(slug => typeof slug === 'string' && /^[a-z0-9-]+$/.test(slug));
-  } catch (error) {
-    if (error && error.code === 'ENOENT') return [];
-    throw new Error(`既存の投稿一覧を読み込めません: ${path.relative(repoRoot, postsJsonPath)}`);
-  }
-}
-
-async function removeDeletedPostHtml(previousSlugs, currentSlugs) {
-  const current = new Set(currentSlugs);
-  for (const slug of previousSlugs) {
-    if (current.has(slug)) continue;
-    await fs.rm(path.join(notesDir, `${slug}.html`), { force: true });
-  }
-}
-
-async function writeHtml({ slug, title, date, summary, image, contentHtml }) {
-  const tpl = await fs.readFile(templatePath, 'utf8');
-  const replacements = new Map([
-    ['{{TITLE}}', escapeHtml(title)],
-    ['{{DATE}}', escapeHtml(date)],
-    ['{{SUMMARY}}', escapeHtml(summary)],
-    ['{{SLUG}}', escapeHtml(slug)],
-    ['{{TWITTER_CARD}}', image ? 'summary_large_image' : 'summary'],
-    ['{{IMAGE_META}}', imageMeta(image)],
-    ['{{CONTENT}}', contentHtml]
-  ]);
-  let html = tpl;
-  replacements.forEach((value, key) => {
-    const pattern = new RegExp(escapeRegExp(key), 'g');
-    html = html.replace(pattern, () => value);
-  });
-  const targetPath = path.join(notesDir, `${slug}.html`);
-  await fs.writeFile(targetPath, html, 'utf8');
-  return targetPath;
-}
-
-async function createPost({ slug, title, date, summary, tags, draft }) {
-  const frontmatter = {
-    title,
-    date,
-    summary,
-    tags,
-    draft
-  };
-  const fileContent = matter.stringify('\n<!-- ここに本文を書いてください -->\n', frontmatter);
-  const targetPath = path.join(contentDir, `${slug}.md`);
-
-  try {
-    await fs.access(targetPath);
-    throw new Error(`既にファイルが存在します: ${path.relative(repoRoot, targetPath)}`);
-  } catch (err) {
-    if (err && err.code !== 'ENOENT') throw err;
-  }
-
-  await fs.writeFile(targetPath, fileContent, 'utf8');
-  console.log(`\nMarkdown ファイルを作成しました: ${path.relative(repoRoot, targetPath)}`);
-
-  // 自動でリビルドして HTML も生成しておく
-  await rebuildPosts();
-}
-
 function transformEmbeds(tokens) {
   for (const token of tokens) {
-    if (token.type === 'paragraph' && token.tokens.length === 1 && token.tokens[0].type === 'link') {
-      const link = token.tokens[0];
-      const href = link.href;
-
-      // YouTube
-      const ytMatch = href.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
-      if (ytMatch) {
-        token.type = 'html';
-        token.text = `<div class="video-container"><iframe src="https://www.youtube.com/embed/${ytMatch[1]}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
-        continue;
-      }
-
-      // Twitter
-      const twMatch = href.match(/(?:twitter\.com|x\.com)\/(\w+)\/status\/(\d+)/);
-      if (twMatch) {
-        token.type = 'html';
-        token.text = `<blockquote class="twitter-tweet"><a href="${href}"></a></blockquote>`;
-        continue;
-      }
-    }
+    if (token.type !== 'paragraph' || token.tokens?.length !== 1 || token.tokens[0].type !== 'link') continue;
+    const href = token.tokens[0].href; const youtube = href.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/); const twitter = href.match(/(?:twitter\.com|x\.com)\/(\w+)\/status\/(\d+)/);
+    if (youtube) { token.type = 'html'; token.text = `<div class="video-container"><iframe src="https://www.youtube.com/embed/${youtube[1]}" title="YouTube video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`; }
+    else if (twitter) { token.type = 'html'; token.text = `<blockquote class="twitter-tweet"><a href="${escapeHtml(href)}"></a></blockquote>`; }
   }
 }
-
-function findThumbnail(tokens) {
-  for (const t of tokens) {
-    if (t.type === 'image') return t.href;
-    if (t.tokens) {
-      const img = findThumbnail(t.tokens);
-      if (img) return img;
-    }
-  }
-  return null;
+function findThumbnail(tokens) { for (const token of tokens) { if (token.type === 'image') return token.href; if (token.tokens) { const image = findThumbnail(token.tokens); if (image) return image; } } return ''; }
+function imageMeta(image) {
+  if (!image) return ''; const absolute = /^https?:\/\//i.test(image) ? image : `https://synomare.github.io${image.startsWith('/') ? image : `/${image}`}`;
+  return `<meta property="og:image" content="${escapeHtml(absolute)}">\n  <meta name="twitter:image" content="${escapeHtml(absolute)}">`;
 }
-
+function relationList(title, items, emptyText, className) {
+  const body = items.length ? `<ul>${items.map(item => `<li><a href="${escapeHtml(item.href)}">${escapeHtml(item.title)}</a>${item.context ? `<p>${escapeHtml(item.context)}</p>` : ''}</li>`).join('')}</ul>` : `<p class="relation-empty">${escapeHtml(emptyText)}</p>`;
+  return `<section class="relation ${className}"><h2>${escapeHtml(title)}</h2>${body}</section>`;
+}
+function graphFor(post) {
+  const linked = [...post.outgoing, ...post.incoming, ...post.related.slice(0, 3)]; const nodes = [{ slug: post.slug, title: post.title, kind: 'current' }];
+  for (const item of linked) if (!nodes.some(node => node.slug === item.slug)) nodes.push({ slug: item.slug, title: item.title, kind: 'note' });
+  return { nodes, edges: linked.map(item => ({ from: post.slug, to: item.slug })) };
+}
+function relationsHtml(post) {
+  return `<aside class="entry-side" aria-label="記事のつながり"><div class="graph-panel"><div class="side-label">LOCAL GRAPH</div><div class="mini-graph" data-graph="${escapeHtml(JSON.stringify(post.graph))}"></div></div></aside><div class="relations">${relationList('Links — この記事から', post.outgoing, 'この記事からのリンクはまだありません。', 'outgoing')}${relationList('Backlinks — この記事へ', post.incoming, 'この記事へのリンクはまだありません。', 'incoming')}${relationList('Related — 関連記事', post.related, '関連する記事はまだありません。', 'related')}</div>`;
+}
 async function readPosts() {
-  const files = await fs.readdir(contentDir);
-  const mdFiles = files.filter(f => f.endsWith('.md'));
-  const posts = [];
-
-  for (const file of mdFiles) {
-    const filePath = path.join(contentDir, file);
-    const content = await fs.readFile(filePath, 'utf8');
-    const { data, content: markdownBody } = matter(content);
-
-    const slug = path.basename(file, '.md');
-    const { title, date, summary, tags, draft } = validatePost({
-      slug,
-      data,
-      markdownBody,
-      rawDate: readFrontmatterValue(content, 'date'),
-      file: path.relative(repoRoot, filePath)
-    });
-
-    // Markdown processing
-    const tokens = marked.lexer(markdownBody);
-
-    // Thumbnail extraction
-    const image = findThumbnail(tokens) || '';
-
-    // Auto-embeds
-    transformEmbeds(tokens);
-
-    const contentHtml = marked.parser(tokens);
-
-    posts.push({ slug, title, date, summary, tags, draft, image, contentHtml });
+  const files = (await fs.readdir(contentDir)).filter(file => file.endsWith('.md')); const rawPosts = [];
+  for (const file of files) {
+    const filePath = path.join(contentDir, file); const source = await fs.readFile(filePath, 'utf8'); const { data, content: markdownBody } = matter(source); const slug = path.basename(file, '.md');
+    rawPosts.push({ slug, markdownBody, ...validatePost({ slug, data, markdownBody, rawDate: readFrontmatterValue(source, 'date'), file: path.relative(repoRoot, filePath) }) });
   }
-
-  return sortPosts(posts);
+  sortPosts(rawPosts); const published = rawPosts.filter(post => !post.draft); const resolver = buildLinkResolver(published);
+  for (const post of published) post.outgoing = wikilinkContexts(post.markdownBody, resolver);
+  for (const post of published) {
+    post.incoming = published.flatMap(source => source.outgoing.filter(link => link.slug === post.slug).map(link => ({ slug: source.slug, title: source.title, href: `${source.slug}.html`, context: link.context })));
+    post.related = published.filter(other => other.slug !== post.slug).map(other => ({ slug: other.slug, title: other.title, href: `${other.slug}.html`, shared: other.tags.filter(tag => post.tags.includes(tag)).length }))
+      .filter(item => item.shared > 0).sort((a, b) => b.shared - a.shared || published.findIndex(post => post.slug === a.slug) - published.findIndex(post => post.slug === b.slug)).slice(0, 6);
+    const tokens = marked.lexer(replaceWikilinks(post.markdownBody, resolver)); post.image = findThumbnail(tokens); transformEmbeds(tokens); post.contentHtml = marked.parser(tokens); post.graph = graphFor(post);
+  }
+  return { all: rawPosts, published };
 }
-
-async function checkPosts() {
-  const posts = await readPosts();
-  const published = posts.filter(post => !post.draft).length;
-  console.log(`Notes の検証に成功しました（全${posts.length}件 / 公開${published}件 / 下書き${posts.length - published}件）。`);
+function publicMeta(post) {
+  return { slug: post.slug, title: post.title, date: post.date, summary: post.summary, cardExcerpt: post.cardExcerpt, cardSize: post.cardSize, tags: post.tags, aliases: post.aliases,
+    image: post.image, href: `${post.slug}.html`, year: post.date.slice(0, 4), yearMonth: post.date.slice(0, 7), path: `notes/${post.slug}.html`, outgoing: post.outgoing, incoming: post.incoming, related: post.related, graph: post.graph };
 }
-
+async function writeData(posts) {
+  const data = posts.map(publicMeta); await fs.writeFile(postsJsonPath, `${JSON.stringify(data, null, 2)}\n`, 'utf8');
+  await fs.writeFile(postsJsPath, `(function(){\n  window.__SYNOMARE_POSTS__ = ${JSON.stringify(data, null, 2)};\n})();\n`, 'utf8');
+}
+async function previousSlugs() { try { return JSON.parse(await fs.readFile(postsJsonPath, 'utf8')).map(post => post.slug).filter(Boolean); } catch (error) { if (error.code === 'ENOENT') return []; throw error; } }
+async function writeHtml(post) {
+  let html = await fs.readFile(templatePath, 'utf8'); const replacements = { '{{TITLE}}': escapeHtml(post.title), '{{DATE}}': escapeHtml(post.date), '{{SUMMARY}}': escapeHtml(post.summary), '{{SLUG}}': escapeHtml(post.slug), '{{TWITTER_CARD}}': post.image ? 'summary_large_image' : 'summary', '{{IMAGE_META}}': imageMeta(post.image), '{{CONTENT}}': post.contentHtml, '{{RELATIONS}}': relationsHtml(post) };
+  for (const [key, value] of Object.entries(replacements)) html = html.replace(new RegExp(escapeRegExp(key), 'g'), () => value);
+  await fs.writeFile(path.join(notesDir, `${post.slug}.html`), html, 'utf8');
+}
 async function rebuildPosts() {
-  const previousSlugs = await readPreviouslyGeneratedSlugs();
-  const posts = await readPosts();
-  const publishedPosts = posts.filter(post => !post.draft);
-
-  // メタデータ保存用（HTMLを含まない）
-  const metaPosts = publishedPosts.map(({ contentHtml, draft, ...meta }) => meta);
-  await writeJson(metaPosts);
-  await writePostsJs(metaPosts);
-
-  // HTML生成
-  for (const post of publishedPosts) {
-    await writeHtml(post);
-  }
-
-  await removeDeletedPostHtml(previousSlugs, publishedPosts.map(post => post.slug));
-
-  console.log('\nサイトを再生成しました。');
-  console.log(`- 公開記事数: ${publishedPosts.length}`);
-  console.log(`- 下書き数: ${posts.length - publishedPosts.length}`);
-  console.log(`- メタデータ: ${path.relative(repoRoot, postsJsonPath)}`);
+  const oldSlugs = await previousSlugs(); const { all, published } = await readPosts(); await writeData(published); for (const post of published) await writeHtml(post);
+  const current = new Set(published.map(post => post.slug)); for (const slug of oldSlugs) if (!current.has(slug)) await fs.rm(path.join(notesDir, `${slug}.html`), { force: true });
+  console.log(`\nサイトを再生成しました。\n- 公開記事数: ${published.length}\n- 下書き数: ${all.length - published.length}\n- メタデータ: ${path.relative(repoRoot, postsJsonPath)}`);
 }
-
-(async function main() {
+async function createPost({ slug, title, date, summary, tags }) {
+  const target = path.join(contentDir, `${slug}.md`); try { await fs.access(target); throw new Error(`既にファイルが存在します: ${path.relative(repoRoot, target)}`); } catch (error) { if (error.code !== 'ENOENT') throw error; }
+  const source = matter.stringify('\n<!-- ここに本文を書いてください -->\n', { title, date, summary, tags: tags.length ? tags : ['未分類'], aliases: [], card_size: 'm', draft: false });
+  await fs.writeFile(target, source, 'utf8'); await rebuildPosts();
+}
+function parseArgs(argv) {
+  const positional = []; const options = {};
+  for (const arg of argv) { if (!arg.startsWith('--')) { positional.push(arg); continue; } const [key, ...rest] = arg.slice(2).split('='); const value = rest.join('='); if (key === 'tag' || key === 'tags') (options.tags ||= []).push(value); else options[key] = value; }
+  return { positional, options };
+}
+(async () => {
   const { positional, options } = parseArgs(process.argv.slice(2));
-  const rebuildMode = Object.prototype.hasOwnProperty.call(options, 'rebuild');
-  const checkMode = Object.prototype.hasOwnProperty.call(options, 'check');
-
   try {
-    await ensureTemplate();
-    // contentDir がなければ作る
-    await fs.mkdir(contentDir, { recursive: true });
-
-    if (rebuildMode) {
-      await rebuildPosts();
-      return;
-    }
-    if (checkMode) {
-      await checkPosts();
-      return;
-    }
-
-    if (positional.length < 2) {
-      usage();
-      process.exit(1);
-    }
-
-    const [slugRaw, ...titleParts] = positional;
-    const title = titleParts.join(' ').trim();
-    if (!title) {
-      logError('タイトルを指定してください。');
-      usage();
-      process.exit(1);
-    }
-    validateSlug(slugRaw);
-    const slug = slugRaw;
-
-    const date = options.date ? String(options.date) : today();
-    validateDate(date);
-
-    const summary = (options.summary ? String(options.summary) : 'ここに記事の概要を1〜2文で書いてください。').trim();
-    const tagsRaw = Array.isArray(options.tags) ? options.tags : (options.tags ? [options.tags] : []);
-    const tags = Array.from(new Set(tagsRaw
-      .flatMap(value => String(value).split(','))
-      .map(tag => tag.trim())
-      .filter(Boolean)
-    ));
-
-    await createPost({ slug, title, date, summary, tags, draft: false });
-
-  } catch (err) {
-    logError(err.message);
-    process.exit(1);
-  }
+    await fs.mkdir(contentDir, { recursive: true }); await fs.access(templatePath);
+    if ('rebuild' in options) return await rebuildPosts();
+    if ('check' in options) { const { all, published } = await readPosts(); console.log(`Notes の検証に成功しました（全${all.length}件 / 公開${published.length}件 / 下書き${all.length - published.length}件）。`); return; }
+    if (positional.length < 2) throw new Error('slug とタイトルを指定してください。');
+    const [slug, ...titleParts] = positional; validateSlug(slug); const date = options.date || todayJst(); validateDate(date);
+    const tags = unique((options.tags || []).flatMap(value => value.split(',')).map(value => value.trim()).filter(Boolean));
+    await createPost({ slug, title: titleParts.join(' ').trim(), date, summary: options.summary || '本文を読む', tags });
+  } catch (error) { logError(error.message); process.exit(1); }
 })();

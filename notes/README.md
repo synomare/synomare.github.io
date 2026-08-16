@@ -1,7 +1,22 @@
 # Notes（ブログ）の運用メモ
 
 `notes/` 以下は Markdown 原稿から記事 HTML と一覧データを生成する簡易な仕組みです。
-生成は `scripts/new-post.mjs` が担当し、依存は `gray-matter` と `marked` のみです。
+公開ページ生成は `scripts/new-post.mjs`、専用エディターは React・Vite・CodeMirror が担当します。
+
+## Notes専用エディター（文章を書くときはこちら）
+
+1. `https://synomare.github.io/admin/notes/` を直接開き、**LOGIN WITH GITHUB**を押します。
+2. 新規記事は上部の記事選択から **＋ NEW NOTE** を選びます。タイトルと本文だけで保存でき、slug・日付・概要・タグは自動補完されます。
+3. 本文中で `[[` と入力すると既存記事が候補に出ます。`[[記事名]]` または `[[記事名|表示名]]` で記事同士をつなげられます。
+4. **DETAILS** ではカードサイズS/M/L、概要、カード用抜粋、タグ、別名、公開状態を変更できます。
+5. **＋ IMAGE** で画像を選ぶと本文へ記法が挿入されます。画像は公開時にMarkdownと同じGitコミットで `assets/images/notes/` へ保存されます。
+6. **PUBLISH** または `Ctrl/Cmd + Enter` で公開します。公開中はGitHub画面を開く必要はありません。
+
+入力内容は約0.5秒後にブラウザ内へ自動保存されます。GitHubログインのtokenはメモリだけに保持され、IndexedDB・localStorage・リポジトリには保存されません。別の更新によってmainが進んだ場合は上書きせず **CONFLICT** と表示するため、**RELOAD**後に差分を確認して再度公開してください。
+
+記事の削除、壊れたfrontmatterの修復、従来画面での復旧は `https://synomare.github.io/admin/` を使用します。専用エディターには誤操作防止のため削除機能を置いていません。
+
+公開Notes一覧では、各記事の`card_size`と閲覧者側のVIEW S/M/Lが同時に反映されます。VIEW設定はURLとブラウザへ保存され、検索・タグ・年の絞り込みと併用できます。記事ページには内部リンク、バックリンク、共有タグによる関連記事、ローカルグラフが表示されます。
 
 ## 管理画面から更新する（通常はこちら）
 

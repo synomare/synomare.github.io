@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "npm run build:notes && npm run build:works",
+    "build": "npm run build:notes && npm run build:works && npm run build:notes-admin && npm run build:info",
     "build:notes": "node scripts/new-post.mjs --rebuild",
+    "build:notes-admin": "vite build",
+    "build:info": "node scripts/write-build-info.mjs",
     "build:works": "node scripts/build-works.mjs --rebuild",
     "check": "npm run check:notes && npm run check:works",
     "check:notes": "node scripts/new-post.mjs --check",
@@ -17,8 +19,20 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@codemirror/autocomplete": "^6.18.7",
+    "@codemirror/commands": "^6.8.1",
+    "@codemirror/lang-markdown": "^6.3.3",
+    "@codemirror/state": "^6.5.2",
+    "@codemirror/view": "^6.36.5",
     "gray-matter": "^4.0.3",
-    "marked": "^17.0.1"
+    "marked": "^17.0.1",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "yaml": "^2.8.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.0.2",
+    "vite": "^7.1.2"
   },
   "overrides": {
     "js-yaml": "3.15.1"

@@ -1,0 +1,3 @@
+.title-input { font-size: clamp(2rem, 3.2vw, 3.2rem); }
+.document-head { padding-top: clamp(20px, 3vw, 38px); }
+.editor-loading { min-height: 420px; padding: 2rem clamp(18px, 4vw, 56px); color: var(--dim); font: 400 .55rem var(--mono); letter-spacing: .1em; }
