@@ -13,6 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@1,400;1,500&family=Space+Mono:wght@400;700&family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="preload" href="/assets/fonts/OTTOATTACTYPE.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="stylesheet" href="assets/css/type.css">
   <style>
     :root {
@@ -163,11 +164,11 @@
       font-family: var(--display);
       font-style: normal;
       font-weight: 400;
-      font-size: clamp(4.2rem, 16vw, 13rem);
+      font-size: clamp(4rem, 14vw, 11rem);
       letter-spacing: -0.03em;
       line-height: 0.8;
       color: transparent;
-      -webkit-text-stroke: 1.5px var(--ink);
+      -webkit-text-stroke: var(--display-stroke) var(--ink);
       filter: url(#etch);
     }
     .display-row .jp { font-family: var(--mono); font-size: 0.64rem; letter-spacing: 0.5em; text-transform: uppercase; color: var(--red); }

@@ -14,6 +14,7 @@ test('OTTOは大見出し用の表示書体として読み込まれる', async (
   assert.ok(font.size > 1000);
   assert.match(typeCss, /font-family:\s*["']OTTO ATTACTYPE["']/);
   assert.match(typeCss, /OTTOATTACTYPE\.ttf/);
+  assert.match(typeCss, /--display-stroke:\s*clamp\(/);
 
   const pages = [
     ['index.html', 'assets/css/type.css'],
@@ -26,6 +27,7 @@ test('OTTOは大見出し用の表示書体として読み込まれる', async (
   for (const [relativePath, href] of pages) {
     const source = await fs.readFile(path.join(repoRoot, relativePath), 'utf8');
     assert.match(source, new RegExp(`rel="stylesheet" href="${href.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')}"`), relativePath);
+    assert.match(source, /rel="preload" href="\/assets\/fonts\/OTTOATTACTYPE\.ttf" as="font" type="font\/ttf" crossorigin/, relativePath);
   }
   assert.match(await fs.readFile(path.join(repoRoot, 'index.html'), 'utf8'), /\.ghost[\s\S]*font-family: var\(--display\)/);
   assert.match(await fs.readFile(path.join(repoRoot, 'notes', 'index.html'), 'utf8'), /\.display\{[^}]*var\(--display\)/);

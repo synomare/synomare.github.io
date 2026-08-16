@@ -16,24 +16,28 @@ export function parseDocument(source, fallbackSlug = '') {
   const data = match ? (YAML.parse(match[1]) || {}) : {};
   return {
     slug: fallbackSlug,
+    postType: data.post_type === 'photo' ? 'photo' : 'text', photo: String(data.photo || ''),
     title: String(data.title || ''), date: String(data.date || jstDate()),
     summary: String(data.summary || ''), tags: Array.isArray(data.tags) ? data.tags : [], aliases: Array.isArray(data.aliases) ? data.aliases : [],
-    cardSize: ['s', 'm', 'l'].includes(data.card_size) ? data.card_size : 'm', cardExcerpt: String(data.card_excerpt || ''),
+    cardSize: ['s', 'm', 'l'].includes(data.card_size) ? data.card_size : 'auto', cardExcerpt: String(data.card_excerpt || ''),
     draft: data.draft === true, body: match ? source.slice(match[0].length) : source, existing: true
   };
 }
 export function excerptFromBody(body, max = 160) {
-  const text = String(body).replace(/```[\s\S]*?```/g, ' ').replace(/!\[[^\]]*\]\([^)]*\)/g, ' ').replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (_, target, label) => label || target).replace(/[#*_>`~\[\]()]/g, ' ').replace(/https?:\/\/\S+/g, ' ').replace(/\s+/g, ' ').trim() || '本文を読む';
+  const text = String(body).replace(/```[\s\S]*?```/g, ' ').replace(/!\[[^\]]*\]\([^)]*\)/g, ' ').replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (_, target, label) => label || target).replace(/[#*_>`~\[\]()]/g, ' ').replace(/https?:\/\/\S+/g, ' ').replace(/\s+/g, ' ').trim();
   return text.length > max ? `${text.slice(0, max - 1)}…` : text;
 }
 export function tagsFromBody(body) {
   return [...new Set([...String(body).matchAll(/(?:^|\s)#([^\s#.,!?、。]+)/gu)].map(match => match[1]))].slice(0, 20);
 }
 export function serializeDocument(note) {
-  const summary = note.summary.trim() || excerptFromBody(note.body);
-  const tags = note.tags.length ? note.tags : (tagsFromBody(note.body).length ? tagsFromBody(note.body) : ['未分類']);
-  const data = { title: note.title.trim(), date: note.date || jstDate(), summary, tags, aliases: note.aliases, card_size: note.cardSize || 'm' };
-  if (note.cardExcerpt.trim()) data.card_excerpt = note.cardExcerpt.trim();
+  const isPhoto = note.postType === 'photo';
+  const summary = note.summary.trim() || excerptFromBody(note.body) || (note.title.trim() || `写真 ${note.date || jstDate()}`);
+  const tags = note.tags.length ? note.tags : (tagsFromBody(note.body).length ? tagsFromBody(note.body) : [isPhoto ? '写真' : '未分類']);
+  const data = { post_type: isPhoto ? 'photo' : 'text', date: note.date || jstDate(), summary, tags, aliases: note.aliases || [], card_size: note.cardSize || 'auto' };
+  if (note.title.trim()) data.title = note.title.trim();
+  if (isPhoto && note.photo) data.photo = note.photo;
+  if (!isPhoto && note.cardExcerpt.trim()) data.card_excerpt = note.cardExcerpt.trim();
   data.draft = note.draft === true;
   return `---\n${YAML.stringify(data).trim()}\n---\n\n${note.body.trim()}\n`;
 }
@@ -45,5 +49,5 @@ export function outgoingFromBody(body) {
   return [...String(body).matchAll(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g)].map(match => ({ target: match[1].trim(), label: (match[2] || match[1]).trim() }));
 }
 export function newNote(existing = []) {
-  return { slug: generateSlug(existing), title: '', date: jstDate(), summary: '', tags: [], aliases: [], cardSize: 'm', cardExcerpt: '', draft: false, body: '', existing: false };
+  return { slug: generateSlug(existing), postType: 'text', photo: '', title: '', date: jstDate(), summary: '', tags: [], aliases: [], cardSize: 'auto', cardExcerpt: '', draft: false, body: '', existing: false };
 }

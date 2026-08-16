@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { generateSlug, parseOAuthMessage, serializeDocument } from '../notes-admin/src/lib.js';
+import { generateSlug, newNote, parseDocument, parseOAuthMessage, serializeDocument } from '../notes-admin/src/lib.js';
 import { publishAtomic } from '../notes-admin/src/github.js';
 import { detectImageType, IMAGE_ACCEPT } from '../notes-admin/src/images.js';
 
@@ -18,6 +18,18 @@ test('OAuthメッセージは成功形式だけからtokenを読む', () => {
   assert.equal(parseOAuthMessage('authorization:github:success:{"token":"secret"}'), 'secret');
   assert.equal(parseOAuthMessage('authorization:github:error:{"token":"secret"}'), '');
   assert.equal(parseOAuthMessage('authorization:github:success:not-json'), '');
+});
+
+test('写真投稿はタイトルと本文なしで画像をfrontmatterへ保存する', () => {
+  const note = { ...newNote([]), postType: 'photo', photo: '/assets/images/notes/photo.jpg', date: '2026-08-16' };
+  const markdown = serializeDocument(note);
+  assert.match(markdown, /post_type: photo/);
+  assert.match(markdown, /photo: \/assets\/images\/notes\/photo\.jpg/);
+  assert.match(markdown, /card_size: auto/);
+  assert.doesNotMatch(markdown, /^title:/m);
+  const parsed = parseDocument(markdown, note.slug);
+  assert.equal(parsed.postType, 'photo');
+  assert.equal(parsed.photo, '/assets/images/notes/photo.jpg');
 });
 
 test('Markdown公開はmainのbase SHAを確認し単一commitをfast-forwardする', async t => {

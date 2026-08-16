@@ -13,6 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@1,400;1,500&family=Space+Mono:wght@400;700&family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="preload" href="/assets/fonts/OTTOATTACTYPE.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="stylesheet" href="assets/css/type.css">
   <style>
     :root {
@@ -183,11 +184,11 @@
       font-family: var(--display);
       font-style: normal;
       font-weight: 400;
-      font-size: clamp(4.2rem, 17vw, 15rem);
-      letter-spacing: -0.04em;
+      font-size: clamp(4rem, 15vw, 13rem);
+      letter-spacing: -0.035em;
       line-height: 0.85;
       color: transparent;
-      -webkit-text-stroke: 1.5px var(--ink);
+      -webkit-text-stroke: var(--display-stroke) var(--ink);
       white-space: nowrap;
       filter: url(#etch);
     }
@@ -225,7 +226,7 @@
     .p-thread { top: 30vh; left: 30vw; width: 34vw; transform: rotate(14deg); }
 
     @media (max-width: 700px) {
-      .ghost-name { white-space: normal; font-size: clamp(3rem, 17vw, 5rem); }
+      .ghost-name { white-space: normal; font-size: clamp(3.5rem, 16vw, 4.5rem); }
       .colophon .kv { grid-template-columns: 1fr; gap: 0.3em; }
       .z-side { width: 80vw; right: -24vw; opacity: 0.5; }
       .p-thread { display: none; }

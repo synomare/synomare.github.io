@@ -13,6 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Space+Mono:wght@400;700&family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="preload" href="/assets/fonts/OTTOATTACTYPE.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="stylesheet" href="assets/css/type.css">
   <style>
     :root {
@@ -211,11 +212,11 @@
       font-family: var(--display);
       font-style: normal;
       font-weight: 400;
-      font-size: clamp(5rem, 17.5vw, 20rem);
+      font-size: clamp(5rem, 16vw, 18rem);
       line-height: 1;
-      letter-spacing: -0.03em;
+      letter-spacing: -0.025em;
       color: transparent;
-      -webkit-text-stroke: 1.5px var(--ink);
+      -webkit-text-stroke: var(--display-stroke) var(--ink);
       white-space: nowrap;
       pointer-events: none;
       mix-blend-mode: multiply;
@@ -333,7 +334,7 @@
       .intro { position: relative; top: auto; left: auto; margin: 16vh 5vw 1.6rem; }
       .field .tag { position: relative; top: auto !important; left: auto !important; right: auto !important; display: block; width: fit-content; margin: 0.8rem 5vw; }
       .thread { display: none; }
-      .ghost { position: absolute; font-size: 22vw; }
+      .ghost { position: absolute; font-size: 20vw; }
     }
   </style>
 </head>

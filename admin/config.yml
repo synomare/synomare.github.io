@@ -45,6 +45,23 @@ collections:
       - label: タイトル
         name: title
         widget: string
+        required: false
+        hint: テキスト投稿では必須です。写真投稿は未入力でも公開できます。
+      - label: 投稿タイプ
+        name: post_type
+        widget: select
+        options:
+          - { label: テキスト / 写真を含む記事, value: text }
+          - { label: 写真のみ, value: photo }
+        default: text
+        hint: 写真のみを選ぶ場合は、下の「写真投稿の画像」を1枚設定してください。
+      - label: 写真投稿の画像
+        name: photo
+        widget: image
+        required: false
+        media_folder: /assets/images/notes
+        public_folder: /assets/images/notes
+        hint: 「写真のみ」の投稿で使います。テキスト本文へ画像を入れる場合は本文の画像ボタンを使ってください。
       - label: 公開日
         name: date
         widget: datetime
@@ -80,10 +97,12 @@ collections:
         name: card_size
         widget: select
         options:
+          - { label: AUTO / 内容に合わせる, value: auto }
           - { label: S / 小, value: s }
           - { label: M / 中, value: m }
           - { label: L / 大, value: l }
-        default: m
+        default: auto
+        hint: AUTOは写真投稿=L、画像入りテキスト=M、テキストのみ=Sになります。手動指定はAUTOより優先されます。
       - label: カード用抜粋
         name: card_excerpt
         widget: text
@@ -92,8 +111,8 @@ collections:
       - label: 本文
         name: body
         widget: markdown
-        required: true
-        hint: JPEG・PNG・WebP・GIF・AVIF・BMP・SVG・HEICに対応します。HEICは公開ビルド時にJPEGへ変換されます。変換状況を事前確認する場合はNotes専用エディターを使用してください。
+        required: false
+        hint: テキスト投稿では必須です。写真投稿では空で構いません。JPEG・PNG・WebP・GIF・AVIF・BMP・SVG・HEICに対応します。
       - label: 公開設定
         name: draft
         widget: boolean

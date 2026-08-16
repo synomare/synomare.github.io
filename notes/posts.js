@@ -1,12 +1,65 @@
 (function(){
   window.__SYNOMARE_POSTS__ = [
   {
+    "slug": "20260816-200548",
+    "postType": "text",
+    "title": "はじめに",
+    "displayTitle": "はじめに",
+    "date": "2026-08-16",
+    "summary": "ゆっくりものを考え、書く時間が必要だなと思ってブログ機能を作った。日々の考え事とか、メモとか、読書日記とか、なんでもここに貯めていくようにできたらなと思う。",
+    "cardExcerpt": "ゆっくりものを考え、書く時間が必要だなと思ってブログ機能を作った。日々の考え事とか、メモとか、読書日記とか、なんでもここに貯めていくようにできたらなと思う。",
+    "cardSize": "m",
+    "cardSizeMode": "m",
+    "tags": [
+      "未分類"
+    ],
+    "aliases": [],
+    "image": "/assets/images/notes/1786878777173-3828089f17bd-img-0487.webp",
+    "href": "20260816-200548.html",
+    "year": "2026",
+    "yearMonth": "2026-08",
+    "path": "notes/20260816-200548.html",
+    "outgoing": [],
+    "incoming": [],
+    "related": [
+      {
+        "slug": "20260816-163440",
+        "title": "test",
+        "href": "20260816-163440.html",
+        "shared": 1
+      }
+    ],
+    "graph": {
+      "nodes": [
+        {
+          "slug": "20260816-200548",
+          "title": "はじめに",
+          "kind": "current"
+        },
+        {
+          "slug": "20260816-163440",
+          "title": "test",
+          "kind": "note"
+        }
+      ],
+      "edges": [
+        {
+          "from": "20260816-200548",
+          "to": "20260816-163440"
+        }
+      ]
+    }
+  },
+  {
     "slug": "20260816-163440",
+    "postType": "text",
     "title": "test",
+    "displayTitle": "test",
     "date": "2026-08-16",
     "summary": "これはテスト投稿でございます",
     "cardExcerpt": "これはテスト投稿でございます",
     "cardSize": "s",
+    "cardSizeMode": "s",
     "tags": [
       "未分類"
     ],
@@ -18,16 +71,33 @@
     "path": "notes/20260816-163440.html",
     "outgoing": [],
     "incoming": [],
-    "related": [],
+    "related": [
+      {
+        "slug": "20260816-200548",
+        "title": "はじめに",
+        "href": "20260816-200548.html",
+        "shared": 1
+      }
+    ],
     "graph": {
       "nodes": [
         {
           "slug": "20260816-163440",
           "title": "test",
           "kind": "current"
+        },
+        {
+          "slug": "20260816-200548",
+          "title": "はじめに",
+          "kind": "note"
         }
       ],
-      "edges": []
+      "edges": [
+        {
+          "from": "20260816-163440",
+          "to": "20260816-200548"
+        }
+      ]
     }
   }
 ];

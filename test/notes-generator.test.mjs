@@ -393,6 +393,87 @@ tags: [思考]
   assert.match(html, /LOCAL GRAPH/);
 });
 
+test('未指定カードサイズを内容別に決め、明示指定を優先する', async t => {
+  const root = await makeSite({
+    'text-only.md': `---
+title: 小さなテキスト
+date: 2026-08-16
+---
+
+本文だけの記事です。
+`,
+    'text-image.md': `---
+title: 画像入りテキスト
+date: 2026-08-16
+---
+
+![掲載写真](/assets/images/notes/text.jpg)
+
+写真を含む本文です。
+`,
+    'photo-only.md': `---
+post_type: photo
+date: 2026-08-16
+photo: /assets/images/notes/photo.jpg
+---
+`,
+    'photo-small.md': `---
+post_type: photo
+date: 2026-08-16
+photo: /assets/images/notes/photo.jpg
+card_size: s
+---
+`
+  }, {
+    'assets/images/notes/text.jpg': Buffer.from([0xff, 0xd8, 0xff, 0xd9]),
+    'assets/images/notes/photo.jpg': Buffer.from([0xff, 0xd8, 0xff, 0xd9])
+  });
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+  const result = await runGenerator(root);
+  assert.equal(result.code, 0, result.stderr);
+  const posts = JSON.parse(await fs.readFile(path.join(root, 'notes', 'posts.json'), 'utf8'));
+  const bySlug = Object.fromEntries(posts.map(post => [post.slug, post]));
+  assert.equal(bySlug['text-only'].cardSize, 's');
+  assert.equal(bySlug['text-image'].cardSize, 'm');
+  assert.equal(bySlug['photo-only'].cardSize, 'l');
+  assert.equal(bySlug['photo-only'].postType, 'photo');
+  assert.equal(bySlug['photo-small'].cardSize, 's');
+  assert.equal(bySlug['photo-small'].cardSizeMode, 's');
+});
+
+test('写真単体はタイトルと本文なしで公開し専用詳細を生成する', async t => {
+  const root = await makeSite({
+    'single-photo.md': `---
+post_type: photo
+date: 2026-08-16
+photo: /assets/images/notes/photo.jpg
+---
+`
+  }, { 'assets/images/notes/photo.jpg': Buffer.from([0xff, 0xd8, 0xff, 0xd9]) });
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+  const result = await runGenerator(root);
+  assert.equal(result.code, 0, result.stderr);
+  const html = await fs.readFile(path.join(root, 'notes', 'single-photo.html'), 'utf8');
+  assert.match(html, /class="photo-page"/);
+  assert.match(html, /class="photo-detail"/);
+  assert.match(html, /data-post-type="photo"/);
+  assert.doesNotMatch(html, /LOCAL GRAPH/);
+});
+
+test('写真投稿で画像がない場合は公開を拒否する', async t => {
+  const root = await makeSite({
+    'photo-missing.md': `---
+post_type: photo
+date: 2026-08-16
+---
+`
+  });
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+  const result = await runGenerator(root, '--check');
+  assert.notEqual(result.code, 0);
+  assert.match(result.stderr, /写真投稿では photo は必須/);
+});
+
 test('不正なカードサイズを拒否する', async t => {
   const root = await makeSite({
     'bad-card.md': `---
@@ -407,5 +488,17 @@ card_size: huge
   t.after(() => fs.rm(root, { recursive: true, force: true }));
   const result = await runGenerator(root, '--check');
   assert.notEqual(result.code, 0);
-  assert.match(result.stderr, /card_size は s、m、l/);
+  assert.match(result.stderr, /card_size は auto、s、m、l/);
+});
+
+test('Notes一覧は投稿タイプ別表示と4列基準の自動レイアウトを持つ', async () => {
+  const source = await fs.readFile(path.join(sourceRoot, 'notes', 'index.html'), 'utf8');
+  assert.match(source, /data-type="\$\{type\}"/);
+  assert.match(source, /const span=\{s:3,m:3,l:6\}/);
+  assert.match(source, /post\.postType==='photo'/);
+  assert.match(source, /post-card\[data-type="photo"\]/);
+  assert.match(source, /gap:clamp\(18px,1\.8vw,26px\)/);
+  assert.match(source, /\.post-card>a:focus-visible\{outline:1px solid var\(--red\)/);
+  assert.doesNotMatch(source, /\.post-card\{[^}]*border-top:/);
+  assert.doesNotMatch(source, /\.card-media\{[^}]*border:/);
 });
