@@ -88,6 +88,15 @@ function escapeRegExp(str) {
   return str.replace(/[\^$.*+?()[\]{}|]/g, '\\$&');
 }
 
+function readFrontmatterValue(source, name) {
+  const block = source.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/);
+  if (!block) return undefined;
+  const key = escapeRegExp(name);
+  const line = block[1].match(new RegExp(`^${key}:\\s*(?:"([^"]*)"|'([^']*)'|([^\\s#]+))\\s*(?:#.*)?$`, 'm'));
+  if (!line) return undefined;
+  return line.slice(1).find(value => value !== undefined);
+}
+
 async function ensureTemplate() {
   try {
     await fs.access(templatePath);
@@ -112,7 +121,7 @@ function sortPosts(posts) {
 
 function validateSlug(slug) {
   if (!slug) throw new Error('slug が指定されていません。');
-  if (!/^[a-z0-9-]+$/.test(slug)) {
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
     throw new Error('slug は英小文字・数字・ハイフンのみで指定してください。');
   }
 }
@@ -121,13 +130,35 @@ function validateDate(value) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
     throw new Error('date は YYYY-MM-DD 形式で指定してください。');
   }
-  const time = Date.parse(value + 'T00:00:00Z');
-  if (Number.isNaN(time)) {
+  const [year, month, day] = value.split('-').map(Number);
+  const parsed = new Date(Date.UTC(year, month - 1, day));
+  if (
+    Number.isNaN(parsed.getTime()) ||
+    parsed.getUTCFullYear() !== year ||
+    parsed.getUTCMonth() !== month - 1 ||
+    parsed.getUTCDate() !== day
+  ) {
     throw new Error('date の値を解釈できませんでした。');
   }
 }
 
-function validatePost({ slug, data, markdownBody, file }) {
+function imageMeta(image) {
+  if (!image) return '';
+  const absolute = /^https?:\/\//i.test(image)
+    ? image
+    : `https://synomare.github.io${image.startsWith('/') ? image : `/${image}`}`;
+  const content = escapeHtml(absolute);
+  return `<meta property="og:image" content="${content}">\n  <meta name="twitter:image" content="${content}">`;
+}
+
+function validateDraft(value, file) {
+  if (value !== undefined && typeof value !== 'boolean') {
+    throw new Error(`${file}: draft は true または false で指定してください。`);
+  }
+  return value === true;
+}
+
+function validatePost({ slug, data, markdownBody, rawDate, file }) {
   validateSlug(slug);
 
   if (typeof data.title !== 'string' || !data.title.trim()) {
@@ -136,26 +167,33 @@ function validatePost({ slug, data, markdownBody, file }) {
   if (typeof data.date !== 'string' && !(data.date instanceof Date)) {
     throw new Error(`${file}: date は必須です。`);
   }
-  const date = data.date instanceof Date
+  const date = rawDate || (data.date instanceof Date
     ? data.date.toISOString().slice(0, 10)
-    : String(data.date);
+    : String(data.date));
   validateDate(date);
 
   if (typeof data.summary !== 'string' || !data.summary.trim()) {
     throw new Error(`${file}: summary は必須です。`);
   }
-  if (!Array.isArray(data.tags) || data.tags.some(tag => typeof tag !== 'string' || !tag.trim())) {
-    throw new Error(`${file}: tags は文字列の配列で指定してください。`);
+  if (
+    !Array.isArray(data.tags) ||
+    data.tags.length < 1 ||
+    data.tags.length > 20 ||
+    data.tags.some(tag => typeof tag !== 'string' || !tag.trim())
+  ) {
+    throw new Error(`${file}: tags は1〜20個の文字列の配列で指定してください。`);
   }
   if (typeof markdownBody !== 'string' || !markdownBody.trim()) {
     throw new Error(`${file}: 本文は必須です。`);
   }
+  const draft = validateDraft(data.draft, file);
 
   return {
     title: data.title.trim(),
     date,
     summary: data.summary.trim(),
-    tags: data.tags.map(tag => tag.trim())
+    tags: data.tags.map(tag => tag.trim()),
+    draft
   };
 }
 
@@ -208,13 +246,15 @@ async function removeDeletedPostHtml(previousSlugs, currentSlugs) {
   }
 }
 
-async function writeHtml({ slug, title, date, summary, contentHtml }) {
+async function writeHtml({ slug, title, date, summary, image, contentHtml }) {
   const tpl = await fs.readFile(templatePath, 'utf8');
   const replacements = new Map([
     ['{{TITLE}}', escapeHtml(title)],
     ['{{DATE}}', escapeHtml(date)],
     ['{{SUMMARY}}', escapeHtml(summary)],
     ['{{SLUG}}', escapeHtml(slug)],
+    ['{{TWITTER_CARD}}', image ? 'summary_large_image' : 'summary'],
+    ['{{IMAGE_META}}', imageMeta(image)],
     ['{{CONTENT}}', contentHtml]
   ]);
   let html = tpl;
@@ -227,12 +267,13 @@ async function writeHtml({ slug, title, date, summary, contentHtml }) {
   return targetPath;
 }
 
-async function createPost({ slug, title, date, summary, tags }) {
+async function createPost({ slug, title, date, summary, tags, draft }) {
   const frontmatter = {
     title,
     date,
     summary,
-    tags
+    tags,
+    draft
   };
   const fileContent = matter.stringify('\n<!-- ここに本文を書いてください -->\n', frontmatter);
   const targetPath = path.join(contentDir, `${slug}.md`);
@@ -298,10 +339,11 @@ async function readPosts() {
     const { data, content: markdownBody } = matter(content);
 
     const slug = path.basename(file, '.md');
-    const { title, date, summary, tags } = validatePost({
+    const { title, date, summary, tags, draft } = validatePost({
       slug,
       data,
       markdownBody,
+      rawDate: readFrontmatterValue(content, 'date'),
       file: path.relative(repoRoot, filePath)
     });
 
@@ -316,7 +358,7 @@ async function readPosts() {
 
     const contentHtml = marked.parser(tokens);
 
-    posts.push({ slug, title, date, summary, tags, image, contentHtml });
+    posts.push({ slug, title, date, summary, tags, draft, image, contentHtml });
   }
 
   return sortPosts(posts);
@@ -324,27 +366,30 @@ async function readPosts() {
 
 async function checkPosts() {
   const posts = await readPosts();
-  console.log(`Notes の検証に成功しました（記事数: ${posts.length}）。`);
+  const published = posts.filter(post => !post.draft).length;
+  console.log(`Notes の検証に成功しました（全${posts.length}件 / 公開${published}件 / 下書き${posts.length - published}件）。`);
 }
 
 async function rebuildPosts() {
   const previousSlugs = await readPreviouslyGeneratedSlugs();
   const posts = await readPosts();
+  const publishedPosts = posts.filter(post => !post.draft);
 
   // メタデータ保存用（HTMLを含まない）
-  const metaPosts = posts.map(({ contentHtml, ...meta }) => meta);
+  const metaPosts = publishedPosts.map(({ contentHtml, draft, ...meta }) => meta);
   await writeJson(metaPosts);
   await writePostsJs(metaPosts);
 
   // HTML生成
-  for (const post of posts) {
+  for (const post of publishedPosts) {
     await writeHtml(post);
   }
 
-  await removeDeletedPostHtml(previousSlugs, posts.map(post => post.slug));
+  await removeDeletedPostHtml(previousSlugs, publishedPosts.map(post => post.slug));
 
   console.log('\nサイトを再生成しました。');
-  console.log(`- 記事数: ${posts.length}`);
+  console.log(`- 公開記事数: ${publishedPosts.length}`);
+  console.log(`- 下書き数: ${posts.length - publishedPosts.length}`);
   console.log(`- メタデータ: ${path.relative(repoRoot, postsJsonPath)}`);
 }
 
@@ -393,7 +438,7 @@ async function rebuildPosts() {
       .filter(Boolean)
     ));
 
-    await createPost({ slug, title, date, summary, tags });
+    await createPost({ slug, title, date, summary, tags, draft: false });
 
   } catch (err) {
     logError(err.message);

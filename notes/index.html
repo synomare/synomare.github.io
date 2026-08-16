@@ -174,6 +174,31 @@
 
     .lead { margin: 0 0 1.6rem; font-size: 0.9rem; color: var(--dim); }
 
+    .filter-bar {
+      display: grid;
+      grid-template-columns: minmax(12rem, 1fr) auto auto auto;
+      gap: .55rem;
+      align-items: center;
+      margin: 0 0 2rem;
+      font-family: var(--mono);
+      font-size: .62rem;
+    }
+    .filter-bar input, .filter-bar select, .filter-bar button {
+      min-height: 2.35rem;
+      box-sizing: border-box;
+      border: 1px solid var(--ink);
+      border-radius: 0;
+      padding: .45rem .65rem;
+      color: var(--ink);
+      background: var(--card);
+      font: inherit;
+      letter-spacing: .04em;
+    }
+    .filter-bar input:focus, .filter-bar select:focus, .filter-bar button:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+    .filter-bar button { cursor: pointer; }
+    .filter-bar button:hover { color: var(--paper); background: var(--ink); }
+    .filter-count { color: var(--dim); white-space: nowrap; }
+
     .post-list {
       list-style: none; margin: 0; padding: 0;
       background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(2em - 1px), rgba(23, 20, 15, 0.045) calc(2em - 1px), rgba(23, 20, 15, 0.045) 2em);
@@ -187,6 +212,16 @@
     .post-list time { display: inline-block; color: var(--red); font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.15em; margin-right: 1em; }
     .post-list p { margin: .4rem 0 0; font-size: 0.82rem; color: var(--dim); }
     .post-meta { display: inline; }
+    .post-tags { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .55rem; }
+    .post-tag { color: var(--red); font-family: var(--mono); font-size: .58rem; letter-spacing: .08em; }
+    .post-tag::before { content: '#'; }
+    .filter-empty { padding: 1.2rem .3rem; color: var(--dim); }
+
+    @media (max-width: 700px) {
+      .filter-bar { grid-template-columns: 1fr 1fr; }
+      .filter-bar input { grid-column: 1 / -1; }
+      .filter-count { justify-self: end; }
+    }
   </style>
 </head>
 
@@ -218,6 +253,16 @@
         <span class="jp">Journal — 雑記・断章</span>
       </section>
       <p class="lead">書いたものやメモをここにまとめています。新しい記事から順に並びます。</p>
+      <form class="filter-bar" id="noteFilters" role="search" aria-label="Notesを検索">
+        <label class="sr-only" for="noteSearch">Notesを検索</label>
+        <input id="noteSearch" type="search" placeholder="タイトル・概要・タグを検索" autocomplete="off">
+        <label class="sr-only" for="noteTag">タグで絞り込む</label>
+        <select id="noteTag"><option value="">すべてのタグ</option></select>
+        <label class="sr-only" for="noteYear">年で絞り込む</label>
+        <select id="noteYear"><option value="">すべての年</option></select>
+        <button type="button" id="noteClear">クリア</button>
+        <span class="filter-count" id="noteCount" aria-live="polite"></span>
+      </form>
       <div class="sec-head"><span>Entries — 投稿一覧</span></div>
       <ul class="post-list" id="postList" aria-live="polite"></ul>
     </div>
@@ -243,14 +288,13 @@
   <script>
     (function(){
       var list=document.getElementById('postList');
+      var search=document.getElementById('noteSearch');
+      var tagFilter=document.getElementById('noteTag');
+      var yearFilter=document.getElementById('noteYear');
+      var clear=document.getElementById('noteClear');
+      var count=document.getElementById('noteCount');
       if(!list) return;
       var posts=(window.__SYNOMARE_POSTS__||[]).slice();
-      if(!posts.length){
-        var empty=document.createElement('li');
-        empty.textContent='まだ記事がありません。';
-        list.appendChild(empty);
-        return;
-      }
       posts.sort(function(a,b){
         var timeA=a&&a.date?Date.parse(a.date):NaN;
         var timeB=b&&b.date?Date.parse(b.date):NaN;
@@ -259,30 +303,96 @@
         if(isNaN(timeB)) return -1;
         return timeA<timeB?1:-1;
       });
-      posts.forEach(function(post, i){
-        var li=document.createElement('li');
-        var link=document.createElement('a');
-        link.href=post.href||post.slug+'.html';
-        var meta=document.createElement('span');
-        meta.className='post-meta';
-        var time=document.createElement('time');
-        if(post.date){ time.setAttribute('datetime',post.date); time.textContent=post.date; }
-        meta.appendChild(time);
-        link.appendChild(meta);
-        var title=document.createElement('strong');
-        title.textContent=post.title;
-        link.appendChild(title);
-        if(post.summary){
-          var summary=document.createElement('p');
-          summary.textContent=post.summary;
-          link.appendChild(summary);
-        }
-        if(post.year) li.dataset.year=post.year;
-        if(post.yearMonth) li.dataset.yearMonth=post.yearMonth;
-        if(post.tags && post.tags.length) li.dataset.tags=post.tags.join(',');
-        li.appendChild(link);
-        list.appendChild(li);
+      function addOptions(select, values){
+        values.forEach(function(value){
+          var option=document.createElement('option');
+          option.value=value;
+          option.textContent=value;
+          select.appendChild(option);
+        });
+      }
+      var tags=[];
+      var years=[];
+      posts.forEach(function(post){
+        (post.tags||[]).forEach(function(tag){ if(tags.indexOf(tag)===-1) tags.push(tag); });
+        if(post.year && years.indexOf(post.year)===-1) years.push(post.year);
       });
+      tags.sort(function(a,b){ return a.localeCompare(b,'ja'); });
+      years.sort().reverse();
+      addOptions(tagFilter,tags);
+      addOptions(yearFilter,years);
+      function readParams(){
+        var params=new URLSearchParams(window.location.search);
+        search.value=params.get('q')||'';
+        tagFilter.value=params.get('tag')||'';
+        yearFilter.value=params.get('year')||'';
+      }
+      function writeParams(){
+        var params=new URLSearchParams();
+        if(search.value.trim()) params.set('q',search.value.trim());
+        if(tagFilter.value) params.set('tag',tagFilter.value);
+        if(yearFilter.value) params.set('year',yearFilter.value);
+        var query=params.toString();
+        window.history.replaceState(null,'',window.location.pathname+(query?'?'+query:''));
+      }
+      function render(){
+        var query=search.value.trim().toLocaleLowerCase('ja');
+        var tag=tagFilter.value;
+        var year=yearFilter.value;
+        list.innerHTML='';
+        var matches=posts.filter(function(post){
+          var haystack=[post.title,post.summary,(post.tags||[]).join(' ')].join(' ').toLocaleLowerCase('ja');
+          return (!query || haystack.indexOf(query)!==-1) &&
+            (!tag || (post.tags||[]).indexOf(tag)!==-1) &&
+            (!year || post.year===year);
+        });
+        if(!matches.length){
+          var empty=document.createElement('li');
+          empty.className='filter-empty';
+          empty.textContent=posts.length?'条件に一致する記事がありません。':'まだ記事がありません。';
+          list.appendChild(empty);
+        }
+        matches.forEach(function(post){
+          var li=document.createElement('li');
+          var link=document.createElement('a');
+          link.href=post.href||post.slug+'.html';
+          var meta=document.createElement('span');
+          meta.className='post-meta';
+          var time=document.createElement('time');
+          if(post.date){ time.setAttribute('datetime',post.date); time.textContent=post.date; }
+          meta.appendChild(time);
+          link.appendChild(meta);
+          var title=document.createElement('strong');
+          title.textContent=post.title;
+          link.appendChild(title);
+          if(post.summary){
+            var summary=document.createElement('p');
+            summary.textContent=post.summary;
+            link.appendChild(summary);
+          }
+          if(post.tags && post.tags.length){
+            var tagsEl=document.createElement('span');
+            tagsEl.className='post-tags';
+            post.tags.forEach(function(value){
+              var tagEl=document.createElement('span');
+              tagEl.className='post-tag';
+              tagEl.textContent=value;
+              tagsEl.appendChild(tagEl);
+            });
+            link.appendChild(tagsEl);
+          }
+          li.appendChild(link);
+          list.appendChild(li);
+        });
+        count.textContent=matches.length+' / '+posts.length+' entries';
+        writeParams();
+      }
+      readParams();
+      render();
+      search.addEventListener('input',render);
+      tagFilter.addEventListener('change',render);
+      yearFilter.addEventListener('change',render);
+      clear.addEventListener('click',function(){ search.value=''; tagFilter.value=''; yearFilter.value=''; render(); search.focus(); });
     })();
   </script>
 </body>

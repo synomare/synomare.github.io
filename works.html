@@ -195,6 +195,33 @@
     }
     .register .sec-head { margin-bottom: 0; }
 
+    .work-filters {
+      display: grid;
+      grid-template-columns: minmax(12rem, 1fr) auto auto auto;
+      gap: .55rem;
+      align-items: center;
+      padding: 1rem .3rem .35rem;
+      font-family: var(--mono);
+      font-size: .62rem;
+    }
+    .work-filters input, .work-filters select, .work-filters button {
+      min-height: 2.35rem;
+      box-sizing: border-box;
+      border: 1px solid var(--ink);
+      border-radius: 0;
+      padding: .45rem .65rem;
+      color: var(--ink);
+      background: var(--card);
+      font: inherit;
+      letter-spacing: .04em;
+    }
+    .work-filters input:focus, .work-filters select:focus, .work-filters button:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+    .work-filters button { cursor: pointer; }
+    .work-filters button:hover { color: var(--paper); background: var(--ink); }
+    .work-count { color: var(--dim); white-space: nowrap; }
+    .work-row[hidden] { display: none; }
+    .work-list { min-height: 3rem; }
+
     .work-row {
       display: grid;
       grid-template-columns: 8em 1fr auto;
@@ -223,6 +250,9 @@
     .works-empty { margin: 1.6rem 0; color: var(--dim); }
 
     @media (max-width: 700px) {
+      .work-filters { grid-template-columns: 1fr 1fr; }
+      .work-filters input { grid-column: 1 / -1; }
+      .work-count { justify-self: end; }
       .work-row, .work-row.has-image { grid-template-columns: 1fr; gap: 0.6em; }
       .w-thumb { width: min(100%, 24rem); }
       .w-type { justify-self: start; }
@@ -271,9 +301,19 @@
 
     <section class="register" aria-label="作品一覧">
       <div class="sec-head"><span>Registered Works — 収蔵一覧</span></div>
-
+      <form class="work-filters" id="workFilters" role="search" aria-label="Worksを検索">
+        <label class="sr-only" for="workSearch">Worksを検索</label>
+        <input id="workSearch" type="search" placeholder="作品名・説明・種別を検索" autocomplete="off">
+        <label class="sr-only" for="workType">種別で絞り込む</label>
+        <select id="workType"><option value="">すべての種別</option></select>
+        <label class="sr-only" for="workYear">年で絞り込む</label>
+        <select id="workYear"><option value="">すべての年</option></select>
+        <button type="button" id="workClear">クリア</button>
+        <span class="work-count" id="workCount" aria-live="polite"></span>
+      </form>
+      <div class="work-list" id="workList" aria-live="polite">
       <!-- WORKS:START -->
-      <a class="work-row" href="/yugun/">
+      <a class="work-row" href="/yugun/" data-search="嶼群（博物館（たち）） 博物館を舞台にした、土地と記憶をめぐる戯曲。テキスト全文、座談会、対談を収録。 演劇 / theatre" data-type="演劇 / Theatre" data-year="2025">
         <span class="w-no">2025</span>
         <span class="w-main">
           <span class="w-title">嶼群（博物館（たち））</span>
@@ -282,6 +322,8 @@
         <span class="w-type">演劇 / Theatre</span>
       </a>
       <!-- WORKS:END -->
+      </div>
+      <p class="works-empty" id="workNoResults" hidden>条件に一致する作品がありません。</p>
     </section>
 
     <p class="more">その他の制作物 — <a href="https://www.instagram.com/syno_mare/?utm_source=qr" target="_blank" rel="noopener">INSTAGRAM</a></p>
@@ -301,6 +343,68 @@
       }
       var y = document.getElementById('year');
       if (y) y.textContent = new Date().getFullYear();
+    })();
+  </script>
+  <script>
+    (function(){
+      var list=document.getElementById('workList');
+      var search=document.getElementById('workSearch');
+      var typeFilter=document.getElementById('workType');
+      var yearFilter=document.getElementById('workYear');
+      var clear=document.getElementById('workClear');
+      var count=document.getElementById('workCount');
+      var noResults=document.getElementById('workNoResults');
+      if(!list || !search || !typeFilter || !yearFilter) return;
+      var rows=Array.prototype.slice.call(list.querySelectorAll('.work-row'));
+      function uniqueValues(attribute){
+        var values=[];
+        rows.forEach(function(row){ var value=row.getAttribute(attribute); if(value && values.indexOf(value)===-1) values.push(value); });
+        return values;
+      }
+      function addOptions(select, values){
+        values.forEach(function(value){ var option=document.createElement('option'); option.value=value; option.textContent=value; select.appendChild(option); });
+      }
+      var types=uniqueValues('data-type').sort(function(a,b){ return a.localeCompare(b,'ja'); });
+      var years=uniqueValues('data-year').sort().reverse();
+      addOptions(typeFilter,types);
+      addOptions(yearFilter,years);
+      function readParams(){
+        var params=new URLSearchParams(window.location.search);
+        search.value=params.get('q')||'';
+        typeFilter.value=params.get('type')||'';
+        yearFilter.value=params.get('year')||'';
+      }
+      function writeParams(){
+        var params=new URLSearchParams();
+        if(search.value.trim()) params.set('q',search.value.trim());
+        if(typeFilter.value) params.set('type',typeFilter.value);
+        if(yearFilter.value) params.set('year',yearFilter.value);
+        var query=params.toString();
+        window.history.replaceState(null,'',window.location.pathname+(query?'?'+query:''));
+      }
+      function render(){
+        var query=search.value.trim().toLocaleLowerCase('ja');
+        var type=typeFilter.value;
+        var year=yearFilter.value;
+        var visible=0;
+        rows.forEach(function(row){
+          var haystack=(row.getAttribute('data-search')||'').toLocaleLowerCase('ja');
+          var match=(!query || haystack.indexOf(query)!==-1) &&
+            (!type || row.getAttribute('data-type')===type) &&
+            (!year || row.getAttribute('data-year')===year);
+          row.hidden=!match;
+          if(match) visible++;
+        });
+        noResults.hidden=visible!==0 || rows.length===0;
+        count.textContent=visible+' / '+rows.length+' works';
+        writeParams();
+      }
+      readParams();
+      render();
+      search.addEventListener('input',render);
+      typeFilter.addEventListener('change',render);
+      yearFilter.addEventListener('change',render);
+      clear.addEventListener('click',function(){ search.value=''; typeFilter.value=''; yearFilter.value=''; render(); search.focus(); });
     })();
   </script>
 </body>

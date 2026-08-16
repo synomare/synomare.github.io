@@ -28,7 +28,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Test Notes generator
+      - name: Test content generators
         run: npm test
 
       - name: Generate site content

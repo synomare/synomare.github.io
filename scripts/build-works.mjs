@@ -54,6 +54,22 @@ function validateUrl(value, file) {
   return url;
 }
 
+function validateImage(value, file) {
+  const image = optionalString(value, 'image', file);
+  if (!image) return '';
+  if (!/^(?:https:\/\/|\/|\.\/|\.\.\/)/.test(image)) {
+    throw new Error(`${file}: image は / から始まるサイト内パスか https:// URLで指定してください。`);
+  }
+  return image;
+}
+
+function validateDraft(value, file) {
+  if (value !== undefined && typeof value !== 'boolean') {
+    throw new Error(`${file}: draft は true または false で指定してください。`);
+  }
+  return value === true;
+}
+
 function normalizeWork(slug, data, file) {
   validateSlug(slug, file);
   const title = requiredString(data.title, 'title', file);
@@ -64,10 +80,11 @@ function normalizeWork(slug, data, file) {
   const summary = requiredString(data.summary, 'summary', file);
   const type = requiredString(data.type, 'type', file);
   const url = validateUrl(data.url, file);
-  const image = optionalString(data.image, 'image', file);
+  const image = validateImage(data.image, file);
   const priority = data.priority == null || data.priority === '' ? 0 : Number(data.priority);
   if (!Number.isInteger(priority)) throw new Error(`${file}: priority は整数で指定してください。`);
-  return { slug, title, year, summary, type, url, image, priority };
+  const draft = validateDraft(data.draft, file);
+  return { slug, title, year, summary, type, url, image, priority, draft };
 }
 
 function sortWorks(works) {
@@ -101,7 +118,8 @@ function renderWork(work) {
   const image = work.image
     ? `\n        <span class="w-thumb"><img src="${escapeHtml(work.image)}" alt="${escapeHtml(work.title)}" loading="lazy" decoding="async"></span>`
     : '';
-  return `      <${tag} class="work-row${work.image ? ' has-image' : ''}"${attributes}>
+  const search = `${work.title} ${work.summary} ${work.type}`.toLocaleLowerCase('ja');
+  return `      <${tag} class="work-row${work.image ? ' has-image' : ''}"${attributes} data-search="${escapeHtml(search)}" data-type="${escapeHtml(work.type)}" data-year="${escapeHtml(work.year)}">
         <span class="w-no">${escapeHtml(work.year)}</span>${image}
         <span class="w-main">
           <span class="w-title">${escapeHtml(work.title)}</span>
@@ -118,27 +136,30 @@ async function writeWorks(works) {
   if (start === -1 || end === -1 || end < start) {
     throw new Error('works.html に作品一覧の生成マーカーがありません。');
   }
-  const rendered = works.length
-    ? works.map(renderWork).join('\n\n')
+  const publishedWorks = works.filter(work => !work.draft);
+  const rendered = publishedWorks.length
+    ? publishedWorks.map(renderWork).join('\n\n')
     : '      <p class="works-empty">まだ作品が登録されていません。</p>';
   const nextHtml = `${html.slice(0, start + startMarker.length)}\n${rendered}\n      ${html.slice(end)}`;
   await fs.writeFile(worksHtmlPath, nextHtml, 'utf8');
   await fs.mkdir(worksDir, { recursive: true });
-  await fs.writeFile(worksJsonPath, JSON.stringify(works, null, 2) + '\n', 'utf8');
+  await fs.writeFile(worksJsonPath, JSON.stringify(publishedWorks.map(({ draft, ...work }) => work), null, 2) + '\n', 'utf8');
 }
 
 (async () => {
   try {
     const works = await readWorks();
     if (process.argv.includes('--check')) {
-      console.log(`Works の検証に成功しました（作品数: ${works.length}）。`);
+      const published = works.filter(work => !work.draft).length;
+      console.log(`Works の検証に成功しました（全${works.length}件 / 公開${published}件 / 下書き${works.length - published}件）。`);
       return;
     }
     if (!process.argv.includes('--rebuild')) {
       throw new Error('--rebuild または --check を指定してください。');
     }
     await writeWorks(works);
-    console.log(`Works を再生成しました（作品数: ${works.length}）。`);
+    const published = works.filter(work => !work.draft).length;
+    console.log(`Works を再生成しました（公開${published}件 / 下書き${works.length - published}件）。`);
   } catch (error) {
     console.error(`\n\x1b[31mError:\x1b[0m ${error.message}\n`);
     process.exit(1);

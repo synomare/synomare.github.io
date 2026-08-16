@@ -4,6 +4,12 @@ backend:
   branch: main
   base_url: https://synomare-notes-oauth.decap-oauth.workers.dev
   auth_endpoint: /auth
+  commit_messages:
+    create: "content: create {{collection}} {{slug}}"
+    update: "content: update {{collection}} {{slug}}"
+    delete: "content: delete {{collection}} {{slug}}"
+    uploadMedia: "assets: upload {{path}}"
+    deleteMedia: "assets: delete {{path}}"
 
 site_url: https://synomare.github.io
 display_url: https://synomare.github.io
@@ -67,6 +73,11 @@ collections:
         name: body
         widget: markdown
         required: true
+      - label: 公開設定
+        name: draft
+        widget: boolean
+        default: false
+        hint: オンの間は保存されますが、公開ページには表示されません。
 
   - name: works
     label: Works
@@ -115,6 +126,9 @@ collections:
         required: false
         media_folder: /assets/images/works
         public_folder: /assets/images/works
+        media_library:
+          config:
+            max_file_size: 10485760
         hint: 未入力なら現在と同じテキスト行として表示します。
       - label: 表示優先度
         name: priority
@@ -123,3 +137,8 @@ collections:
         default: 0
         value_type: int
         hint: 数字が大きい作品ほど上に表示します。同じ場合は制作年の新しい順です。
+      - label: 公開設定
+        name: draft
+        widget: boolean
+        default: false
+        hint: オンの間はWorks一覧に表示されません。

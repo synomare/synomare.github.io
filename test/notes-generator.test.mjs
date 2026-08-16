@@ -79,6 +79,8 @@ tags:
   assert.match(html, /youtube\.com\/embed\/dQw4w9WgXcQ/);
   assert.match(html, /twitter-tweet/);
   assert.match(html, /<h1>本文<\/h1>/);
+  assert.match(html, /og:image/);
+  assert.match(html, /twitter:card" content="summary_large_image/);
 });
 
 test('不正なslugを拒否する', async t => {
@@ -98,6 +100,63 @@ tags: [test]
   const result = await runGenerator(root, '--check');
   assert.notEqual(result.code, 0);
   assert.match(result.stderr, /slug は英小文字/);
+});
+
+test('slugの先頭末尾ハイフンを拒否する', async t => {
+  const root = await makeSite({
+    '-bad-slug-.md': `---
+title: 不正slug
+date: 2026-08-15
+summary: 概要です。
+tags: [test]
+---
+
+本文です。
+`
+  });
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+
+  const result = await runGenerator(root, '--check');
+  assert.notEqual(result.code, 0);
+  assert.match(result.stderr, /slug は英小文字/);
+});
+
+test('存在しない日付を拒否する', async t => {
+  const root = await makeSite({
+    'invalid-date.md': `---
+title: 不正日付
+date: 2026-02-30
+summary: 概要です。
+tags: [test]
+---
+
+本文です。
+`
+  });
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+
+  const result = await runGenerator(root, '--check');
+  assert.notEqual(result.code, 0);
+  assert.match(result.stderr, /date の値を解釈/);
+});
+
+test('空のタグ配列を拒否する', async t => {
+  const root = await makeSite({
+    'no-tags.md': `---
+title: タグなし
+date: 2026-08-15
+summary: 概要です。
+tags: []
+---
+
+本文です。
+`
+  });
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+
+  const result = await runGenerator(root, '--check');
+  assert.notEqual(result.code, 0);
+  assert.match(result.stderr, /tags は1〜20個/);
 });
 
 test('必須メタデータ不足を拒否する', async t => {
@@ -160,6 +219,28 @@ tags: [test]
   const second = await runGenerator(root);
   assert.equal(second.code, 0, second.stderr);
   await assert.rejects(fs.access(generatedPath), error => error.code === 'ENOENT');
+  const posts = JSON.parse(await fs.readFile(path.join(root, 'notes', 'posts.json'), 'utf8'));
+  assert.deepEqual(posts, []);
+});
+
+test('下書き記事は検証されるが公開一覧とHTMLには出さない', async t => {
+  const root = await makeSite({
+    'draft-post.md': `---
+title: 下書き記事
+date: 2026-08-15
+summary: 下書き確認用です。
+tags: [draft]
+draft: true
+---
+
+本文です。
+`
+  });
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+
+  const result = await runGenerator(root);
+  assert.equal(result.code, 0, result.stderr);
+  await assert.rejects(fs.access(path.join(root, 'notes', 'draft-post.html')), error => error.code === 'ENOENT');
   const posts = JSON.parse(await fs.readFile(path.join(root, 'notes', 'posts.json'), 'utf8'));
   assert.deepEqual(posts, []);
 });

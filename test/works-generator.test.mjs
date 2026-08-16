@@ -82,6 +82,26 @@ type: Text
   assert.match(html, /まだ作品が登録されていません/);
 });
 
+test('下書き作品は一覧とJSONに出さない', async t => {
+  const root = await makeSite({
+    'draft-work.md': `---
+title: 下書き作品
+year: "2026"
+summary: 下書き確認用です。
+type: Text
+draft: true
+---
+`
+  });
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+  const result = await runGenerator(root);
+  assert.equal(result.code, 0, result.stderr);
+  const html = await fs.readFile(path.join(root, 'works.html'), 'utf8');
+  assert.doesNotMatch(html, /下書き作品/);
+  const works = JSON.parse(await fs.readFile(path.join(root, 'works', 'works.json'), 'utf8'));
+  assert.deepEqual(works, []);
+});
+
 test('不正な作品slugを拒否する', async t => {
   const root = await makeSite({
     'Bad_Work.md': `---
@@ -96,4 +116,21 @@ type: Text
   const result = await runGenerator(root, '--check');
   assert.notEqual(result.code, 0);
   assert.match(result.stderr, /slug は英小文字/);
+});
+
+test('危険な作品画像URLを拒否する', async t => {
+  const root = await makeSite({
+    'bad-image.md': `---
+title: 不正画像
+year: "2025"
+summary: 概要です。
+type: Text
+image: javascript:alert(1)
+---
+`
+  });
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+  const result = await runGenerator(root, '--check');
+  assert.notEqual(result.code, 0);
+  assert.match(result.stderr, /image は \/ から始まる/);
 });
