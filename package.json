@@ -25,6 +25,8 @@
     "@codemirror/state": "^6.5.2",
     "@codemirror/view": "^6.36.5",
     "gray-matter": "^4.0.3",
+    "heic-convert": "^2.1.0",
+    "heic2any": "^0.0.4",
     "marked": "^17.0.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",

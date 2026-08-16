@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import matter from 'gray-matter';
+import convertHeic from 'heic-convert';
 import { marked } from 'marked';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -12,8 +14,11 @@ const contentDir = path.join(notesDir, 'content');
 const postsJsonPath = path.join(notesDir, 'posts.json');
 const postsJsPath = path.join(notesDir, 'posts.js');
 const templatePath = path.join(notesDir, 'post-template.html');
+const generatedImageDir = path.join(repoRoot, 'assets', 'images', 'notes', 'generated');
 const WIKILINK_RE = /\[\[([^\]|]+?)(?:\|([^\]]+?))?\]\]/g;
 const CARD_SIZES = new Set(['s', 'm', 'l']);
+const WEB_IMAGE_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.gif', '.webp', '.avif', '.bmp', '.svg']);
+const HEIC_EXTENSIONS = new Set(['.heic', '.heif']);
 
 function logError(message) { console.error(`\n\x1b[31mError:\x1b[0m ${message}\n`); }
 function escapeHtml(value = '') { return String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]); }
@@ -109,9 +114,55 @@ function transformEmbeds(tokens) {
     else if (twitter) { token.type = 'html'; token.text = `<blockquote class="twitter-tweet"><a href="${escapeHtml(href)}"></a></blockquote>`; }
   }
 }
+function encodePublicPath(value) {
+  return value.split('/').map((part, index) => index === 0 ? '' : encodeURIComponent(part)).join('/');
+}
+function resolveLocalImage(href, sourceFile) {
+  const value = String(href || '').trim();
+  if (/^(?:https?:)?\/\//i.test(value)) return null;
+  if (/^(?:data|blob|javascript):/i.test(value)) throw new Error(`${sourceFile}: 埋め込みデータURLやblob URLは画像に使用できません。画像ファイルをアップロードしてください。`);
+  const clean = value.split(/[?#]/, 1)[0];
+  let decoded;
+  try { decoded = decodeURIComponent(clean); } catch { throw new Error(`${sourceFile}: 画像URLの文字エンコードが壊れています: ${value}`); }
+  const publicPath = decoded.startsWith('/') ? path.posix.normalize(decoded)
+    : decoded.startsWith('assets/') ? `/${path.posix.normalize(decoded)}`
+      : path.posix.normalize(`/notes/${decoded}`);
+  const filePath = path.resolve(repoRoot, `.${publicPath}`);
+  const relative = path.relative(repoRoot, filePath);
+  if (relative.startsWith('..') || path.isAbsolute(relative)) throw new Error(`${sourceFile}: サイト外の画像パスは使用できません: ${value}`);
+  return { filePath, publicPath };
+}
+async function prepareImageHref(href, { sourceFile, writeAssets }) {
+  const local = resolveLocalImage(href, sourceFile);
+  if (!local) return href;
+  try { await fs.access(local.filePath); } catch { throw new Error(`${sourceFile}: 画像ファイルが見つかりません: ${local.publicPath}`); }
+  const extension = path.extname(local.filePath).toLowerCase();
+  if (WEB_IMAGE_EXTENSIONS.has(extension)) return encodePublicPath(local.publicPath);
+  if (!HEIC_EXTENSIONS.has(extension)) throw new Error(`${sourceFile}: ${extension || '拡張子なし'}画像はWeb表示に対応していません。JPEG・PNG・WebP・GIF・AVIF・BMP・SVG・HEICを使用してください。`);
+
+  const input = await fs.readFile(local.filePath);
+  let output;
+  try { output = await convertHeic({ buffer: input, format: 'JPEG', quality: 0.88 }); }
+  catch { throw new Error(`${sourceFile}: HEIC画像をJPEGへ変換できませんでした: ${local.publicPath}`); }
+  const hash = createHash('sha256').update(input).digest('hex').slice(0, 12);
+  const filename = path.basename(local.filePath);
+  const basename = filename.slice(0, -path.extname(filename).length).replace(/[^a-z0-9_-]+/gi, '-').replace(/^-+|-+$/g, '') || 'image';
+  const outputName = `${basename}-${hash}.jpg`;
+  if (writeAssets) {
+    await fs.mkdir(generatedImageDir, { recursive: true });
+    await fs.writeFile(path.join(generatedImageDir, outputName), output);
+  }
+  return `/assets/images/notes/generated/${outputName}`;
+}
+async function prepareImageTokens(tokens, options) {
+  for (const token of tokens) {
+    if (token.type === 'image') token.href = await prepareImageHref(token.href, options);
+    if (token.tokens) await prepareImageTokens(token.tokens, options);
+  }
+}
 function findThumbnail(tokens) { for (const token of tokens) { if (token.type === 'image') return token.href; if (token.tokens) { const image = findThumbnail(token.tokens); if (image) return image; } } return ''; }
 function imageMeta(image) {
-  if (!image) return ''; const absolute = /^https?:\/\//i.test(image) ? image : `https://synomare.github.io${image.startsWith('/') ? image : `/${image}`}`;
+  if (!image) return ''; const absolute = image.startsWith('//') ? `https:${image}` : /^https?:\/\//i.test(image) ? image : `https://synomare.github.io${image.startsWith('/') ? image : `/${image}`}`;
   return `<meta property="og:image" content="${escapeHtml(absolute)}">\n  <meta name="twitter:image" content="${escapeHtml(absolute)}">`;
 }
 function relationList(title, items, emptyText, className) {
@@ -126,7 +177,7 @@ function graphFor(post) {
 function relationsHtml(post) {
   return `<aside class="entry-side" aria-label="記事のつながり"><div class="graph-panel"><div class="side-label">LOCAL GRAPH</div><div class="mini-graph" data-graph="${escapeHtml(JSON.stringify(post.graph))}"></div></div></aside><div class="relations">${relationList('Links — この記事から', post.outgoing, 'この記事からのリンクはまだありません。', 'outgoing')}${relationList('Backlinks — この記事へ', post.incoming, 'この記事へのリンクはまだありません。', 'incoming')}${relationList('Related — 関連記事', post.related, '関連する記事はまだありません。', 'related')}</div>`;
 }
-async function readPosts() {
+async function readPosts({ writeAssets = false } = {}) {
   const files = (await fs.readdir(contentDir)).filter(file => file.endsWith('.md')); const rawPosts = [];
   for (const file of files) {
     const filePath = path.join(contentDir, file); const source = await fs.readFile(filePath, 'utf8'); const { data, content: markdownBody } = matter(source); const slug = path.basename(file, '.md');
@@ -138,7 +189,9 @@ async function readPosts() {
     post.incoming = published.flatMap(source => source.outgoing.filter(link => link.slug === post.slug).map(link => ({ slug: source.slug, title: source.title, href: `${source.slug}.html`, context: link.context })));
     post.related = published.filter(other => other.slug !== post.slug).map(other => ({ slug: other.slug, title: other.title, href: `${other.slug}.html`, shared: other.tags.filter(tag => post.tags.includes(tag)).length }))
       .filter(item => item.shared > 0).sort((a, b) => b.shared - a.shared || published.findIndex(post => post.slug === a.slug) - published.findIndex(post => post.slug === b.slug)).slice(0, 6);
-    const tokens = marked.lexer(replaceWikilinks(post.markdownBody, resolver)); post.image = findThumbnail(tokens); transformEmbeds(tokens); post.contentHtml = marked.parser(tokens); post.graph = graphFor(post);
+    const tokens = marked.lexer(replaceWikilinks(post.markdownBody, resolver));
+    await prepareImageTokens(tokens, { sourceFile: `notes/content/${post.slug}.md`, writeAssets });
+    post.image = findThumbnail(tokens); transformEmbeds(tokens); post.contentHtml = marked.parser(tokens); post.graph = graphFor(post);
   }
   return { all: rawPosts, published };
 }
@@ -157,7 +210,7 @@ async function writeHtml(post) {
   await fs.writeFile(path.join(notesDir, `${post.slug}.html`), html, 'utf8');
 }
 async function rebuildPosts() {
-  const oldSlugs = await previousSlugs(); const { all, published } = await readPosts(); await writeData(published); for (const post of published) await writeHtml(post);
+  const oldSlugs = await previousSlugs(); await fs.rm(generatedImageDir, { recursive: true, force: true }); const { all, published } = await readPosts({ writeAssets: true }); await writeData(published); for (const post of published) await writeHtml(post);
   const current = new Set(published.map(post => post.slug)); for (const slug of oldSlugs) if (!current.has(slug)) await fs.rm(path.join(notesDir, `${slug}.html`), { force: true });
   console.log(`\nサイトを再生成しました。\n- 公開記事数: ${published.length}\n- 下書き数: ${all.length - published.length}\n- メタデータ: ${path.relative(repoRoot, postsJsonPath)}`);
 }

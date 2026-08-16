@@ -6,4 +6,5 @@ notes/*.html
 !notes/index.html
 !notes/post-template.html
 admin/notes/
+assets/images/notes/generated/
 build-info.json

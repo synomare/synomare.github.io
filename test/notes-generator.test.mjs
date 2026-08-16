@@ -11,12 +11,17 @@ const sourceRoot = path.resolve(testDir, '..');
 const generatorPath = path.join(sourceRoot, 'scripts', 'new-post.mjs');
 const templatePath = path.join(sourceRoot, 'notes', 'post-template.html');
 
-async function makeSite(files) {
+async function makeSite(files, assets = {}) {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'synomare-notes-'));
   await fs.mkdir(path.join(root, 'notes', 'content'), { recursive: true });
   await fs.copyFile(templatePath, path.join(root, 'notes', 'post-template.html'));
   for (const [name, content] of Object.entries(files)) {
     await fs.writeFile(path.join(root, 'notes', 'content', name), content, 'utf8');
+  }
+  for (const [name, content] of Object.entries(assets)) {
+    const target = path.join(root, name);
+    await fs.mkdir(path.dirname(target), { recursive: true });
+    await fs.writeFile(target, content);
   }
   return root;
 }
@@ -64,7 +69,7 @@ tags:
 
 本文です。
 `
-  });
+  }, { 'assets/images/notes/sample.jpg': Buffer.from([0xff, 0xd8, 0xff, 0xd9]) });
   t.after(() => fs.rm(root, { recursive: true, force: true }));
 
   const result = await runGenerator(root);
@@ -81,6 +86,59 @@ tags:
   assert.match(html, /<h1>本文<\/h1>/);
   assert.match(html, /og:image/);
   assert.match(html, /twitter:card" content="summary_large_image/);
+});
+
+test('HEIC画像を公開用JPEGへ変換し記事と一覧の参照を差し替える', async t => {
+  const sourceHeic = await fs.readFile(path.join(sourceRoot, 'assets', 'images', 'notes', '1786865741293-img_0203.heic'));
+  const root = await makeSite({
+    'heic-post.md': `---
+title: HEICの記事
+date: 2026-08-16
+tags: [写真]
+---
+
+![iPhoneの写真](/assets/images/notes/photo.HEIC)
+`
+  }, { 'assets/images/notes/photo.HEIC': sourceHeic });
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+
+  const result = await runGenerator(root);
+  assert.equal(result.code, 0, result.stderr);
+  const posts = JSON.parse(await fs.readFile(path.join(root, 'notes', 'posts.json'), 'utf8'));
+  assert.match(posts[0].image, /^\/assets\/images\/notes\/generated\/photo-[a-f0-9]{12}\.jpg$/);
+  const generated = await fs.readFile(path.join(root, posts[0].image.slice(1)));
+  assert.deepEqual([...generated.subarray(0, 3)], [0xff, 0xd8, 0xff]);
+  const html = await fs.readFile(path.join(root, 'notes', 'heic-post.html'), 'utf8');
+  assert.match(html, /generated\/photo-[a-f0-9]{12}\.jpg/);
+});
+
+test('存在しないローカル画像と非対応形式を公開前に拒否する', async t => {
+  const missingRoot = await makeSite({
+    'missing-image.md': `---
+title: 画像なし
+date: 2026-08-16
+---
+
+![見つからない](/assets/images/notes/missing.jpg)
+`
+  });
+  const unsupportedRoot = await makeSite({
+    'tiff-image.md': `---
+title: TIFF
+date: 2026-08-16
+---
+
+![TIFF](/assets/images/notes/sample.tiff)
+`
+  }, { 'assets/images/notes/sample.tiff': Buffer.from('not-a-web-image') });
+  t.after(() => Promise.all([missingRoot, unsupportedRoot].map(root => fs.rm(root, { recursive: true, force: true }))));
+
+  const missing = await runGenerator(missingRoot, '--check');
+  assert.notEqual(missing.code, 0);
+  assert.match(missing.stderr, /画像ファイルが見つかりません/);
+  const unsupported = await runGenerator(unsupportedRoot, '--check');
+  assert.notEqual(unsupported.code, 0);
+  assert.match(unsupported.stderr, /画像はWeb表示に対応していません/);
 });
 
 test('不正なslugを拒否する', async t => {

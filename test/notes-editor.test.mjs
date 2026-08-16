@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { generateSlug, parseOAuthMessage, serializeDocument } from '../notes-admin/src/lib.js';
 import { publishAtomic } from '../notes-admin/src/github.js';
+import { detectImageType, IMAGE_ACCEPT } from '../notes-admin/src/images.js';
 
 test('エディターはJSTタイムスタンプslugと自動メタデータを生成する', () => {
   const slug = generateSlug([], new Date('2026-08-16T03:34:56Z'));
@@ -58,4 +59,12 @@ test('OAuth tokenを永続ストレージへ書き込むコードを含めない
     readFile(new URL('../notes-admin/src/drafts.js', import.meta.url), 'utf8')
   ]);
   assert.doesNotMatch(sources.join('\n'), /(?:localStorage|sessionStorage)[\s\S]{0,80}token/i);
+});
+
+test('画像は拡張子やMIME表記だけに頼らずファイル内容から判別する', async () => {
+  const asFile = (bytes, name, type = '') => Object.assign(new Blob([Uint8Array.from(bytes)], { type }), { name });
+  assert.equal(await detectImageType(asFile([0xff, 0xd8, 0xff, 0x00], '写真.BIN')), 'image/jpeg');
+  assert.equal(await detectImageType(asFile([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a], 'image')), 'image/png');
+  assert.equal(await detectImageType(new Blob(['<svg xmlns="http://www.w3.org/2000/svg"></svg>'], { type: '' })), 'image/svg+xml');
+  assert.match(IMAGE_ACCEPT, /\.heic/);
 });

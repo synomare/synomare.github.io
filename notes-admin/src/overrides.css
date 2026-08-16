@@ -1,3 +1,54 @@
 .title-input { font-size: clamp(2rem, 3.2vw, 3.2rem); }
+
+.image-queue {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  padding: 12px clamp(18px, 4vw, 56px);
+  border-top: 1px solid var(--line);
+  background: var(--card);
+}
+
+.image-queue figure {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+  min-width: 0;
+  margin: 0;
+  padding: 7px;
+  border: 1px solid var(--line);
+}
+
+.image-queue img {
+  width: 58px;
+  height: 58px;
+  object-fit: cover;
+  background: var(--paper);
+}
+
+.image-preview-placeholder {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  background: repeating-linear-gradient(135deg, var(--paper), var(--paper) 7px, var(--card) 7px, var(--card) 14px);
+  color: var(--red);
+  text-align: center;
+  font: 400 .42rem/1.5 var(--mono);
+}
+
+.image-queue figcaption { min-width: 0; }
+.image-queue strong,
+.image-queue span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 400 .48rem/1.6 var(--mono);
+}
+.image-queue span { color: var(--dim); }
+.upload.is-busy { opacity: .58; cursor: progress; }
 .document-head { padding-top: clamp(20px, 3vw, 38px); }
 .editor-loading { min-height: 420px; padding: 2rem clamp(18px, 4vw, 56px); color: var(--dim); font: 400 .55rem var(--mono); letter-spacing: .1em; }

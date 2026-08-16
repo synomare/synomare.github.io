@@ -93,6 +93,7 @@ collections:
         name: body
         widget: markdown
         required: true
+        hint: JPEG・PNG・WebP・GIF・AVIF・BMP・SVG・HEICに対応します。HEICは公開ビルド時にJPEGへ変換されます。変換状況を事前確認する場合はNotes専用エディターを使用してください。
       - label: 公開設定
         name: draft
         widget: boolean
