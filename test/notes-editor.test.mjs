@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { generateSlug, newNote, parseDocument, parseOAuthMessage, serializeDocument } from '../notes-admin/src/lib.js';
-import { documentStats, outlineFromBody, preflightIssues } from '../notes-admin/src/editorTools.js';
+import { changeHeadingLevel, changeLineDepth, continueMarkdownBlock, documentStats, hierarchyDepthAt, outlineFromBody, preflightIssues } from '../notes-admin/src/editorTools.js';
 import { previewHtml } from '../notes-admin/src/preview.js';
 import { collectTags, duplicateDocument, filterDocuments } from '../notes-admin/src/articleLibrary.js';
 import { publishAtomic, publishBatch } from '../notes-admin/src/github.js';
@@ -110,6 +110,27 @@ test('本文統計と見出しアウトラインを生成する', () => {
   assert.ok(stats.characters > 10);
 });
 
+test('本文の階層をMarkdown互換のまま行単位で調整できる', () => {
+  assert.equal(changeLineDepth('- 親\n- 子', 0, 7, 1).text, '  - 親\n  - 子');
+  assert.equal(changeLineDepth('  - 子', 0, 6, -1).text, '- 子');
+  assert.equal(changeLineDepth('## 見出し', 0, 6, 1).text, '### 見出し');
+  assert.equal(changeHeadingLevel('### 見出し', 0, 6, -1).text, '## 見出し');
+  assert.equal(hierarchyDepthAt('## 見出し', 0), 1);
+  assert.equal(hierarchyDepthAt('    - 子', 5), 2);
+});
+
+test('リスト入力はEnterで同じ階層を継承し空項目で階層を抜ける', () => {
+  const calls = [];
+  const view = (text, position) => ({
+    state: { selection: { main: { from: position, to: position } }, doc: { lineAt: () => ({ from: 0, text }) } },
+    dispatch: change => calls.push(change)
+  });
+  assert.equal(continueMarkdownBlock(view('  - 項目', 6)), true);
+  assert.equal(calls.at(-1).changes.insert, '\n  - ');
+  assert.equal(continueMarkdownBlock(view('  - ', 4)), true);
+  assert.equal(calls.at(-1).changes.insert, '\n');
+});
+
 test('公開前チェックは必須項目と未解決リンクを区別する', () => {
   const note = { ...newNote([]), title: '', body: '[[まだない記事]]' };
   const issues = preflightIssues(note, [], false);
@@ -139,10 +160,15 @@ test('エディターは書式、プレビュー、貼り付け画像、コピ�
   assert.match(editor, /paste: event/);
   assert.match(editor, /drop: event/);
   assert.match(editor, /Mod-Shift-k/);
+  assert.match(editor, /key: 'Tab'/);
+  assert.match(editor, /key: 'Shift-Tab'/);
+  assert.match(editor, /continueMarkdownBlock/);
   assert.match(editor, /insertMarkdown/);
   assert.match(tools, /\['edit', 'split', 'preview'\]/);
   assert.match(tools, /toUpperCase\(\)/);
   assert.match(tools, /OUTLINE/);
+  assert.match(tools, /DEPTH −/);
+  assert.match(tools, /LEVEL \+/);
   assert.match(app, /<OperationsPanel/);
   assert.match(operations, /TAG MANAGEMENT/);
   assert.match(operations, /IMAGE LIBRARY/);

@@ -12,6 +12,9 @@
 }
 .format-tools,
 .editor-modes { display: flex; align-items: stretch; min-width: 0; }
+.format-group { display: flex; align-items: stretch; }
+.format-group + .format-group { border-left: 1px solid var(--ink); }
+.hierarchy-tools button { color: var(--red); min-width: 68px; }
 .editor-toolbar button {
   min-width: 38px;
   padding: 0 9px;

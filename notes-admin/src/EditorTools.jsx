@@ -6,16 +6,26 @@ const tools = [
   ['[ ]', 'task', 'タスクリスト'], ['` `', 'code', 'コード'], ['—', 'divider', '区切り線'], ['↶', 'undo', '元に戻す'], ['↷', 'redo', 'やり直す']
 ];
 
+const hierarchyTools = [
+  ['DEPTH −', 'outdent', '選択行を一段浅く（Shift + Tab）'],
+  ['DEPTH +', 'indent', '選択行を一段深く（Tab）'],
+  ['LEVEL −', 'headingDown', '見出しレベルを浅く'],
+  ['LEVEL +', 'headingUp', '見出しレベルを深く']
+];
+
 export function EditorToolbar({ mode, onMode, focusMode, onFocusMode, onCommand }) {
   return <div className="editor-toolbar" role="toolbar" aria-label="Markdown書式">
-    <div className="format-tools">{tools.map(([label, action, title]) => <button type="button" key={action} title={title} aria-label={title} onMouseDown={event => event.preventDefault()} onClick={() => onCommand(action)}>{label}</button>)}</div>
+    <div className="format-tools">
+      <div className="format-group hierarchy-tools" aria-label="テキスト階層">{hierarchyTools.map(([label, action, title]) => <button type="button" key={action} title={title} aria-label={title} onMouseDown={event => event.preventDefault()} onClick={() => onCommand(action)}>{label}</button>)}</div>
+      <div className="format-group">{tools.map(([label, action, title]) => <button type="button" key={action} title={title} aria-label={title} onMouseDown={event => event.preventDefault()} onClick={() => onCommand(action)}>{label}</button>)}</div>
+    </div>
     <div className="editor-modes" aria-label="表示モード">{['edit', 'split', 'preview'].map(value => <button type="button" key={value} className={mode === value ? 'active' : ''} aria-pressed={mode === value} onClick={() => onMode(value)}>{value.toUpperCase()}</button>)}<button type="button" className={focusMode ? 'active' : ''} aria-pressed={focusMode} onClick={onFocusMode}>FOCUS</button></div>
   </div>;
 }
 
-export function DocumentStatus({ body, status }) {
+export function DocumentStatus({ body, status, depth = 0 }) {
   const stats = documentStats(body);
-  return <div className="document-status"><span>{stats.characters} CHARS</span><span>{stats.minutes} MIN READ</span><span>{stats.headings} HEADINGS</span><span className="document-save-state">{status || 'READY'}</span></div>;
+  return <div className="document-status"><span>{stats.characters} CHARS</span><span>{stats.minutes} MIN READ</span><span>{stats.headings} HEADINGS</span><span>BLOCK DEPTH {depth}</span><span className="document-save-state">{status || 'READY'}</span></div>;
 }
 
 export function Outline({ note, onJump }) {
