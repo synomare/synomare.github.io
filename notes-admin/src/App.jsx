@@ -1,20 +1,25 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import MarkdownEditor from './MarkdownEditorLazy.jsx';
 import MarkdownPreview from './MarkdownPreviewLazy.jsx';
+import ArticleLibrary from './ArticleLibrary.jsx';
+import OperationsPanel from './OperationsPanel.jsx';
+import TokenEditor from './TokenEditor.jsx';
 import { deleteDraft, loadDraft, saveDraft } from './drafts.js';
-import { loadRepository, publishAtomic } from './github.js';
+import { loadRepository, publishAtomic, publishBatch } from './github.js';
 import { IMAGE_ACCEPT, prepareImageFiles } from './images.js';
 import { excerptFromBody, newNote, outgoingFromBody, parseDocument, parseOAuthMessage, serializeDocument } from './lib.js';
 import { preflightIssues } from './editorTools.js';
 import { DocumentStatus, EditorToolbar, Outline, PublishCheck } from './EditorTools.jsx';
+import { collectTags, duplicateDocument } from './articleLibrary.js';
+import { renameTagInDocuments } from './operations.js';
 
 const OAUTH_ORIGIN = 'https://synomare-notes-oauth.decap-oauth.workers.dev';
 const draftKey = note => note?.existing ? `note:${note.slug}` : 'note:new';
-const splitList = value => [...new Set(value.split(',').map(item => item.trim()).filter(Boolean))].slice(0, 20);
 const QA_PREVIEW = ['127.0.0.1', 'localhost'].includes(location.hostname) && new URLSearchParams(location.search).has('demo');
 const QA_DOCUMENTS = [
-  { slug: 'field-notes', postType: 'text', photo: '', title: '境界に置かれた言葉', date: '2026-08-16', summary: '場所と文章の距離について。', tags: ['思考', '制作'], aliases: ['フィールドノート'], cardSize: 'l', cardExcerpt: '', draft: false, body: '地図の縁に残った言葉を拾いながら、[[小さな信号]]について考える。\n\n## 境界について\n\n読むことと歩くことの間には、まだ名前のない編集がある。', existing: true },
-  { slug: 'small-signals', postType: 'text', photo: '', title: '小さな信号', date: '2026-08-15', summary: '', tags: ['思考'], aliases: [], cardSize: 'auto', cardExcerpt: '', draft: false, body: '見落としそうな変化を記録する。[[フィールドノート]]へ戻る。', existing: true }
+  { slug: 'field-notes', postType: 'text', photo: '', title: '境界に置かれた言葉', date: '2026-08-16', summary: '場所と文章の距離について。', tags: ['思考', '制作'], aliases: ['フィールドノート'], cardSize: 'l', cardExcerpt: '', draft: false, body: '![](/assets/images/notes/1786878777173-3828089f17bd-img-0487.webp)\n\n地図の縁に残った言葉を拾いながら、[[小さな信号]]について考える。\n\n## 境界について\n\n読むことと歩くことの間には、まだ名前のない編集がある。', existing: true },
+  { slug: 'small-signals', postType: 'text', photo: '', title: '小さな信号', date: '2026-08-15', summary: '', tags: ['思考'], aliases: ['フィールドノート'], cardSize: 'auto', cardExcerpt: '', draft: false, body: '見落としそうな変化を記録する。[[フィールドノート]]と[[存在しない記事]]へ戻る。', existing: true },
+  { slug: 'quiet-photo', postType: 'photo', photo: '/assets/images/notes/1786878777173-3828089f17bd-img-0487.webp', title: '静かな写真', date: '2026-08-14', summary: '', tags: ['写真'], aliases: [], cardSize: 'auto', cardExcerpt: '', draft: false, body: '', existing: true }
 ];
 
 function Login({ onToken }) {
@@ -71,27 +76,52 @@ function PhotoStage({ note, images }) {
 }
 
 export default function App() {
-  const [token, setToken] = useState(QA_PREVIEW ? 'qa-preview' : ''); const [baseSha, setBaseSha] = useState(QA_PREVIEW ? 'qa-base' : ''); const [documents, setDocuments] = useState(QA_PREVIEW ? QA_DOCUMENTS : []); const [note, setNote] = useState(QA_PREVIEW ? QA_DOCUMENTS[0] : null); const [images, setImages] = useState([]); const [status, setStatus] = useState(QA_PREVIEW ? 'LOCAL DESIGN PREVIEW' : ''); const [busy, setBusy] = useState(false); const [imageProcessing, setImageProcessing] = useState(false); const [advanced, setAdvanced] = useState(false); const [viewMode, setViewMode] = useState('edit'); const [focusMode, setFocusMode] = useState(false); const [copied, setCopied] = useState(false); const suppressAutosaveUntil = useRef(0); const editorRef = useRef(null);
+  const [token, setToken] = useState(QA_PREVIEW ? 'qa-preview' : ''); const [baseSha, setBaseSha] = useState(QA_PREVIEW ? 'qa-base' : ''); const [documents, setDocuments] = useState(QA_PREVIEW ? QA_DOCUMENTS : []); const [note, setNote] = useState(null); const [repositoryLoaded, setRepositoryLoaded] = useState(QA_PREVIEW); const [images, setImages] = useState([]); const [status, setStatus] = useState(QA_PREVIEW ? 'LOCAL DESIGN PREVIEW' : ''); const [busy, setBusy] = useState(false); const [imageProcessing, setImageProcessing] = useState(false); const [advanced, setAdvanced] = useState(false); const [viewMode, setViewMode] = useState('edit'); const [focusMode, setFocusMode] = useState(false); const [libraryOpen, setLibraryOpen] = useState(false); const [operationsOpen, setOperationsOpen] = useState(false); const [operationsTab, setOperationsTab] = useState('tags'); const [bulkTagSlugs, setBulkTagSlugs] = useState([]); const [bulkTagSnapshot, setBulkTagSnapshot] = useState(null); const [copied, setCopied] = useState(false); const suppressAutosaveUntil = useRef(0); const editorRef = useRef(null);
   const refresh = useCallback(async activeToken => {
     setBusy(true); setStatus('GitHubから記事を読み込んでいます…');
-    try { const repo = await loadRepository(activeToken); const docs = repo.documents.map(doc => parseDocument(doc.source, doc.slug)); setDocuments(docs); setBaseSha(repo.baseSha); setNote(current => docs.find(doc => doc.slug === current?.slug) || (current && !current.existing ? current : (docs[0] || newNote(docs.map(doc => doc.slug))))); setStatus(`${docs.length}件の記事を読み込みました。`); }
+    try { const repo = await loadRepository(activeToken); const docs = repo.documents.map(doc => parseDocument(doc.source, doc.slug)); setDocuments(docs); setBaseSha(repo.baseSha); setBulkTagSlugs([]); setBulkTagSnapshot(null); setRepositoryLoaded(true); setNote(current => { if (current && !current.existing) return current; if (current?.slug) return docs.find(doc => doc.slug === current.slug) || null; return null; }); setStatus(`${docs.length}件の記事を読み込みました。`); }
     catch (error) { setStatus(error.message); if (/push権限/.test(error.message) || error.status === 401) setToken(''); }
     finally { setBusy(false); }
   }, []);
   useEffect(() => { if (token && !QA_PREVIEW) refresh(token); }, [token, refresh]);
   useEffect(() => { if (!note || Date.now() < suppressAutosaveUntil.current) return; const timer = setTimeout(() => { saveDraft(draftKey(note), { note, images }).then(() => setStatus(previous => previous.includes('公開') ? previous : 'LOCAL DRAFT SAVED')).catch(() => {}); }, 500); return () => clearTimeout(timer); }, [note, images]);
-  useEffect(() => { const exitFocus = event => { if (event.key === 'Escape') setFocusMode(false); }; addEventListener('keydown', exitFocus); return () => removeEventListener('keydown', exitFocus); }, []);
-  const selectNote = async slug => { const selected = slug === '__new__' ? newNote(documents.map(doc => doc.slug)) : documents.find(doc => doc.slug === slug); const recovered = await loadDraft(draftKey(selected)).catch(() => null); setNote(recovered?.note ? { postType: 'text', photo: '', ...recovered.note } : selected); setImages(recovered?.images || []); setStatus(recovered ? 'ローカル下書きを復元しました。' : ''); };
-  const update = patch => setNote(current => ({ ...current, ...patch }));
+  useEffect(() => { const exitPanels = event => { if (event.key === 'Escape') { setFocusMode(false); setLibraryOpen(false); setOperationsOpen(false); } }; addEventListener('keydown', exitPanels); return () => removeEventListener('keydown', exitPanels); }, []);
+  const selectNote = async slug => { const selected = slug === '__new__' ? newNote(documents.map(doc => doc.slug)) : documents.find(doc => doc.slug === slug); if (!selected) return; const recovered = await loadDraft(draftKey(selected)).catch(() => null); const next = recovered?.note ? { postType: 'text', photo: '', ...recovered.note } : selected; setNote(next); if (next?.existing && recovered?.note) setDocuments(current => current.map(doc => doc.slug === next.slug ? next : doc)); setImages(recovered?.images || []); setViewMode('edit'); setLibraryOpen(false); setOperationsOpen(false); setStatus(recovered ? 'ローカル下書きを復元しました。' : slug === '__new__' ? 'NEW NOTE' : `${selected.title || selected.slug}を編集中です。`); };
+  const update = patch => { const activeSlug = note?.slug; setNote(current => ({ ...current, ...patch })); if (note?.existing) setDocuments(current => current.map(doc => doc.slug === activeSlug ? { ...doc, ...patch } : doc)); };
   const issues = useMemo(() => preflightIssues(note, documents, imageProcessing), [note, documents, imageProcessing]);
   const publish = useCallback(async () => {
     if (!note || busy || imageProcessing) return; if (QA_PREVIEW) { setStatus('DESIGN PREVIEW — 公開処理は実行しません。'); return; }
+    if (bulkTagSlugs.length) { setStatus('先にTOOLS / TAGSから一括変更を保存してください。'); setOperationsOpen(true); setOperationsTab('tags'); return; }
     const blocking = issues.find(issue => issue.level === 'error'); if (blocking) { setStatus(`ERROR — ${blocking.text}`); return; }
     setBusy(true); setStatus(note.draft ? '下書きをGitHubへ保存しています…' : '公開コミットを作成しています…');
     try { const success = note.draft ? 'GitHub下書きを保存しました。' : '公開しました。数分後にサイトへ反映されます。'; await publishAtomic({ token, baseSha, slug: note.slug, markdown: serializeDocument(note), images, existing: note.existing }); suppressAutosaveUntil.current = Date.now() + 2000; await deleteDraft(draftKey(note)); setImages([]); await refresh(token); setStatus(success); }
     catch (error) { setStatus(error.code === 'CONFLICT' ? `CONFLICT — ${error.message}` : `ERROR — ${error.message}`); }
     finally { setBusy(false); }
-  }, [note, busy, imageProcessing, issues, token, baseSha, images, refresh]);
+  }, [note, busy, imageProcessing, issues, token, baseSha, images, refresh, bulkTagSlugs]);
+  const publishBulkTags = useCallback(async () => {
+    if (!bulkTagSlugs.length || busy) return;
+    if (QA_PREVIEW) { setStatus('DESIGN PREVIEW — 一括保存は実行しません。'); return; }
+    setBusy(true); setStatus(`${bulkTagSlugs.length}件の記事を一括保存しています…`);
+    try {
+      await publishBatch({ token, baseSha, entries: documents.filter(document => bulkTagSlugs.includes(document.slug)).map(document => ({ slug: document.slug, markdown: serializeDocument(document) })), message: `content: rename tags (${bulkTagSlugs.length} Notes)` });
+      await refresh(token); setStatus('タグの一括変更を保存しました。');
+    } catch (error) { setStatus(error.code === 'CONFLICT' ? `CONFLICT — ${error.message}` : `ERROR — ${error.message}`); }
+    finally { setBusy(false); }
+  }, [bulkTagSlugs, busy, token, baseSha, documents, refresh]);
+  const renameTag = (from, to) => {
+    const current = note?.existing ? documents.map(document => document.slug === note.slug ? note : document) : documents;
+    const result = renameTagInDocuments(current, from, to);
+    if (!result.changedSlugs.length) return;
+    if (!bulkTagSnapshot) setBulkTagSnapshot(documents);
+    setDocuments(result.documents);
+    if (note?.existing) setNote(result.documents.find(document => document.slug === note.slug));
+    setBulkTagSlugs(previous => [...new Set([...previous, ...result.changedSlugs])]);
+    setStatus(`タグを ${from} → ${to} に変更しました。保存待ちです。`);
+  };
+  const discardTagChanges = () => {
+    if (!bulkTagSnapshot) return;
+    setDocuments(bulkTagSnapshot); if (note?.existing) setNote(bulkTagSnapshot.find(document => document.slug === note.slug) || note); setBulkTagSlugs([]); setBulkTagSnapshot(null); setStatus('タグの一括変更を取り消しました。');
+  };
   const handleImageFiles = useCallback(async inputFiles => {
     const files = [...inputFiles]; if (!files.length) return;
     setImageProcessing(true); setStatus(`${files.length}件の画像を確認・変換しています…`);
@@ -124,13 +154,29 @@ export default function App() {
   };
   const jumpToLine = line => { setViewMode('edit'); requestAnimationFrame(() => editorRef.current?.goToLine(line)); };
   const relationNotes = useMemo(() => documents.filter(doc => doc.slug !== note?.slug), [documents, note?.slug]);
+  const toolDocuments = useMemo(() => note?.existing ? documents.map(document => document.slug === note.slug ? note : document) : documents, [documents, note]);
+  const tagSuggestions = useMemo(() => collectTags(documents), [documents]);
+  const aliasSuggestions = useMemo(() => [...new Set(documents.flatMap(document => document.aliases || []))].sort((a, b) => a.localeCompare(b, 'ja')), [documents]);
+  const duplicate = source => { const copy = duplicateDocument(source, documents.map(document => document.slug)); setNote(copy); setImages([]); setViewMode('edit'); setAdvanced(true); setLibraryOpen(false); setStatus('記事を下書きとして複製しました。タイトルと内容を確認してください。'); };
+  const useImage = path => {
+    if (note.postType === 'photo') { update({ photo: path }); setStatus('既存画像を写真投稿へ設定しました。'); }
+    else if (editorRef.current?.insertMarkdown) { editorRef.current.insertMarkdown(`\n\n![](${path})\n\n`); setStatus('本文へ既存画像を挿入しました。'); }
+    else { update({ body: `${note.body}${note.body.endsWith('\n') || !note.body ? '' : '\n'}\n![](${path})\n` }); setStatus('本文へ既存画像を挿入しました。'); }
+    setOperationsOpen(false);
+  };
+  const logout = () => { setToken(''); setNote(null); setRepositoryLoaded(false); setLibraryOpen(false); setOperationsOpen(false); };
   if (!token) return <Login onToken={setToken} />;
-  if (!note) return <main className="login"><p>{status || 'LOADING…'}</p></main>;
+  if (!note) {
+    if (!repositoryLoaded) return <main className="login"><p>{status || 'LOADING…'}</p></main>;
+    return <ArticleLibrary entry documents={documents} activeSlug="" onClose={() => {}} onSelect={selectNote} onNew={() => selectNote('__new__')} onDuplicate={duplicate}/>;
+  }
   return <div className={`app-shell ${focusMode ? 'is-focus' : ''}`}>
+    <ArticleLibrary open={libraryOpen} documents={documents} activeSlug={note.slug} onClose={() => setLibraryOpen(false)} onSelect={selectNote} onNew={() => selectNote('__new__')} onDuplicate={duplicate}/>
+    <OperationsPanel open={operationsOpen} tab={operationsTab} onTabChange={setOperationsTab} documents={toolDocuments} onClose={() => setOperationsOpen(false)} onSelect={selectNote} onUseImage={useImage} onRenameTag={renameTag} pendingTagChanges={bulkTagSlugs.length} onSaveTagChanges={publishBulkTags} onDiscardTagChanges={discardTagChanges}/>
     <header className="editor-top">
       <div className="editor-brand"><a href="/">SYNOMARE</a><span>NOTES</span></div>
       <select aria-label="記事を選ぶ" value={note.existing ? note.slug : '__new__'} onChange={event => selectNote(event.target.value)}><option value="__new__">＋ NEW NOTE</option>{documents.map(doc => <option key={doc.slug} value={doc.slug}>{doc.title || (doc.postType === 'photo' ? `PHOTO / ${doc.date}` : doc.slug)}</option>)}</select>
-      <div className="editor-session"><button aria-label="GitHubから記事を再読み込み" onClick={() => refresh(token)} disabled={busy}>RELOAD</button><button aria-label="ログアウト" onClick={() => setToken('')}>LOG OUT</button></div>
+      <div className="editor-session"><button aria-label="記事ライブラリを開く" onClick={() => { setOperationsOpen(false); setLibraryOpen(true); }}>LIBRARY</button><button aria-label="記事運用ツールを開く" onClick={() => { setLibraryOpen(false); setOperationsOpen(true); }}>TOOLS</button><button aria-label="GitHubから記事を再読み込み" onClick={() => refresh(token)} disabled={busy}>RELOAD</button><button aria-label="ログアウト" onClick={logout}>LOG OUT</button></div>
     </header>
     <main className={`workspace is-${note.postType} mode-${viewMode}`}>
       <section className="writing">
@@ -148,7 +194,7 @@ export default function App() {
           <DocumentStatus body={note.body} status={status}/>
           <ImageQueue images={images} onRemove={removeImage}/>
         </>}
-        {advanced ? <section className="details"><label>SLUG<input value={note.slug} readOnly={note.existing} onChange={event => update({ slug: event.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '') })}/></label><label>DATE<input type="date" value={note.date} onChange={event => update({ date: event.target.value })}/></label><label>CARD SIZE<select value={note.cardSize} onChange={event => update({ cardSize: event.target.value })}><option value="auto">AUTO / CONTENT</option><option value="s">S / SMALL</option><option value="m">M / MEDIUM</option><option value="l">L / LARGE</option></select></label><label>VISIBILITY<select value={note.draft ? 'draft' : 'public'} onChange={event => update({ draft: event.target.value === 'draft' })}><option value="public">PUBLIC</option><option value="draft">GITHUB DRAFT</option></select></label><label className="wide">{note.postType === 'photo' ? 'CAPTION / DESCRIPTION' : 'SUMMARY'}<input value={note.summary} placeholder={note.postType === 'photo' ? '未入力でも公開できます' : excerptFromBody(note.body)} onChange={event => update({ summary: event.target.value })}/></label>{note.postType === 'text' ? <label className="wide">CARD EXCERPT<input value={note.cardExcerpt} placeholder="概要を使用" onChange={event => update({ cardExcerpt: event.target.value })}/></label> : null}<label>TAGS<input value={note.tags.join(', ')} placeholder={note.postType === 'photo' ? '写真' : '未分類'} onChange={event => update({ tags: splitList(event.target.value) })}/></label><label>ALIASES<input value={note.aliases.join(', ')} onChange={event => update({ aliases: splitList(event.target.value) })}/></label></section> : null}
+        {advanced ? <section className="details"><label>SLUG<input value={note.slug} readOnly={note.existing} onChange={event => update({ slug: event.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '') })}/></label><label>DATE<input type="date" value={note.date} onChange={event => update({ date: event.target.value })}/></label><label>CARD SIZE<select value={note.cardSize} onChange={event => update({ cardSize: event.target.value })}><option value="auto">AUTO / CONTENT</option><option value="s">S / SMALL</option><option value="m">M / MEDIUM</option><option value="l">L / LARGE</option></select></label><label>VISIBILITY<select value={note.draft ? 'draft' : 'public'} onChange={event => update({ draft: event.target.value === 'draft' })}><option value="public">PUBLIC</option><option value="draft">GITHUB DRAFT</option></select></label><label className="wide">{note.postType === 'photo' ? 'CAPTION / DESCRIPTION' : 'SUMMARY'}<input value={note.summary} placeholder={note.postType === 'photo' ? '未入力でも公開できます' : excerptFromBody(note.body)} onChange={event => update({ summary: event.target.value })}/></label>{note.postType === 'text' ? <label className="wide">CARD EXCERPT<input value={note.cardExcerpt} placeholder="概要を使用" onChange={event => update({ cardExcerpt: event.target.value })}/></label> : null}<TokenEditor label="TAGS" values={note.tags} suggestions={tagSuggestions} placeholder={note.postType === 'photo' ? '写真' : 'タグを入力してEnter'} onChange={tags => update({ tags })}/><TokenEditor label="ALIASES" values={note.aliases} suggestions={aliasSuggestions} placeholder="別名を入力してEnter" onChange={aliases => update({ aliases })}/></section> : null}
         <PublishCheck issues={issues}/>
         <div className="editor-actions">
           <span className={`save-status ${status.startsWith('ERROR') || status.startsWith('CONFLICT') ? 'error' : ''}`} aria-live="polite">{status}</span>

@@ -4,8 +4,10 @@ import { readFile } from 'node:fs/promises';
 import { generateSlug, newNote, parseDocument, parseOAuthMessage, serializeDocument } from '../notes-admin/src/lib.js';
 import { documentStats, outlineFromBody, preflightIssues } from '../notes-admin/src/editorTools.js';
 import { previewHtml } from '../notes-admin/src/preview.js';
-import { publishAtomic } from '../notes-admin/src/github.js';
+import { collectTags, duplicateDocument, filterDocuments } from '../notes-admin/src/articleLibrary.js';
+import { publishAtomic, publishBatch } from '../notes-admin/src/github.js';
 import { detectImageType, IMAGE_ACCEPT } from '../notes-admin/src/images.js';
+import { analyzeLinks, collectImages, collectTagStats, renameTagInDocuments } from '../notes-admin/src/operations.js';
 
 test('エディターはJSTタイムスタンプslugと自動メタデータを生成する', () => {
   const slug = generateSlug([], new Date('2026-08-16T03:34:56Z'));
@@ -125,10 +127,11 @@ test('Markdownプレビューは生HTMLを実行せず内部リンクを表示�
 });
 
 test('エディターは書式、プレビュー、貼り付け画像、コピーを提供する', async () => {
-  const [app, editor, tools] = await Promise.all([
+  const [app, editor, tools, operations] = await Promise.all([
     readFile(new URL('../notes-admin/src/App.jsx', import.meta.url), 'utf8'),
     readFile(new URL('../notes-admin/src/MarkdownEditor.jsx', import.meta.url), 'utf8'),
-    readFile(new URL('../notes-admin/src/EditorTools.jsx', import.meta.url), 'utf8')
+    readFile(new URL('../notes-admin/src/EditorTools.jsx', import.meta.url), 'utf8'),
+    readFile(new URL('../notes-admin/src/OperationsPanel.jsx', import.meta.url), 'utf8')
   ]);
   assert.match(app, /COPY MD/);
   assert.match(app, /<MarkdownPreview/);
@@ -136,9 +139,88 @@ test('エディターは書式、プレビュー、貼り付け画像、コピ�
   assert.match(editor, /paste: event/);
   assert.match(editor, /drop: event/);
   assert.match(editor, /Mod-Shift-k/);
+  assert.match(editor, /insertMarkdown/);
   assert.match(tools, /\['edit', 'split', 'preview'\]/);
   assert.match(tools, /toUpperCase\(\)/);
   assert.match(tools, /OUTLINE/);
+  assert.match(app, /<OperationsPanel/);
+  assert.match(operations, /TAG MANAGEMENT/);
+  assert.match(operations, /IMAGE LIBRARY/);
+  assert.match(operations, /LINK MAINTENANCE/);
+});
+
+test('記事ライブラリは本文・タグ・公開状態で絞り込み並べ替える', () => {
+  const documents = [
+    { slug: 'old', title: '古い記録', date: '2026-01-01', postType: 'text', draft: false, summary: '', body: '庭の本文', tags: ['庭'], aliases: [] },
+    { slug: 'new', title: '新しい写真', date: '2026-08-17', postType: 'photo', draft: true, summary: '海辺', body: '', tags: ['写真', '海'], aliases: [] }
+  ];
+  assert.deepEqual(collectTags(documents), ['海', '写真', '庭']);
+  assert.deepEqual(filterDocuments(documents, { query: '庭' }).map(document => document.slug), ['old']);
+  assert.deepEqual(filterDocuments(documents, { type: 'photo', status: 'draft', tag: '海' }).map(document => document.slug), ['new']);
+  assert.deepEqual(filterDocuments(documents, { sort: 'oldest' }).map(document => document.slug), ['old', 'new']);
+});
+
+test('過去記事の複製は新slugの下書きとして作る', () => {
+  const source = { ...newNote([]), slug: 'original', title: '原稿', date: '2026-01-01', body: '本文', draft: false, existing: true };
+  const duplicated = duplicateDocument(source, ['original']);
+  assert.notEqual(duplicated.slug, source.slug);
+  assert.equal(duplicated.title, '原稿 — copy');
+  assert.equal(duplicated.body, '本文');
+  assert.equal(duplicated.draft, true);
+  assert.equal(duplicated.existing, false);
+});
+
+test('専用エディターは記事ライブラリと複数タグUIを持つ', async () => {
+  const [app, library, tokens] = await Promise.all([
+    readFile(new URL('../notes-admin/src/App.jsx', import.meta.url), 'utf8'),
+    readFile(new URL('../notes-admin/src/ArticleLibrary.jsx', import.meta.url), 'utf8'),
+    readFile(new URL('../notes-admin/src/TokenEditor.jsx', import.meta.url), 'utf8')
+  ]);
+  assert.match(app, /<ArticleLibrary/);
+  assert.match(app, /<TokenEditor label="TAGS"/);
+  assert.match(library, /SEARCH/);
+  assert.match(library, /DUPLICATE/);
+  assert.match(library, /OPEN LIVE/);
+  assert.match(library, /article-library-entry/);
+  assert.match(tokens, /event\.key === 'Enter'/);
+  assert.match(tokens, /nativeEvent\.isComposing/);
+  assert.match(tokens, /currentValues\.map/);
+  assert.match(tokens, /className="token-add"/);
+});
+
+test('記事運用ツールはタグ・画像・リンクの保守データを作る', () => {
+  const documents = [
+    { slug: 'one', title: '一つ目', date: '2026-08-17', draft: false, tags: ['制作', '記録'], aliases: ['最初'], postType: 'text', photo: '', body: '![](\/assets\/images\/notes\/one.webp)\n\n[[最初]] [[存在しない]]' },
+    { slug: 'two', title: '二つ目', date: '2026-08-16', draft: false, tags: ['制作'], aliases: ['最初'], postType: 'text', photo: '', body: '' },
+    { slug: 'photo', title: '写真', date: '2026-08-15', draft: true, tags: ['写真'], aliases: [], postType: 'photo', photo: '/assets/images/notes/photo.webp', body: '' }
+  ];
+  assert.equal(collectTagStats(documents).find(tag => tag.name === '制作').count, 2);
+  assert.equal(collectImages(documents).length, 2);
+  const links = analyzeLinks(documents);
+  assert.equal(links.unresolved[0].target, '存在しない');
+  assert.equal(links.ambiguous[0].target, '最初');
+  assert.ok(links.orphans.some(article => article.slug === 'photo'));
+  const renamed = renameTagInDocuments(documents, '制作', '展示');
+  assert.deepEqual(renamed.changedSlugs, ['one', 'two']);
+  assert.deepEqual(renamed.documents.find(document => document.slug === 'one').tags, ['展示', '記録']);
+});
+
+test('複数記事のタグ変更を一つのGit commitへ保存する', async t => {
+  const originalFetch = globalThis.fetch; const calls = [];
+  t.after(() => { globalThis.fetch = originalFetch; });
+  globalThis.fetch = async (url, options = {}) => { const body = options.body ? JSON.parse(options.body) : null; calls.push({ url: String(url), method: options.method || 'GET', body });
+    if (String(url).endsWith('/git/ref/heads/main')) return Response.json({ object: { sha: 'base' } });
+    if (String(url).endsWith('/git/commits/base')) return Response.json({ tree: { sha: 'tree-base' } });
+    if (String(url).endsWith('/git/blobs')) return Response.json({ sha: `blob-${calls.length}` }, { status: 201 });
+    if (String(url).endsWith('/git/trees')) return Response.json({ sha: 'tree-new' }, { status: 201 });
+    if (String(url).endsWith('/git/commits')) return Response.json({ sha: 'commit-new' }, { status: 201 });
+    if (String(url).endsWith('/git/refs/heads/main')) return Response.json({ object: { sha: 'commit-new' } });
+    return Response.json({ message: 'unexpected' }, { status: 500 });
+  };
+  const sha = await publishBatch({ token: 'memory-only', baseSha: 'base', entries: [{ slug: 'one', markdown: '# 1' }, { slug: 'two', markdown: '# 2' }] });
+  assert.equal(sha, 'commit-new');
+  const tree = calls.find(call => call.url.endsWith('/git/trees'));
+  assert.deepEqual(tree.body.tree.map(item => item.path), ['notes/content/one.md', 'notes/content/two.md']);
 });
 
 test('画像は拡張子やMIME表記だけに頼らずファイル内容から判別する', async () => {

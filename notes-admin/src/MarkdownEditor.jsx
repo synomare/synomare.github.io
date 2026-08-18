@@ -23,6 +23,13 @@ function prefixLines(view, prefix) {
   view.focus();
 }
 
+function insertText(view, text) {
+  if (!view) return;
+  const { from, to } = view.state.selection.main;
+  view.dispatch({ changes: { from, to, insert: text }, selection: { anchor: from + text.length }, scrollIntoView: true });
+  view.focus();
+}
+
 function runCommand(view, command) {
   if (!view) return;
   if (command === 'h2') prefixLines(view, '## ');
@@ -56,6 +63,7 @@ const MarkdownEditor = forwardRef(function MarkdownEditor({ value, onChange, not
 
   useImperativeHandle(forwardedRef, () => ({
     command: command => runCommand(viewRef.current, command),
+    insertMarkdown: text => insertText(viewRef.current, text),
     focus: () => viewRef.current?.focus(),
     goToLine: lineNumber => {
       const view = viewRef.current; if (!view) return;
