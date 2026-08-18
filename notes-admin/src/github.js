@@ -27,15 +27,20 @@ function bytesToBase64(buffer) {
   for (let index = 0; index < bytes.length; index += size) binary += String.fromCharCode(...bytes.subarray(index, index + size));
   return btoa(binary);
 }
-export async function publishAtomic({ token, baseSha, slug, markdown, images = [], existing }) {
+export async function publishBatch({ token, baseSha, entries = [], images = [], message = 'content: update Notes' }) {
+  if (!entries.length) throw new Error('保存する記事がありません。');
   const currentRef = await request(`/repos/${OWNER}/${REPO}/git/ref/heads/main`, token);
   if (currentRef.object.sha !== baseSha) { const error = new Error('mainが別の更新で進んでいます。再読み込みして変更を確認してください。'); error.code = 'CONFLICT'; throw error; }
   const baseCommit = await request(`/repos/${OWNER}/${REPO}/git/commits/${baseSha}`, token);
-  const markdownBlob = await request(`/repos/${OWNER}/${REPO}/git/blobs`, token, { method: 'POST', body: JSON.stringify({ content: markdown, encoding: 'utf-8' }) });
+  const markdownBlobs = await Promise.all(entries.map(async entry => ({ path: `notes/content/${entry.slug}.md`, sha: (await request(`/repos/${OWNER}/${REPO}/git/blobs`, token, { method: 'POST', body: JSON.stringify({ content: entry.markdown, encoding: 'utf-8' }) })).sha })));
   const imageBlobs = await Promise.all(images.map(async image => ({ path: image.path, sha: (await request(`/repos/${OWNER}/${REPO}/git/blobs`, token, { method: 'POST', body: JSON.stringify({ content: bytesToBase64(await image.file.arrayBuffer()), encoding: 'base64' }) })).sha })));
-  const tree = await request(`/repos/${OWNER}/${REPO}/git/trees`, token, { method: 'POST', body: JSON.stringify({ base_tree: baseCommit.tree.sha, tree: [{ path: `notes/content/${slug}.md`, mode: '100644', type: 'blob', sha: markdownBlob.sha }, ...imageBlobs.map(image => ({ ...image, mode: '100644', type: 'blob' }))] }) });
-  const commit = await request(`/repos/${OWNER}/${REPO}/git/commits`, token, { method: 'POST', body: JSON.stringify({ message: `content: ${existing ? 'update' : 'create'} Note ${slug}`, tree: tree.sha, parents: [baseSha] }) });
+  const tree = await request(`/repos/${OWNER}/${REPO}/git/trees`, token, { method: 'POST', body: JSON.stringify({ base_tree: baseCommit.tree.sha, tree: [...markdownBlobs, ...imageBlobs].map(blob => ({ ...blob, mode: '100644', type: 'blob' })) }) });
+  const commit = await request(`/repos/${OWNER}/${REPO}/git/commits`, token, { method: 'POST', body: JSON.stringify({ message, tree: tree.sha, parents: [baseSha] }) });
   try { await request(`/repos/${OWNER}/${REPO}/git/refs/heads/main`, token, { method: 'PATCH', body: JSON.stringify({ sha: commit.sha, force: false }) }); }
   catch (error) { if (error.status === 422) { error.code = 'CONFLICT'; error.message = '公開直前にmainが更新されました。下書きは残っています。'; } throw error; }
   return commit.sha;
+}
+
+export async function publishAtomic({ token, baseSha, slug, markdown, images = [], existing }) {
+  return publishBatch({ token, baseSha, entries: [{ slug, markdown }], images, message: `content: ${existing ? 'update' : 'create'} Note ${slug}` });
 }
