@@ -11,11 +11,17 @@ export const DATE_TIME = new Intl.DateTimeFormat('ja-JP', {
   minute: '2-digit',
   second: '2-digit'
 });
+export const SURFACES = [
+  ['stream', 'STREAM'],
+  ['field', 'FIELD'],
+  ['folds', 'FOLDS']
+];
 export const PLATES = [
   ['stream', 'STREAM'],
   ['returned', 'RETURNED'],
   ['questions', 'QUESTIONS'],
-  ['tensions', 'TENSIONS']
+  ['tensions', 'TENSIONS'],
+  ['unused', 'UNUSED']
 ];
 
 export function demoTraces() {

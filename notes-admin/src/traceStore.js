@@ -1,6 +1,7 @@
 const DB_NAME = 'synomare-trace-stream';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const TRACE_STORE = 'traces';
+const FOLD_STORE = 'folds';
 const META_STORE = 'meta';
 
 function openDb() {
@@ -18,6 +19,11 @@ function openDb() {
         store.createIndex('updatedAt', 'updatedAt');
         store.createIndex('visibility', 'visibility');
         store.createIndex('syncStatus', 'syncStatus');
+      }
+      if (!db.objectStoreNames.contains(FOLD_STORE)) {
+        const store = db.createObjectStore(FOLD_STORE, { keyPath: 'id' });
+        store.createIndex('createdAt', 'createdAt');
+        store.createIndex('updatedAt', 'updatedAt');
       }
       if (!db.objectStoreNames.contains(META_STORE)) db.createObjectStore(META_STORE, { keyPath: 'key' });
     };
@@ -79,6 +85,26 @@ export function removeStoredTraces(ids) {
     for (const id of values) await requestResult(store.delete(id));
     return values.length;
   });
+}
+
+export function listStoredFolds() {
+  return transact(FOLD_STORE, 'readonly', ({ [FOLD_STORE]: store }) => requestResult(store.getAll()));
+}
+
+export function saveStoredFold(fold) {
+  return transact(FOLD_STORE, 'readwrite', ({ [FOLD_STORE]: store }) => requestResult(store.put(fold)));
+}
+
+export function saveStoredFolds(folds) {
+  const values = Array.isArray(folds) ? folds : [];
+  return transact(FOLD_STORE, 'readwrite', async ({ [FOLD_STORE]: store }) => {
+    for (const fold of values) await requestResult(store.put(fold));
+    return values.length;
+  });
+}
+
+export function removeStoredFold(id) {
+  return transact(FOLD_STORE, 'readwrite', ({ [FOLD_STORE]: store }) => requestResult(store.delete(id)));
 }
 
 export function getTraceMeta(key) {

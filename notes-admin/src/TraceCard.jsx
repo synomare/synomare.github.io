@@ -37,8 +37,8 @@ function TraceConflict({ trace, onResolve, onAcceptDelete }) {
   </section>;
 }
 
-export default function TraceCard({ trace, byId, incoming, editing, onEdit, onEditChange, onEditCancel, onEditSave, onRelation, onDelete, onResolve, onAcceptDelete }) {
-  return <article id={`trace-${trace.id}`} className={`trace-card is-${trace.kind} sync-${trace.syncStatus}`}>
+export default function TraceCard({ trace, byId, incoming, editing, selected, onToggleSelection, onEdit, onEditChange, onEditCancel, onEditSave, onRelation, onDelete, onResolve, onAcceptDelete }) {
+  return <article id={`trace-${trace.id}`} className={`trace-card is-${trace.kind} sync-${trace.syncStatus} ${selected ? 'is-selected' : ''}`}>
     <header className="trace-card-meta">
       <time dateTime={trace.createdAt}>{DATE_TIME.format(new Date(trace.createdAt))}</time>
       <span>{trace.visibility === 'public' ? 'PUBLIC REPO' : 'LOCAL ONLY'}</span>
@@ -57,6 +57,7 @@ export default function TraceCard({ trace, byId, incoming, editing, onEdit, onEd
     {trace.revisions?.length ? <details className="trace-history"><summary>REVISION HISTORY / {trace.revisions.length}</summary>{[...trace.revisions].reverse().map(revision => <div key={revision.id}><time>{DATE_TIME.format(new Date(revision.createdAt))}</time><p>{revision.content}</p></div>)}</details> : null}
     {trace.conflict ? <TraceConflict trace={trace} onResolve={onResolve} onAcceptDelete={onAcceptDelete}/> : null}
     {editing?.id === trace.id ? null : <footer className="trace-card-actions">
+      <button className={selected ? 'selected' : ''} onClick={() => onToggleSelection(trace.id)}>{selected ? 'SELECTED' : 'SELECT'}</button>
       <button onClick={() => onRelation(trace, 'continues')}>CONTINUE</button>
       <button onClick={() => onRelation(trace, 'contrasts')}>CONTRAST</button>
       <details><summary>CONNECT</summary><button onClick={() => onRelation(trace, 'exemplifies')}>EXAMPLE</button><button onClick={() => onRelation(trace, 'answers')}>ANSWER</button><button onClick={() => onRelation(trace, 'cites')}>CITE</button></details>

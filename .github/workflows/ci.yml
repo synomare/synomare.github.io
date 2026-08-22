@@ -31,3 +31,10 @@ jobs:
 
       - name: Build site
         run: npm run build
+
+      - name: Upload admin preview
+        uses: actions/upload-artifact@v4
+        with:
+          name: notes-admin-preview
+          path: admin/notes
+          retention-days: 3

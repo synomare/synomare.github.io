@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import './styles.css';
 import './overrides.css';
 import './trace.css';
+import './field-fold.css';
 
 const NotesApp = lazy(() => import('./App.jsx'));
 const TraceApp = lazy(() => import('./TraceApp.jsx'));
