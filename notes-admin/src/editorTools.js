@@ -1,4 +1,5 @@
 import { outgoingFromBody } from './lib.js';
+import { relatedReferenceIssues } from './relatedNotes.js';
 
 export const INDENT_UNIT = '  ';
 
@@ -149,5 +150,6 @@ export function preflightIssues(note, documents = [], imageProcessing = false) {
   const known = new Set(documents.flatMap(doc => [doc.slug, doc.title, ...(doc.aliases || [])].filter(Boolean).map(value => value.normalize('NFKC').toLocaleLowerCase('ja'))));
   const unresolved = [...new Set(outgoingFromBody(note.body).filter(link => !known.has(link.target.normalize('NFKC').toLocaleLowerCase('ja'))).map(link => link.target))];
   if (unresolved.length) issues.push({ level: 'warning', text: `未解決リンク：${unresolved.join('、')}` });
+  relatedReferenceIssues(note, documents).forEach(issue => issues.push({ level: 'warning', text: issue.text, related: issue }));
   return issues;
 }

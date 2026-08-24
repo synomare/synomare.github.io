@@ -18,7 +18,7 @@ export function parseDocument(source, fallbackSlug = '') {
     slug: fallbackSlug,
     postType: data.post_type === 'photo' ? 'photo' : 'text', photo: String(data.photo || ''),
     title: String(data.title || ''), date: String(data.date || jstDate()),
-    summary: String(data.summary || ''), tags: Array.isArray(data.tags) ? data.tags : [], aliases: Array.isArray(data.aliases) ? data.aliases : [],
+    summary: String(data.summary || ''), tags: Array.isArray(data.tags) ? data.tags : [], aliases: Array.isArray(data.aliases) ? data.aliases : [], relatedNotes: Array.isArray(data.related_notes) ? data.related_notes : [], relatedExclude: Array.isArray(data.related_exclude) ? data.related_exclude : [],
     cardSize: ['s', 'm', 'l'].includes(data.card_size) ? data.card_size : 'auto', cardExcerpt: String(data.card_excerpt || ''),
     draft: data.draft === true, body: match ? source.slice(match[0].length) : source, existing: true
   };
@@ -34,7 +34,7 @@ export function serializeDocument(note) {
   const isPhoto = note.postType === 'photo';
   const summary = note.summary.trim() || excerptFromBody(note.body) || (note.title.trim() || `写真 ${note.date || jstDate()}`);
   const tags = note.tags.length ? note.tags : (tagsFromBody(note.body).length ? tagsFromBody(note.body) : [isPhoto ? '写真' : '未分類']);
-  const data = { post_type: isPhoto ? 'photo' : 'text', date: note.date || jstDate(), summary, tags, aliases: note.aliases || [], card_size: note.cardSize || 'auto' };
+  const data = { post_type: isPhoto ? 'photo' : 'text', date: note.date || jstDate(), summary, tags, aliases: note.aliases || [], related_notes: note.relatedNotes || [], related_exclude: note.relatedExclude || [], card_size: note.cardSize || 'auto' };
   if (note.title.trim()) data.title = note.title.trim();
   if (isPhoto && note.photo) data.photo = note.photo;
   if (!isPhoto && note.cardExcerpt.trim()) data.card_excerpt = note.cardExcerpt.trim();
@@ -49,5 +49,5 @@ export function outgoingFromBody(body) {
   return [...String(body).matchAll(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g)].map(match => ({ target: match[1].trim(), label: (match[2] || match[1]).trim() }));
 }
 export function newNote(existing = []) {
-  return { slug: generateSlug(existing), postType: 'text', photo: '', title: '', date: jstDate(), summary: '', tags: [], aliases: [], cardSize: 'auto', cardExcerpt: '', draft: false, body: '', existing: false };
+  return { slug: generateSlug(existing), postType: 'text', photo: '', title: '', date: jstDate(), summary: '', tags: [], aliases: [], relatedNotes: [], relatedExclude: [], cardSize: 'auto', cardExcerpt: '', draft: false, body: '', existing: false };
 }

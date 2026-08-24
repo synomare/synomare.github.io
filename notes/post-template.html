@@ -14,6 +14,21 @@
     @media(max-width:900px){.entry-layout{grid-template-columns:minmax(0,70ch)}.entry-side{position:static;order:2;margin-top:2rem}.mini-graph{max-width:300px}.relation{grid-template-columns:1fr;gap:.8rem}}
     @media(max-width:700px){.topbar{font-size:.55rem}.topbar nav{margin-left:0;width:100%;overflow:auto;flex-wrap:nowrap}.breadcrumb{margin-bottom:2.5rem}main{padding-inline:16px}.entry{font-size:1rem}.relations{margin-top:4rem}footer{flex-direction:column}}
   </style>
+  <style>
+    /* Cosense-like nested text blocks emitted by the Notes generator. The
+       custom property keeps arbitrary depths working without a hard-coded
+       maximum while the guide remains quiet on the paper-like layout. */
+    .entry .note-block { position: relative; margin: .5rem 0 1.15rem; padding-left: calc(var(--note-depth) * clamp(.8rem, 1.7vw, 1.45rem)); }
+    .entry .note-block::before { content: ''; position: absolute; left: calc((var(--note-depth) - .55) * clamp(.8rem, 1.7vw, 1.45rem)); top: .45em; bottom: .45em; width: 1px; background: var(--line); }
+    .entry .note-block > p { margin: 0; }
+    .entry .note-block.note-depth-1 { margin-top: .2rem; }
+    .entry .note-block.note-depth-2::before { background: color-mix(in srgb, var(--red) 48%, var(--line)); }
+    .entry .note-block img { max-width: 100%; }
+    @media(max-width:700px) {
+      .entry .note-block { padding-left: calc(var(--note-depth) * .75rem); }
+      .entry .note-block::before { left: calc((var(--note-depth) - .5) * .75rem); }
+    }
+  </style>
 </head>
 <body class="{{BODY_CLASS}}">
   <a class="sr-only" href="#main">Skip to Content</a><header class="topbar"><a href="../">SYNOMARE</a><span class="date">JST <span id="today">----.--.--</span></span><nav aria-label="site"><a href="../">INDEX</a><a href="../works.html">WORKS</a><a href="index.html" aria-current="page">NOTES</a><a href="../links.html">LINKS</a><a href="../profile.html">PROFILE</a><a href="mailto:synomare@gmail.com">CONTACT</a></nav></header>

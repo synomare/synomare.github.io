@@ -1,6 +1,59 @@
 (function(){
   window.__SYNOMARE_POSTS__ = [
   {
+    "slug": "20260818-174317",
+    "postType": "text",
+    "title": "デザインにできないこと",
+    "displayTitle": "デザインにできないこと",
+    "date": "2026-08-18",
+    "summary": "シルビオ・オルッソ",
+    "cardExcerpt": "シルビオ・オルッソ",
+    "cardSize": "s",
+    "cardSizeMode": "auto",
+    "tags": [
+      "未分類"
+    ],
+    "aliases": [],
+    "relatedNotes": [],
+    "relatedExclude": [],
+    "image": "",
+    "href": "20260818-174317.html",
+    "year": "2026",
+    "yearMonth": "2026-08",
+    "path": "notes/20260818-174317.html",
+    "outgoing": [],
+    "incoming": [],
+    "related": [
+      {
+        "slug": "20260816-200548",
+        "title": "はじめに",
+        "href": "20260816-200548.html",
+        "shared": 1,
+        "manual": false
+      }
+    ],
+    "graph": {
+      "nodes": [
+        {
+          "slug": "20260818-174317",
+          "title": "デザインにできないこと",
+          "kind": "current"
+        },
+        {
+          "slug": "20260816-200548",
+          "title": "はじめに",
+          "kind": "note"
+        }
+      ],
+      "edges": [
+        {
+          "from": "20260818-174317",
+          "to": "20260816-200548"
+        }
+      ]
+    }
+  },
+  {
     "slug": "20260818-110249",
     "postType": "text",
     "title": "Peterparker69 『yo,』",
@@ -11,9 +64,12 @@
     "cardSize": "m",
     "cardSizeMode": "auto",
     "tags": [
-      "感想"
+      "感想",
+      "音楽"
     ],
     "aliases": [],
+    "relatedNotes": [],
+    "relatedExclude": [],
     "image": "/assets/images/notes/1787019160774-44f61a7753cc-img-8443.jpg",
     "href": "20260818-110249.html",
     "year": "2026",
@@ -47,6 +103,8 @@
       "日記"
     ],
     "aliases": [],
+    "relatedNotes": [],
+    "relatedExclude": [],
     "image": "",
     "href": "20260817-024840.html",
     "year": "2026",
@@ -80,6 +138,8 @@
       "未分類"
     ],
     "aliases": [],
+    "relatedNotes": [],
+    "relatedExclude": [],
     "image": "/assets/images/notes/1786878777173-3828089f17bd-img-0487.webp",
     "href": "20260816-200548.html",
     "year": "2026",
@@ -87,16 +147,34 @@
     "path": "notes/20260816-200548.html",
     "outgoing": [],
     "incoming": [],
-    "related": [],
+    "related": [
+      {
+        "slug": "20260818-174317",
+        "title": "デザインにできないこと",
+        "href": "20260818-174317.html",
+        "shared": 1,
+        "manual": false
+      }
+    ],
     "graph": {
       "nodes": [
         {
           "slug": "20260816-200548",
           "title": "はじめに",
           "kind": "current"
+        },
+        {
+          "slug": "20260818-174317",
+          "title": "デザインにできないこと",
+          "kind": "note"
         }
       ],
-      "edges": []
+      "edges": [
+        {
+          "from": "20260816-200548",
+          "to": "20260818-174317"
+        }
+      ]
     }
   }
 ];

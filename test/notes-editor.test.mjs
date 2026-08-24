@@ -8,6 +8,7 @@ import { collectTags, duplicateDocument, filterDocuments } from '../notes-admin/
 import { publishAtomic, publishBatch } from '../notes-admin/src/github.js';
 import { detectImageType, IMAGE_ACCEPT } from '../notes-admin/src/images.js';
 import { analyzeLinks, collectImages, collectTagStats, renameTagInDocuments } from '../notes-admin/src/operations.js';
+import { moveRelatedReference, relatedReferenceIssues, relatedState } from '../notes-admin/src/relatedNotes.js';
 
 test('エディターはJSTタイムスタンプslugと自動メタデータを生成する', () => {
   const slug = generateSlug([], new Date('2026-08-16T03:34:56Z'));
@@ -16,6 +17,56 @@ test('エディターはJSTタイムスタンプslugと自動メタデータを�
   assert.match(markdown, /summary: 最初の段落です。 日記/);
   assert.match(markdown, /- 日記/);
   assert.match(markdown, /card_size: m/);
+});
+
+test('関連記事の手動追加・除外をfrontmatterへ保存し、既存記事で復元する', () => {
+  const note = { ...newNote([]), title: '関連記事テスト', body: '本文', relatedNotes: ['destination'], relatedExclude: ['archive'] };
+  const markdown = serializeDocument(note);
+  assert.match(markdown, /related_notes:\n  - destination/);
+  assert.match(markdown, /related_exclude:\n  - archive/);
+  const parsed = parseDocument(markdown, note.slug);
+  assert.deepEqual(parsed.relatedNotes, ['destination']);
+  assert.deepEqual(parsed.relatedExclude, ['archive']);
+});
+
+test('関連記事の編集状態は手動追加を先頭にし、除外後の自動候補を共有タグ順で補完する', () => {
+  const documents = [
+    { slug: 'source', title: '起点', date: '2026-08-20', tags: ['共通'], aliases: [] },
+    { slug: 'manual', title: '手動', date: '2026-08-15', tags: ['別'], aliases: ['手動alias'] },
+    { slug: 'auto-new', title: '新しい自動', date: '2026-08-19', tags: ['共通'], aliases: [] },
+    { slug: 'auto-old', title: '古い自動', date: '2026-08-18', tags: ['共通'], aliases: [] },
+    { slug: 'excluded', title: '除外', date: '2026-08-17', tags: ['共通'], aliases: [] },
+    { slug: 'available', title: 'タグなし候補', date: '2026-08-16', tags: ['別'], aliases: [] }
+  ];
+  const state = relatedState({ ...documents[0], relatedNotes: ['手動alias'], relatedExclude: ['除外'] }, documents);
+  assert.deepEqual(state.current.map(item => [item.document.slug, item.kind]), [['manual', 'manual'], ['auto-new', 'automatic'], ['auto-old', 'automatic']]);
+  assert.deepEqual(state.excluded.map(item => item.document.slug), ['excluded']);
+  assert.ok(state.available.some(item => item.document.slug === 'available'));
+});
+
+test('関連記事の手動順序を移動でき、公開対象外の参照は現在欄へ混ぜない', () => {
+  const documents = [
+    { slug: 'source', title: '起点', date: '2026-08-20', tags: ['共通'], aliases: [], draft: false },
+    { slug: 'one', title: '一つ', date: '2026-08-19', tags: [], aliases: [], draft: false },
+    { slug: 'two', title: '二つ', date: '2026-08-18', tags: [], aliases: [], draft: false },
+    { slug: 'draft', title: '下書き', date: '2026-08-17', tags: [], aliases: [], draft: true }
+  ];
+  assert.deepEqual(moveRelatedReference(['one', 'two'], 'two', -1), ['two', 'one']);
+  assert.deepEqual(moveRelatedReference(['one', 'two'], 'one', -1), ['one', 'two']);
+  const state = relatedState({ ...documents[0], relatedNotes: ['one', 'draft'], relatedExclude: [] }, documents);
+  assert.deepEqual(state.current.map(item => item.document.slug), ['one']);
+  assert.equal(state.attention[0].status, 'draft');
+});
+
+test('関連記事の不備は未解決・曖昧・自分自身・下書き・追加除外重複として警告できる', () => {
+  const documents = [
+    { slug: 'source', title: '起点', aliases: [], draft: false },
+    { slug: 'one', title: '同名', aliases: [], draft: false },
+    { slug: 'two', title: '同名', aliases: [], draft: false },
+    { slug: 'draft', title: '下書き', aliases: [], draft: true }
+  ];
+  const issues = relatedReferenceIssues({ slug: 'source', relatedNotes: ['存在しない', '同名', 'source', 'draft', 'one'], relatedExclude: ['one'] }, documents);
+  assert.deepEqual(new Set(issues.map(issue => issue.type)), new Set(['unresolved', 'ambiguous', 'self', 'draft', 'conflict']));
 });
 
 test('OAuthメッセージは成功形式だけからtokenを読む', () => {
@@ -197,10 +248,11 @@ test('過去記事の複製は新slugの下書きとして作る', () => {
 });
 
 test('専用エディターは記事ライブラリと複数タグUIを持つ', async () => {
-  const [app, library, tokens] = await Promise.all([
+  const [app, library, tokens, related] = await Promise.all([
     readFile(new URL('../notes-admin/src/App.jsx', import.meta.url), 'utf8'),
     readFile(new URL('../notes-admin/src/ArticleLibrary.jsx', import.meta.url), 'utf8'),
-    readFile(new URL('../notes-admin/src/TokenEditor.jsx', import.meta.url), 'utf8')
+    readFile(new URL('../notes-admin/src/TokenEditor.jsx', import.meta.url), 'utf8'),
+    readFile(new URL('../notes-admin/src/RelatedNotesEditor.jsx', import.meta.url), 'utf8')
   ]);
   assert.match(app, /<ArticleLibrary/);
   assert.match(app, /<TokenEditor label="TAGS"/);
@@ -212,6 +264,18 @@ test('専用エディターは記事ライブラリと複数タグUIを持つ', 
   assert.match(tokens, /nativeEvent\.isComposing/);
   assert.match(tokens, /currentValues\.map/);
   assert.match(tokens, /className="token-add"/);
+  assert.match(app, /<RelatedNotesEditor/);
+  assert.match(app, /relatedState\(note, documents\)\.current/);
+  assert.match(related, /AUTO TAGS/);
+  assert.match(related, /REMOVE/);
+  assert.match(related, /kind === 'automatic'/);
+  assert.match(related, /CURRENT RELATED/);
+  assert.match(related, /ADD \/ HIDDEN/);
+  assert.match(related, /RESTORE/);
+  assert.match(related, /relatedExclude/);
+  assert.match(related, /MOVE|onMove|moveRelatedReference/);
+  assert.match(related, /RESET AUTO/);
+  assert.match(related, /REPAIR/);
 });
 
 test('記事運用ツールはタグ・画像・リンクの保守データを作る', () => {

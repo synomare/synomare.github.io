@@ -90,6 +90,43 @@ tags:
   assert.doesNotMatch(html, /caption\.textContent=img\.title\|\|img\.alt/);
 });
 
+test('エディタのテキスト階層を公開HTMLのブロック構造へ反映する', async t => {
+  const root = await makeSite({
+    'hierarchy-note.md': `---
+title: 階層のある記事
+date: 2026-08-16
+---
+
+親ブロック
+  子ブロック
+  > 孫ブロック
+  > > 曾孫ブロック
+  https://www.youtube.com/watch?v=dQw4w9WgXcQ
+
+    インデントコード
+
+> 通常の引用
+- 親リスト
+  - 子リスト
+`
+  });
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+
+  const result = await runGenerator(root);
+  assert.equal(result.code, 0, result.stderr);
+  const html = await fs.readFile(path.join(root, 'notes', 'hierarchy-note.html'), 'utf8');
+  assert.match(html, /<p>親ブロック<\/p>/);
+  assert.match(html, /<div class="note-block note-depth-1" data-depth="1" style="--note-depth:1"><p>子ブロック<\/p>\s*<\/div>/);
+  assert.match(html, /<div class="note-block note-depth-2" data-depth="2" style="--note-depth:2"><p>孫ブロック<\/p>\s*<\/div>/);
+  assert.match(html, /<div class="note-block note-depth-3" data-depth="3" style="--note-depth:3"><p>曾孫ブロック<\/p>\s*<\/div>/);
+  assert.match(html, /<div class="note-block note-depth-1" data-depth="1" style="--note-depth:1">\s*<div class="video-container"><iframe src="https:\/\/www\.youtube\.com\/embed\/dQw4w9WgXcQ"/);
+  assert.match(html, /<blockquote>\s*<p>通常の引用<\/p>\s*<\/blockquote>/);
+  assert.match(html, /<ul>\s*<li>親リスト<ul>\s*<li>子リスト<\/li>/);
+  assert.match(html, /<pre><code>インデントコード\n<\/code><\/pre>/);
+  const article = html.match(/<article class="entry[\s\S]*?<\/article>/)?.[0] || '';
+  assert.doesNotMatch(article, /親ブロック\s*子ブロック/);
+});
+
 test('同じ公開日の記事はタイムスタンプslugの新しい順に並べる', async t => {
   const root = await makeSite({
     '20260816-090000.md': `---
@@ -393,6 +430,136 @@ tags: [思考]
   assert.match(html, /LOCAL GRAPH/);
 });
 
+test('関連記事はfrontmatterで手動追加・除外でき、タグ自動候補と併用する', async t => {
+  const root = await makeSite({
+    'source.md': `---
+title: 起点
+date: 2026-08-16
+tags: [共通]
+related_notes: [目的地, manual-note]
+related_exclude: [除外記事]
+---
+
+本文です。
+`,
+    'manual-note.md': `---
+title: 手動追加
+date: 2026-08-15
+tags: [別のタグ]
+---
+
+手動でつなぐ記事です。
+`,
+    'alias-target.md': `---
+title: 到着記事
+aliases: [目的地]
+date: 2026-08-14
+tags: [別のタグ]
+---
+
+aliasで解決する記事です。
+`,
+    'auto-note.md': `---
+title: 自動候補
+date: 2026-08-13
+tags: [共通]
+---
+
+タグでつながる記事です。
+`,
+    'excluded.md': `---
+title: 除外記事
+date: 2026-08-12
+tags: [共通]
+---
+
+除外される記事です。
+`
+  });
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+  const result = await runGenerator(root);
+  assert.equal(result.code, 0, result.stderr);
+  const posts = JSON.parse(await fs.readFile(path.join(root, 'notes', 'posts.json'), 'utf8'));
+  const source = posts.find(post => post.slug === 'source');
+  assert.deepEqual(source.relatedNotes, ['目的地', 'manual-note']);
+  assert.deepEqual(source.relatedExclude, ['除外記事']);
+  assert.deepEqual(source.related.map(item => item.slug), ['alias-target', 'manual-note', 'auto-note']);
+  assert.deepEqual(source.related.slice(0, 2).map(item => item.manual), [true, true]);
+  assert.equal(source.related.at(-1).manual, false);
+  assert.doesNotMatch(JSON.stringify(source.related), /excluded/);
+});
+
+test('関連記事の未解決・曖昧な参照は警告し、公開を止めない', async t => {
+  const root = await makeSite({
+    'source.md': `---
+title: 起点
+date: 2026-08-16
+related_notes: [存在しない, 同名]
+---
+
+本文です。
+`,
+    'one.md': `---
+title: 同名
+date: 2026-08-15
+---
+
+本文です。
+`,
+    'two.md': `---
+title: 同名
+date: 2026-08-14
+---
+
+本文です。
+`
+  });
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+  const result = await runGenerator(root);
+  assert.equal(result.code, 0, result.stderr);
+  assert.match(result.stderr, /related_notes/);
+  const posts = JSON.parse(await fs.readFile(path.join(root, 'notes', 'posts.json'), 'utf8'));
+  assert.deepEqual(posts.find(post => post.slug === 'source').related.map(item => item.slug), ['one', 'two']);
+  assert.ok(posts.find(post => post.slug === 'source').related.every(item => item.manual === false));
+});
+
+test('関連記事の順序を保持し、自己参照・下書き・追加除外重複を警告する', async t => {
+  const root = await makeSite({
+    'source.md': `---
+title: 起点
+date: 2026-08-16
+related_notes: [second, draft-note, source]
+related_exclude: [second]
+---
+
+本文です。
+`,
+    'second.md': `---
+title: 二つ目
+date: 2026-08-15
+---
+
+二つ目です。
+`,
+    'draft-note.md': `---
+title: 下書き
+date: 2026-08-14
+draft: true
+---
+
+公開されません。
+`
+  });
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+  const result = await runGenerator(root);
+  assert.equal(result.code, 0, result.stderr);
+  assert.match(result.stderr, /下書き/);
+  assert.match(result.stderr, /自分自身/);
+  assert.match(result.stderr, /追加と除外/);
+  const posts = JSON.parse(await fs.readFile(path.join(root, 'notes', 'posts.json'), 'utf8'));
+  assert.deepEqual(posts.find(post => post.slug === 'source').related.map(item => item.slug), ['second']);
+});
+
 test('未指定カードサイズを内容別に決め、明示指定を優先する', async t => {
   const root = await makeSite({
     'text-only.md': `---
@@ -491,14 +658,19 @@ card_size: huge
   assert.match(result.stderr, /card_size は auto、s、m、l/);
 });
 
-test('Notes一覧は投稿タイプ別表示と4列基準の自動レイアウトを持つ', async () => {
+test('Notes一覧は内容別サイズと順序を守る空き詰めレイアウトを持つ', async () => {
   const source = await fs.readFile(path.join(sourceRoot, 'notes', 'index.html'), 'utf8');
   assert.match(source, /data-type="\$\{type\}"/);
-  assert.match(source, /const span=\{s:3,m:3,l:6\}/);
+  assert.match(source, /const spans=\{s:\{s:2,m:3,l:4\},m:\{s:3,m:4,l:5\},l:\{s:4,m:5,l:7\}\}/);
+  assert.match(source, /mode==='auto'\?\(type==='photo'\?'l':post\.image\?'m':'s'\)/);
+  assert.match(source, /let sequenceFloor=0/);
+  assert.match(source, /data-has-image=/);
   assert.match(source, /post\.postType==='photo'/);
   assert.match(source, /post-card\[data-type="photo"\]/);
-  assert.match(source, /gap:clamp\(18px,1\.8vw,26px\)/);
+  assert.match(source, /--column-gap:clamp\(18px,2\.2vw,34px\)/);
   assert.match(source, /\.post-card>a:focus-visible\{outline:1px solid var\(--red\)/);
+  assert.match(source, /\.post-card:hover>a::before,\.post-card:focus-within>a::before\{opacity:1/);
+  assert.match(source, /\.post-card:hover \.card-media::after,\.post-card:focus-within \.card-media::after/);
   assert.doesNotMatch(source, /\.post-card\{[^}]*border-top:/);
   assert.doesNotMatch(source, /\.card-media\{[^}]*border:/);
 });

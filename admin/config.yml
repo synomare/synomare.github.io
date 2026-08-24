@@ -93,6 +93,26 @@ collections:
         required: false
         default: []
         hint: 内部リンクで使いたい別名がある場合だけ追加します。
+      - label: 関連記事 / 手動追加
+        name: related_notes
+        widget: list
+        required: false
+        default: []
+        hint: slug・タイトル・aliasのいずれかで関連記事を指定します。タグが共通しない記事も追加できます。
+        field:
+          label: 関連記事
+          name: related_note
+          widget: string
+      - label: 関連記事 / 自動除外
+        name: related_exclude
+        widget: list
+        required: false
+        default: []
+        hint: slug・タイトル・aliasのいずれかで、タグから自動表示したくない記事を指定します。
+        field:
+          label: 除外記事
+          name: excluded_note
+          widget: string
       - label: カードサイズ
         name: card_size
         widget: select
