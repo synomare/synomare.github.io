@@ -68,6 +68,14 @@ tags:
 ---
 
 本文です。
+`,
+    'draft-post.md': `---
+title: 非公開の記事
+date: 2026-09-01
+draft: true
+---
+
+下書き本文です。
 `
   }, { 'assets/images/notes/sample.jpg': Buffer.from([0xff, 0xd8, 0xff, 0xd9]) });
   t.after(() => fs.rm(root, { recursive: true, force: true }));
@@ -77,8 +85,11 @@ tags:
 
   const posts = JSON.parse(await fs.readFile(path.join(root, 'notes', 'posts.json'), 'utf8'));
   assert.deepEqual(posts.map(post => post.slug), ['first-post', 'older-post']);
+  assert.deepEqual(posts.map(post => post.archiveNumber), [1, 2]);
   assert.equal(posts[0].image, '/assets/images/notes/sample.jpg');
   assert.deepEqual(posts[0].tags, ['diary', 'update']);
+  const postsScript = await fs.readFile(path.join(root, 'notes', 'posts.js'), 'utf8');
+  assert.match(postsScript, /"archiveNumber": 1/);
 
   const html = await fs.readFile(path.join(root, 'notes', 'first-post.html'), 'utf8');
   assert.match(html, /youtube\.com\/embed\/dQw4w9WgXcQ/);
@@ -427,7 +438,15 @@ tags: [思考]
   const html = await fs.readFile(path.join(root, 'notes', 'source-note.html'), 'utf8');
   assert.match(html, /class="wikilink" href="destination\.html"/);
   assert.match(html, /is-unresolved/);
-  assert.match(html, /LOCAL GRAPH/);
+  assert.doesNotMatch(html, /LOCAL GRAPH|mini-graph|entry-side/);
+  assert.match(html, /\.entry-layout\{display:block;width:100%;max-width:1180px;margin:0 auto\}/);
+  assert.match(html, /\.text-entry>p,[^}]+width:min\(100%,48em\);margin-left:auto;margin-right:auto/);
+  assert.match(html, /\.text-entry>\.note-media,\.text-entry>\.video-container,\.text-entry>\.twitter-tweet\{width:100%;max-width:none\}/);
+  assert.match(html, /\.entry \.note-block \{ position: relative; margin: \.5rem auto 1\.15rem;/);
+  assert.match(html, /class="relations"/);
+  assert.match(html, /Links — この記事から/);
+  assert.match(html, /Related — 関連記事/);
+  assert.doesNotMatch(html, /Backlinks — この記事へ/);
 });
 
 test('関連記事はfrontmatterで手動追加・除外でき、タグ自動候補と併用する', async t => {
@@ -662,15 +681,34 @@ test('Notes一覧は内容別サイズと順序を守る空き詰めレイアウ
   const source = await fs.readFile(path.join(sourceRoot, 'notes', 'index.html'), 'utf8');
   assert.match(source, /data-type="\$\{type\}"/);
   assert.match(source, /const spans=\{s:\{s:2,m:3,l:4\},m:\{s:3,m:4,l:5\},l:\{s:4,m:5,l:7\}\}/);
+  assert.match(source, /autoSpans=\{s:\{plain:2,image:3,photo:4\},m:\{plain:3,image:3,photo:4\},l:\{plain:4,image:4,photo:6\}\}/);
+  assert.match(source, /card\.dataset\.sizeMode==='auto'/);
   assert.match(source, /mode==='auto'\?\(type==='photo'\?'l':post\.image\?'m':'s'\)/);
   assert.match(source, /let sequenceFloor=0/);
   assert.match(source, /data-has-image=/);
   assert.match(source, /post\.postType==='photo'/);
   assert.match(source, /post-card\[data-type="photo"\]/);
+  assert.match(source, /max-height:min\(68vh,560px\)/);
+  assert.match(source, /`\$\{img\.naturalWidth\}\/\$\{img\.naturalHeight\}`/);
+  assert.match(source, /loading="\$\{priority\?'eager':'lazy'\}"/);
   assert.match(source, /--column-gap:clamp\(18px,2\.2vw,34px\)/);
   assert.match(source, /\.post-card>a:focus-visible\{outline:1px solid var\(--red\)/);
   assert.match(source, /\.post-card:hover>a::before,\.post-card:focus-within>a::before\{opacity:1/);
   assert.match(source, /\.post-card:hover \.card-media::after,\.post-card:focus-within \.card-media::after/);
+  assert.match(source, /:root\{--dim:#756e62\}/);
+  assert.match(source, /\.card-excerpt\{font-size:\.78rem\}/);
+  assert.match(source, /Number\.isInteger\(post\.archiveNumber\)\?post\.archiveNumber:posts\.indexOf\(post\)\+1/);
+  assert.match(source, /String\(archiveNumber\)\.padStart\(3,'0'\)/);
+  assert.doesNotMatch(source, /String\(index\+1\)\.padStart\(3,'0'\)/);
+  assert.match(source, /id="filterState"/);
+  assert.match(source, /id="clearFilters"/);
+  assert.match(source, /clearFilters\.hidden=!active/);
+  assert.match(source, /filters\.addEventListener\('submit',event=>event\.preventDefault\(\)\)/);
+  assert.match(source, /clearFilters\.addEventListener\('click',\(\)=>\{clearTimeout\(timer\);search\.value='';tag\.value='';year\.value='';updateUrl\(\);search\.focus\(\)\}\)/);
+  assert.match(source, /\.filter-options\{left:-1px;right:auto;min-width:0;width:min\(88vw,360px\);max-width:calc\(100vw - 24px\)\}/);
+  assert.match(source, /filter-more\[open\] \.filter-options\{position:static/);
+  assert.match(source, /id="postGrid" aria-label="投稿一覧"/);
+  assert.doesNotMatch(source, /id="postGrid" aria-live=/);
   assert.doesNotMatch(source, /\.post-card\{[^}]*border-top:/);
   assert.doesNotMatch(source, /\.card-media\{[^}]*border:/);
 });

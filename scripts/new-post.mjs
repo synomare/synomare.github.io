@@ -249,9 +249,8 @@ function imageMeta(image) {
   if (!image) return ''; const absolute = image.startsWith('//') ? `https:${image}` : /^https?:\/\//i.test(image) ? image : `https://synomare.github.io${image.startsWith('/') ? image : `/${image}`}`;
   return `<meta property="og:image" content="${escapeHtml(absolute)}">\n  <meta name="twitter:image" content="${escapeHtml(absolute)}">`;
 }
-function relationList(title, items, emptyText, className) {
-  const body = items.length ? `<ul>${items.map(item => `<li><a href="${escapeHtml(item.href)}">${escapeHtml(item.title)}</a>${item.context ? `<p>${escapeHtml(item.context)}</p>` : ''}</li>`).join('')}</ul>` : `<p class="relation-empty">${escapeHtml(emptyText)}</p>`;
-  return `<section class="relation ${className}"><h2>${escapeHtml(title)}</h2>${body}</section>`;
+function relationList(title, items, className) {
+  return `<section class="relation ${className}"><h2>${escapeHtml(title)}</h2><ul>${items.map(item => `<li><a href="${escapeHtml(item.href)}">${escapeHtml(item.title)}</a>${item.context ? `<p>${escapeHtml(item.context)}</p>` : ''}</li>`).join('')}</ul></section>`;
 }
 function graphFor(post) {
   const linked = [...post.outgoing, ...post.incoming, ...post.related.slice(0, 3)]; const nodes = [{ slug: post.slug, title: post.displayTitle, kind: 'current' }];
@@ -259,7 +258,12 @@ function graphFor(post) {
   return { nodes, edges: linked.map(item => ({ from: post.slug, to: item.slug })) };
 }
 function relationsHtml(post) {
-  return `<aside class="entry-side" aria-label="記事のつながり"><div class="graph-panel"><div class="side-label">LOCAL GRAPH</div><div class="mini-graph" data-graph="${escapeHtml(JSON.stringify(post.graph))}"></div></div></aside><div class="relations">${relationList('Links — この記事から', post.outgoing, 'この記事からのリンクはまだありません。', 'outgoing')}${relationList('Backlinks — この記事へ', post.incoming, 'この記事へのリンクはまだありません。', 'incoming')}${relationList('Related — 関連記事', post.related, '関連する記事はまだありません。', 'related')}</div>`;
+  const groups = [
+    ['Links — この記事から', post.outgoing, 'outgoing'],
+    ['Backlinks — この記事へ', post.incoming, 'incoming'],
+    ['Related — 関連記事', post.related, 'related']
+  ].filter(([, items]) => items.length);
+  return groups.length ? `<div class="relations">${groups.map(group => relationList(...group)).join('')}</div>` : '';
 }
 function photoHtml(post) {
   const caption = post.title || (post.summary.startsWith('写真 ') ? '' : post.summary);
@@ -271,7 +275,7 @@ async function readPosts({ writeAssets = false } = {}) {
     const filePath = path.join(contentDir, file); const source = await fs.readFile(filePath, 'utf8'); const { data, content: markdownBody } = matter(source); const slug = path.basename(file, '.md');
     rawPosts.push({ slug, markdownBody, ...validatePost({ slug, data, markdownBody, rawDate: readFrontmatterValue(source, 'date'), file: path.relative(repoRoot, filePath) }) });
   }
-  sortPosts(rawPosts); const published = rawPosts.filter(post => !post.draft); const resolver = buildLinkResolver(published); const allResolver = buildLinkResolver(rawPosts);
+  sortPosts(rawPosts); const published = rawPosts.filter(post => !post.draft); published.forEach((post, index) => { post.archiveNumber = index + 1; }); const resolver = buildLinkResolver(published); const allResolver = buildLinkResolver(rawPosts);
   for (const post of published) post.outgoing = post.postType === 'photo' ? [] : wikilinkContexts(post.markdownBody, resolver);
   for (const post of published) {
     post.incoming = published.flatMap(source => source.outgoing.filter(link => link.slug === post.slug).map(link => ({ slug: source.slug, title: source.displayTitle, href: `${source.slug}.html`, context: link.context })));
@@ -297,7 +301,7 @@ async function readPosts({ writeAssets = false } = {}) {
   return { all: rawPosts, published };
 }
 function publicMeta(post) {
-  return { slug: post.slug, postType: post.postType, title: post.title, displayTitle: post.displayTitle, date: post.date, summary: post.summary, cardExcerpt: post.cardExcerpt, cardSize: post.cardSize, cardSizeMode: post.cardSizeMode, tags: post.tags, aliases: post.aliases, relatedNotes: post.relatedNotes, relatedExclude: post.relatedExclude,
+  return { slug: post.slug, archiveNumber: post.archiveNumber, postType: post.postType, title: post.title, displayTitle: post.displayTitle, date: post.date, summary: post.summary, cardExcerpt: post.cardExcerpt, cardSize: post.cardSize, cardSizeMode: post.cardSizeMode, tags: post.tags, aliases: post.aliases, relatedNotes: post.relatedNotes, relatedExclude: post.relatedExclude,
     image: post.image, href: `${post.slug}.html`, year: post.date.slice(0, 4), yearMonth: post.date.slice(0, 7), path: `notes/${post.slug}.html`, outgoing: post.outgoing, incoming: post.incoming, related: post.related, graph: post.graph };
 }
 async function writeData(posts) {

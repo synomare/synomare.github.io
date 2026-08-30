@@ -1,7 +1,46 @@
 (function(){
   window.__SYNOMARE_POSTS__ = [
   {
+    "slug": "20260825-223309",
+    "archiveNumber": 1,
+    "postType": "text",
+    "title": "コミュニケーションのミクロなコストなめんな",
+    "displayTitle": "コミュニケーションのミクロなコストなめんな",
+    "date": "2026-08-25",
+    "summary": "「駆け引き」とか気分でコントロールしてくる系の人らなんなんというやつ Sさんのツイート 見てそう思い返した。 人は高揚感ギャンブルのためのおもちゃでもないしパズルでもないし、サンドバッグでもない。 ならギャンブルとかパズルとかサンドバッグ殴ると実際にやった方がいい。ギャンブルはあんまやらん方がいいと思うけど。 そうい…",
+    "cardExcerpt": "「駆け引き」とか気分でコントロールしてくる系の人らなんなんというやつ Sさんのツイート 見てそう思い返した。 人は高揚感ギャンブルのためのおもちゃでもないしパズルでもないし、サンドバッグでもない。 ならギャンブルとかパズルとかサンドバッグ殴ると実際にやった方がいい。ギャンブルはあんまやらん方がいいと思うけど。 そうい…",
+    "cardSize": "s",
+    "cardSizeMode": "auto",
+    "tags": [
+      "日記"
+    ],
+    "aliases": [],
+    "relatedNotes": [],
+    "relatedExclude": [
+      "20260817-024840"
+    ],
+    "image": "",
+    "href": "20260825-223309.html",
+    "year": "2026",
+    "yearMonth": "2026-08",
+    "path": "notes/20260825-223309.html",
+    "outgoing": [],
+    "incoming": [],
+    "related": [],
+    "graph": {
+      "nodes": [
+        {
+          "slug": "20260825-223309",
+          "title": "コミュニケーションのミクロなコストなめんな",
+          "kind": "current"
+        }
+      ],
+      "edges": []
+    }
+  },
+  {
     "slug": "20260818-174317",
+    "archiveNumber": 2,
     "postType": "text",
     "title": "デザインにできないこと",
     "displayTitle": "デザインにできないこと",
@@ -55,6 +94,7 @@
   },
   {
     "slug": "20260818-110249",
+    "archiveNumber": 3,
     "postType": "text",
     "title": "Peterparker69 『yo,』",
     "displayTitle": "Peterparker69 『yo,』",
@@ -64,8 +104,7 @@
     "cardSize": "m",
     "cardSizeMode": "auto",
     "tags": [
-      "感想",
-      "音楽"
+      "感想"
     ],
     "aliases": [],
     "relatedNotes": [],
@@ -91,6 +130,7 @@
   },
   {
     "slug": "20260817-024840",
+    "archiveNumber": 4,
     "postType": "text",
     "title": "短歌のテクスチャ",
     "displayTitle": "短歌のテクスチャ",
@@ -112,20 +152,39 @@
     "path": "notes/20260817-024840.html",
     "outgoing": [],
     "incoming": [],
-    "related": [],
+    "related": [
+      {
+        "slug": "20260825-223309",
+        "title": "コミュニケーションのミクロなコストなめんな",
+        "href": "20260825-223309.html",
+        "shared": 1,
+        "manual": false
+      }
+    ],
     "graph": {
       "nodes": [
         {
           "slug": "20260817-024840",
           "title": "短歌のテクスチャ",
           "kind": "current"
+        },
+        {
+          "slug": "20260825-223309",
+          "title": "コミュニケーションのミクロなコストなめんな",
+          "kind": "note"
         }
       ],
-      "edges": []
+      "edges": [
+        {
+          "from": "20260817-024840",
+          "to": "20260825-223309"
+        }
+      ]
     }
   },
   {
     "slug": "20260816-200548",
+    "archiveNumber": 5,
     "postType": "text",
     "title": "はじめに",
     "displayTitle": "はじめに",

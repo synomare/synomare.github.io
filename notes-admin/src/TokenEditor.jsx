@@ -1,7 +1,8 @@
-import { useId, useState } from 'react';
+import { useId, useRef, useState } from 'react';
 
 export default function TokenEditor({ label, values, suggestions = [], onChange, placeholder = '', max = 20 }) {
   const [input, setInput] = useState('');
+  const composing = useRef(false);
   const listId = useId();
   const currentValues = Array.isArray(values) ? values : [];
   const add = raw => {
@@ -23,7 +24,7 @@ export default function TokenEditor({ label, values, suggestions = [], onChange,
     <span className="token-label">{label} <small>{currentValues.length}/{max}</small></span>
     <div className="token-editor">
       {currentValues.map(value => <span className="token" key={value}>{label === 'TAGS' ? '#' : ''}{value}<button type="button" aria-label={`${value}を削除`} onClick={() => remove(value)}>×</button></span>)}
-      <input value={input} list={listId} placeholder={currentValues.length ? '追加…' : placeholder} aria-label={`${label}を追加`} onChange={event => setInput(event.target.value)} onKeyDown={keyDown} onPaste={paste} onBlur={() => add(input)}/>
+      <input value={input} list={listId} placeholder={currentValues.length ? '追加…' : placeholder} aria-label={`${label}を追加`} onChange={event => setInput(event.target.value)} onCompositionStart={() => { composing.current = true; }} onCompositionEnd={() => { composing.current = false; }} onKeyDown={keyDown} onPaste={paste} onBlur={() => { if (!composing.current) add(input); }}/>
       <button type="button" className="token-add" disabled={!input.trim()} onMouseDown={event => event.preventDefault()} onClick={() => add(input)}>ADD</button>
       <datalist id={listId}>{suggestions.filter(value => !currentValues.includes(value)).map(value => <option value={value} key={value}/>)}</datalist>
     </div>

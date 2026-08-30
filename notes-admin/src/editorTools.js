@@ -25,6 +25,12 @@ function listMatch(line) {
   return line.match(/^(\s*)(?:(?:[-+*]|\d+[.)])[ \t]+(?:\[[ xX]\][ \t]*)?)(.*)$/);
 }
 
+export function selectionSupportsHierarchyTab(source, from, to) {
+  const range = selectedLineRange(source, from, to);
+  if (range.selected.includes('\n')) return true;
+  return Boolean(quoteMatch(range.selected) || listMatch(range.selected));
+}
+
 function leadingSpaces(line) {
   return (line.match(/^[ \t]*/) || [''])[0];
 }
@@ -131,6 +137,25 @@ export function outlineFromBody(body) {
     const match = line.match(/^(#{1,6})\s+(.+?)\s*#*$/);
     return match ? [{ level: match[1].length, text: match[2].trim(), line: index + 1 }] : [];
   });
+}
+
+export function noteCompletionOptions(notes = [], query = '', limit = 12) {
+  const normalize = value => String(value || '').normalize('NFKC').toLocaleLowerCase('ja');
+  const titleCounts = new Map();
+  for (const note of notes) {
+    const title = normalize(note.title);
+    if (title) titleCounts.set(title, (titleCounts.get(title) || 0) + 1);
+  }
+  const needle = normalize(query);
+  return notes
+    .filter(note => !needle || [note.slug, note.title, ...(note.aliases || [])].some(value => normalize(value).includes(needle)))
+    .slice(0, limit)
+    .map(note => {
+      const title = String(note.title || '').trim();
+      const ambiguousTitle = title && (titleCounts.get(normalize(title)) || 0) > 1;
+      const target = ambiguousTitle ? note.slug : title || note.slug;
+      return { label: title || note.slug, detail: `${note.draft ? 'DRAFT' : 'PUBLIC'} · ${note.slug}`, apply: `${target}]]` };
+    });
 }
 
 export function preflightIssues(note, documents = [], imageProcessing = false) {

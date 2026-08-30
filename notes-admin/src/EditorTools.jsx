@@ -7,8 +7,8 @@ const tools = [
 ];
 
 const hierarchyTools = [
-  ['DEPTH −', 'outdent', '選択行を一段浅く（Shift + Tab）'],
-  ['DEPTH +', 'indent', '選択行を一段深く（Tab）'],
+  ['DEPTH −', 'outdent', '選択行を一段浅く（⌘[／リストではShift + Tab）'],
+  ['DEPTH +', 'indent', '選択行を一段深く（⌘]／リストではTab）'],
   ['LEVEL −', 'headingDown', '見出しレベルを浅く'],
   ['LEVEL +', 'headingUp', '見出しレベルを深く']
 ];

@@ -1,10 +1,10 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
-import { EditorState } from '@codemirror/state';
+import { EditorState, Transaction } from '@codemirror/state';
 import { EditorView, keymap, placeholder } from '@codemirror/view';
 import { defaultKeymap, history, historyKeymap, redo, undo } from '@codemirror/commands';
 import { autocompletion, closeBrackets, closeBracketsKeymap, startCompletion } from '@codemirror/autocomplete';
 import { markdown } from '@codemirror/lang-markdown';
-import { changeHeadingLevel, changeLineDepth, continueMarkdownBlock, hierarchyDepthAt } from './editorTools.js';
+import { changeHeadingLevel, changeLineDepth, continueMarkdownBlock, hierarchyDepthAt, noteCompletionOptions, selectionSupportsHierarchyTab } from './editorTools.js';
 
 function replaceSelection(view, before, after = before, placeholderText = '') {
   const { from, to } = view.state.selection.main;
@@ -88,6 +88,10 @@ const MarkdownEditor = forwardRef(function MarkdownEditor({ value, onChange, not
     command: command => runCommand(viewRef.current, command),
     insertMarkdown: text => insertText(viewRef.current, text),
     focus: () => viewRef.current?.focus(),
+    resetScroll: () => {
+      const view = viewRef.current; if (!view) return;
+      view.scrollDOM.scrollTop = 0; view.scrollDOM.scrollLeft = 0;
+    },
     goToLine: lineNumber => {
       const view = viewRef.current; if (!view) return;
       const line = view.state.doc.line(Math.max(1, Math.min(lineNumber, view.state.doc.lines)));
@@ -97,13 +101,10 @@ const MarkdownEditor = forwardRef(function MarkdownEditor({ value, onChange, not
 
   useEffect(() => {
     const source = context => {
+      if (context.view?.composing) return null;
       const before = context.matchBefore(/\[\[[^\]\n]*/);
       if (!before) return null;
-      const query = before.text.slice(2).normalize('NFKC').toLocaleLowerCase('ja');
-      const options = notesRef.current
-        .filter(note => !query || [note.slug, note.title, ...(note.aliases || [])].join(' ').normalize('NFKC').toLocaleLowerCase('ja').includes(query))
-        .slice(0, 12)
-        .map(note => ({ label: note.title, detail: note.slug, apply: `${note.title}]]` }));
+      const options = noteCompletionOptions(notesRef.current, before.text.slice(2));
       return { from: before.from + 2, options, validFor: /^[^\]\n]*$/ };
     };
     const updateListener = EditorView.updateListener.of(update => {
@@ -111,7 +112,7 @@ const MarkdownEditor = forwardRef(function MarkdownEditor({ value, onChange, not
       if (update.docChanged || update.selectionSet) {
         depthRef.current?.(hierarchyDepthAt(update.state.doc.toString(), update.state.selection.main.head));
       }
-      if (!update.docChanged) return;
+      if (!update.docChanged || update.view.composing) return;
       const cursor = update.state.selection.main.head;
       const tail = update.state.sliceDoc(Math.max(0, cursor - 100), cursor);
       if (/\[\[[^\]\n]*$/.test(tail)) queueMicrotask(() => startCompletion(update.view));
@@ -128,14 +129,15 @@ const MarkdownEditor = forwardRef(function MarkdownEditor({ value, onChange, not
             { key: 'Mod-b', run: editor => { runCommand(editor, 'bold'); return true; } },
             { key: 'Mod-k', run: editor => { runCommand(editor, 'link'); return true; } },
             { key: 'Mod-Shift-k', run: editor => { runCommand(editor, 'wikilink'); return true; } },
-            { key: 'Tab', run: editor => { runCommand(editor, 'indent'); return true; } },
-            { key: 'Shift-Tab', run: editor => { runCommand(editor, 'outdent'); return true; } },
+            { key: 'Tab', run: editor => { const selection = editor.state.selection.main; if (editor.composing || !selectionSupportsHierarchyTab(editor.state.doc.toString(), selection.from, selection.to)) return false; runCommand(editor, 'indent'); return true; } },
+            { key: 'Shift-Tab', run: editor => { const selection = editor.state.selection.main; if (editor.composing || !selectionSupportsHierarchyTab(editor.state.doc.toString(), selection.from, selection.to)) return false; runCommand(editor, 'outdent'); return true; } },
             { key: 'Mod-]', run: editor => { runCommand(editor, 'indent'); return true; } },
             { key: 'Mod-[', run: editor => { runCommand(editor, 'outdent'); return true; } },
-            { key: 'Enter', run: editor => continueMarkdownBlock(editor) },
+            { key: 'Enter', run: editor => editor.composing ? false : continueMarkdownBlock(editor) },
             ...closeBracketsKeymap, ...defaultKeymap, ...historyKeymap
           ]),
           EditorView.domEventHandlers({
+            compositionend: (_event, view) => { const cursor = view.state.selection.main.head; const tail = view.state.sliceDoc(Math.max(0, cursor - 100), cursor); if (/\[\[[^\]\n]*$/.test(tail)) queueMicrotask(() => startCompletion(view)); return false; },
             paste: event => { const files = [...(event.clipboardData?.files || [])].filter(file => file.type.startsWith('image/') || /\.(?:heic|heif|jpe?g|png|gif|webp|avif|bmp|svg)$/i.test(file.name)); if (!files.length) return false; event.preventDefault(); filesRef.current?.(files); return true; },
             drop: event => { const files = [...(event.dataTransfer?.files || [])].filter(file => file.type.startsWith('image/') || /\.(?:heic|heif|jpe?g|png|gif|webp|avif|bmp|svg)$/i.test(file.name)); if (!files.length) return false; event.preventDefault(); filesRef.current?.(files); return true; }
           }),
@@ -150,7 +152,10 @@ const MarkdownEditor = forwardRef(function MarkdownEditor({ value, onChange, not
 
   useEffect(() => {
     const view = viewRef.current;
-    if (view && view.state.doc.toString() !== value) view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: value } });
+    if (view && view.state.doc.toString() !== value) {
+      view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: value }, annotations: Transaction.addToHistory.of(false) });
+      view.scrollDOM.scrollTop = 0; view.scrollDOM.scrollLeft = 0;
+    }
   }, [value]);
 
   return <div className="editor-host" ref={host} />;
