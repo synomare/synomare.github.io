@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { generateSlug, newNote, parseDocument, parseOAuthMessage, serializeDocument } from '../notes-admin/src/lib.js';
-import { changeHeadingLevel, changeLineDepth, continueMarkdownBlock, documentStats, hierarchyDepthAt, noteCompletionOptions, outlineFromBody, preflightIssues, selectionSupportsHierarchyTab } from '../notes-admin/src/editorTools.js';
+import { changeHeadingLevel, changeLineDepth, continueMarkdownBlock, documentStats, hierarchyDepthAt, imageMarkdownRanges, noteCompletionOptions, outlineFromBody, preflightIssues, selectionSupportsHierarchyTab, slashCommandOptions } from '../notes-admin/src/editorTools.js';
 import { createLocalDraftKey, draftKeyFor } from '../notes-admin/src/drafts.js';
 import { previewHtml } from '../notes-admin/src/preview.js';
 import { articleFolios, collectTags, draftLibraryItems, duplicateDocument, filterDocuments, filterLocalDraftItems, localDraftIndex, unchangedDraftRecords } from '../notes-admin/src/articleLibrary.js';
@@ -10,6 +10,8 @@ import { publishAtomic, publishBatch } from '../notes-admin/src/github.js';
 import { detectImageType, IMAGE_ACCEPT } from '../notes-admin/src/images.js';
 import { analyzeLinks, collectImages, collectTagStats, renameTagInDocuments } from '../notes-admin/src/operations.js';
 import { moveRelatedReference, relatedReferenceIssues, relatedState } from '../notes-admin/src/relatedNotes.js';
+import { createPublicationJob, hasQueuedDraft, hasQueuedSlug, nextPublication, publicationActivity, publicationSummary, removePublishedImages, removeQueuedPublication, replacePublication, stopPublicationQueue } from '../notes-admin/src/publicationQueue.js';
+import { changeSummary, compareNotes, diffLines } from '../notes-admin/src/changeReview.js';
 
 test('エディターはJSTタイムスタンプslugと自動メタデータを生成する', () => {
   const slug = generateSlug([], new Date('2026-08-16T03:34:56Z'));
@@ -18,6 +20,29 @@ test('エディターはJSTタイムスタンプslugと自動メタデータを�
   assert.match(markdown, /summary: 最初の段落です。 日記/);
   assert.match(markdown, /- 日記/);
   assert.match(markdown, /card_size: m/);
+  assert.equal(newNote([], 'photo').postType, 'photo');
+  assert.equal(newNote([], 'unknown').postType, 'text');
+});
+
+test('通常の編集でもGitHub版との差分をメタデータと本文行で確認できる', () => {
+  const base = { ...newNote([]), slug: 'existing', existing: true, title: '元の題', body: '導入\n\n残す行\n\n古い結び', tags: ['思考'], draft: false };
+  const current = { ...base, title: '新しい題', body: '導入\n\n追加した行\n\n残す行\n\n新しい結び', tags: ['思考', '制作'], draft: true };
+  const comparison = compareNotes(base, current);
+  assert.equal(comparison.changed, true);
+  assert.deepEqual(comparison.metadata.map(change => change.key), ['title', 'tags', 'draft']);
+  assert.equal(comparison.body.added, 3);
+  assert.equal(comparison.body.removed, 1);
+  assert.match(changeSummary(comparison), /3 FIELDS · \+3 \/ −1 LINES/);
+  assert.ok(comparison.body.operations.some(operation => operation.type === 'add' && operation.text === '追加した行'));
+  assert.ok(comparison.body.operations.some(operation => operation.type === 'remove' && operation.text === '古い結び'));
+});
+
+test('変更なしと新規記事を公開差分で区別する', () => {
+  const note = { ...newNote([]), slug: 'same', title: '同じ', body: '本文', tags: ['記録'] };
+  assert.equal(changeSummary(compareNotes(note, { ...note, tags: [...note.tags] })), 'NO CHANGES');
+  assert.equal(changeSummary(compareNotes(null, note)), 'NEW NOTE');
+  assert.deepEqual(diffLines('同じ', '同じ'), { changed: false, added: 0, removed: 0, operations: [] });
+  assert.deepEqual(diffLines('', '最初の行'), { changed: true, added: 1, removed: 0, operations: [{ type: 'add', text: '最初の行' }] });
 });
 
 test('新規記事はslugを変えても変わらない独立したローカル下書きキーを使う', () => {
@@ -40,6 +65,15 @@ test('内部リンク補完は同名記事をslugで区別し公開状態も示�
   assert.deepEqual(options.map(option => option.apply), ['one]]', 'two]]', '固有名]]']);
   assert.match(options[0].detail, /PUBLIC · one/);
   assert.match(options[1].detail, /DRAFT · two/);
+});
+
+test('行頭スラッシュコマンドはMarkdownブロックとカーソル位置を定義する', () => {
+  const options = slashCommandOptions();
+  assert.deepEqual(options.map(option => option.label), ['/h2', '/h3', '/bullet', '/number', '/task', '/quote', '/code', '/divider', '/wikilink']);
+  assert.deepEqual(options.find(option => option.label === '/task'), { label: '/task', detail: 'タスクリスト', insert: '- [ ] ', cursorOffset: 6 });
+  assert.deepEqual(options.find(option => option.label === '/code'), { label: '/code', detail: 'コードブロック', insert: '```\n\n```', cursorOffset: 4 });
+  assert.equal(Object.isFrozen(options), true);
+  assert.equal(Object.isFrozen(options[0]), true);
 });
 
 test('Tabによる階層変更はリスト・引用・複数行だけで有効になる', () => {
@@ -177,6 +211,73 @@ test('iPhone編集画面は記事選択、本文、固定公開操作を優先�
   assert.match(styles, /safe-area-inset-bottom/);
   assert.match(styles, /grid-template-columns: repeat\(4, minmax\(0, 1fr\)\)/);
   assert.match(styles, /font-size: 16px !important/);
+  assert.match(styles, /\.app-shell\.is-focus \.type-switch,[\s\S]*\.app-shell\.is-focus \.document-meta \{ display: none; \}/);
+  assert.match(styles, /\.app-shell\.is-focus \.document-head \{[\s\S]*min-height: 52px/);
+  assert.match(styles, /\.app-shell\.is-focus \.title-input \{[\s\S]*text-overflow: ellipsis/);
+});
+
+test('本文エディターは入口の空き時間と記事選択意図で先読みし低速回線を圧迫しない', async () => {
+  const [app, lazyEditor, retryable, library, styles] = await Promise.all([
+    readFile(new URL('../notes-admin/src/App.jsx', import.meta.url), 'utf8'),
+    readFile(new URL('../notes-admin/src/MarkdownEditorLazy.jsx', import.meta.url), 'utf8'),
+    readFile(new URL('../notes-admin/src/retryableLazy.js', import.meta.url), 'utf8'),
+    readFile(new URL('../notes-admin/src/ArticleLibrary.jsx', import.meta.url), 'utf8'),
+    readFile(new URL('../notes-admin/src/overrides.css', import.meta.url), 'utf8')
+  ]);
+  assert.match(retryable, /let modulePromise = null/);
+  assert.match(lazyEditor, /export function preloadMarkdownEditor/);
+  assert.match(retryable, /modulePromise = null;\s+throw error/);
+  assert.match(lazyEditor, /role="status" aria-live="polite"/);
+  assert.match(app, /connection\?\.saveData/);
+  assert.match(app, /SLOW_EFFECTIVE_TYPE\.test\(connection\?\.effectiveType/);
+  assert.match(app, /requestIdleCallback\(prepareEditor, \{ timeout: 1600 \}\)/);
+  assert.match(app, /setTimeout\(prepareEditor, 900\)/);
+  assert.match(app, /onEditorIntent=\{prepareEditor\}/);
+  assert.match(library, /onPointerEnter=\{onEditorIntent\}/);
+  assert.match(library, /onPointerDown=\{onEditorIntent\}/);
+  assert.match(library, /onFocus=\{onEditorIntent\}/);
+  assert.match(styles, /\.editor-loading-lines/);
+  assert.doesNotMatch(lazyEditor, /heic2any/);
+});
+
+test('本文エディターのchunk取得失敗を本文領域へ閉じ込め再試行できる', async () => {
+  const [lazyEditor, boundary, retryable, styles] = await Promise.all([
+    readFile(new URL('../notes-admin/src/MarkdownEditorLazy.jsx', import.meta.url), 'utf8'),
+    readFile(new URL('../notes-admin/src/LazyModuleBoundary.jsx', import.meta.url), 'utf8'),
+    readFile(new URL('../notes-admin/src/retryableLazy.js', import.meta.url), 'utf8'),
+    readFile(new URL('../notes-admin/src/overrides.css', import.meta.url), 'utf8')
+  ]);
+  assert.match(boundary, /class LazyModuleBoundary extends Component/);
+  assert.match(boundary, /static getDerivedStateFromError/);
+  assert.match(lazyEditor, /function resetEditor\(\)[\s\S]*Editor = lazy\(editorModule\.loadRetry\)/);
+  assert.match(retryable, /url\.origin === location\.origin && isExpectedPath/);
+  assert.match(retryable, /url\.searchParams\.set\('retry'/);
+  assert.match(retryable, /import\(\/\* @vite-ignore \*\/ url\.href\)/);
+  assert.match(lazyEditor, /role="alert"/);
+  assert.match(lazyEditor, /RETRY EDITOR/);
+  assert.match(boundary, /this\.props\.renderContent\(\)/);
+  assert.match(styles, /\.editor-load-error/);
+  assert.match(styles, /\.editor-load-error button:focus-visible/);
+});
+
+test('Markdownプレビューは表示モードへの意図で先読みし取得失敗から再試行できる', async () => {
+  const [app, tools, lazyPreview, styles] = await Promise.all([
+    readFile(new URL('../notes-admin/src/App.jsx', import.meta.url), 'utf8'),
+    readFile(new URL('../notes-admin/src/EditorTools.jsx', import.meta.url), 'utf8'),
+    readFile(new URL('../notes-admin/src/MarkdownPreviewLazy.jsx', import.meta.url), 'utf8'),
+    readFile(new URL('../notes-admin/src/overrides.css', import.meta.url), 'utf8')
+  ]);
+  assert.match(lazyPreview, /export function preloadMarkdownPreview/);
+  assert.match(lazyPreview, /MarkdownPreview-\[\\w-\]\+/);
+  assert.match(lazyPreview, /role="status" aria-live="polite"/);
+  assert.match(lazyPreview, /role="alert"/);
+  assert.match(lazyPreview, /RETRY PREVIEW/);
+  assert.match(app, /preloadMarkdownPreview\(\)\.catch/);
+  assert.match(app, /onPreviewIntent=\{preparePreview\}/);
+  assert.match(tools, /value === 'edit' \? undefined : onPreviewIntent/);
+  assert.match(tools, /onPointerDown=/);
+  assert.match(tools, /onFocus=/);
+  assert.match(styles, /\.preview-load-error/);
 });
 
 test('本文統計と見出しアウトラインを生成する', () => {
@@ -189,6 +290,15 @@ test('本文統計と見出しアウトラインを生成する', () => {
   assert.equal(stats.headings, 2);
   assert.equal(stats.minutes, 1);
   assert.ok(stats.characters > 10);
+});
+
+test('画像Markdownは本文を変えずコンパクト表示用の範囲へ分解する', () => {
+  const body = '![](/assets/images/notes/one.webp)\n\n本文\n\n![説明](https://example.com/two.jpg)';
+  assert.deepEqual(imageMarkdownRanges(body), [
+    { from: 0, to: 34, alt: '', index: 1 },
+    { from: 40, to: 74, alt: '説明', index: 2 }
+  ]);
+  assert.deepEqual(imageMarkdownRanges('![壊れた画像](改行\npath)'), []);
 });
 
 test('本文の階層をMarkdown互換のまま行単位で調整できる', () => {
@@ -228,18 +338,24 @@ test('Markdownプレビューは生HTMLを実行せず内部リンクを表示�
   assert.match(html, />表示名<\/a>/);
 });
 
-test('エディターは書式、プレビュー、貼り付け画像、コピーを提供する', async () => {
-  const [app, editor, tools, operations] = await Promise.all([
+test('エディターは書式、検索置換、プレビュー、貼り付け画像、コピーを提供する', async () => {
+  const [app, editor, tools, operations, styles] = await Promise.all([
     readFile(new URL('../notes-admin/src/App.jsx', import.meta.url), 'utf8'),
     readFile(new URL('../notes-admin/src/MarkdownEditor.jsx', import.meta.url), 'utf8'),
     readFile(new URL('../notes-admin/src/EditorTools.jsx', import.meta.url), 'utf8'),
-    readFile(new URL('../notes-admin/src/OperationsPanel.jsx', import.meta.url), 'utf8')
+    readFile(new URL('../notes-admin/src/OperationsPanel.jsx', import.meta.url), 'utf8'),
+    readFile(new URL('../notes-admin/src/overrides.css', import.meta.url), 'utf8')
   ]);
   assert.match(app, /COPY MD/);
   assert.match(app, /<MarkdownPreview/);
   assert.match(app, /<PublishCheck/);
   assert.match(editor, /paste: event/);
   assert.match(editor, /drop: event/);
+  assert.match(editor, /class ImageMarkdownWidget extends WidgetType/);
+  assert.match(editor, /Decoration\.replace\(\{ widget: new ImageMarkdownWidget\(range\) \}\)/);
+  assert.match(editor, /button\.addEventListener\('click'/);
+  assert.match(editor, /button\.addEventListener\('keydown'/);
+  assert.match(editor, /revealImageMarkdownAt\(this\.range\.from, view\)/);
   assert.match(editor, /Mod-Shift-k/);
   assert.match(editor, /key: 'Tab'/);
   assert.match(editor, /key: 'Shift-Tab'/);
@@ -250,6 +366,13 @@ test('エディターは書式、プレビュー、貼り付け画像、コピ�
   assert.match(editor, /resetScroll/);
   assert.match(editor, /Transaction\.addToHistory\.of\(false\)/);
   assert.match(editor, /selectionSupportsHierarchyTab/);
+  assert.match(editor, /openSearchPanel/);
+  assert.match(editor, /search\(\{ top: true \}\)/);
+  assert.match(editor, /\.\.\.searchKeymap/);
+  assert.match(editor, /本文を検索/);
+  assert.match(editor, /slashCommandOptions/);
+  assert.match(editor, /override: \[wikilinkSource, slashSource\]/);
+  assert.match(editor, /Transaction\.userEvent\.of\('input\.complete'\)/);
   assert.match(app, /persistActiveDraft/);
   assert.match(app, /resetEditingPosition/);
   assert.match(app, /pagehide/);
@@ -259,8 +382,17 @@ test('エディターは書式、プレビュー、貼り付け画像、コピ�
   assert.match(app, /BLOCKED —/);
   assert.match(tools, /\['edit', 'split', 'preview'\]/);
   assert.match(tools, /toUpperCase\(\)/);
+  assert.match(tools, /aria-expanded=\{formatOpen\}/);
+  assert.match(tools, /markdown-format-tools/);
+  assert.match(tools, /setFormatOpen\(false\)/);
   assert.match(tools, /OUTLINE/);
   assert.match(tools, /DEPTH −/);
+  assert.match(tools, /\['FIND', 'search'/);
+  assert.match(styles, /\.cm-searchMatch-selected/);
+  assert.match(styles, /\.cm-search \.cm-textfield/);
+  assert.match(styles, /\.editor-toolbar\.formats-open \.format-tools/);
+  assert.match(styles, /\.cm-image-token/);
+  assert.match(styles, /grid-template-columns: repeat\(5/);
   assert.match(tools, /LEVEL \+/);
   assert.match(app, /<OperationsPanel/);
   assert.match(operations, /TAG MANAGEMENT/);
@@ -283,6 +415,92 @@ test('記事ライブラリは本文・タグ・公開状態で絞り込み並�
     { slug: 'published-new', date: '2026-08-17', draft: false }
   ]);
   assert.deepEqual([folios.get('published-new'), folios.get('published-old'), folios.get('draft-newest')], [1, 2, 1]);
+});
+
+test('公開キューは追加時の原稿を固定し、追加順の次項目だけを選ぶ', () => {
+  const source = { ...newNote([]), slug: 'first-note', title: '最初', body: '最初の本文', tags: ['記録'] };
+  const first = createPublicationJob({
+    id: 'job-1',
+    note: source,
+    images: [{ path: 'assets/images/notes/one.webp', file: new Blob(['one']) }],
+    markdown: '# 最初',
+    draftRecord: { key: 'local:first', savedAt: 100, fingerprint: 'fingerprint-1' },
+    enqueuedAt: 100
+  });
+  source.title = 'あとから変更';
+  source.tags.push('追加');
+  const second = createPublicationJob({ id: 'job-2', note: { ...newNote([]), slug: 'second-note', title: '次' }, markdown: '# 次', enqueuedAt: 200 });
+  assert.equal(first.title, '最初');
+  assert.deepEqual(first.note.tags, ['記録']);
+  assert.equal(nextPublication([first, second]).id, 'job-1');
+  const publishing = replacePublication([first, second], first.id, { state: 'publishing' });
+  assert.equal(nextPublication(publishing).id, 'job-2');
+  assert.equal(hasQueuedSlug(publishing, 'first-note'), true);
+  assert.equal(hasQueuedDraft(publishing, 'local:first'), true);
+  assert.deepEqual(publicationSummary(publishing), { queued: 1, publishing: 1, error: 0, published: 0, active: 2, total: 2 });
+  const cancelled = removeQueuedPublication(publishing, second.id);
+  assert.deepEqual(cancelled.map(item => item.id), ['job-1']);
+  assert.equal(hasQueuedSlug(cancelled, 'second-note'), false);
+  assert.deepEqual(removeQueuedPublication(publishing, first.id), publishing);
+});
+
+test('公開キュー停止は完了項目だけを残し、公開済み画像を再送対象から外す', () => {
+  const note = { ...newNote([]), slug: 'queued-note', title: 'Queued' };
+  const done = { ...createPublicationJob({ id: 'done', note, markdown: '# done' }), state: 'done' };
+  const failed = { ...createPublicationJob({ id: 'failed', note: { ...note, slug: 'failed-note' }, markdown: '# failed' }), state: 'error' };
+  const waiting = createPublicationJob({ id: 'waiting', note: { ...note, slug: 'waiting-note' }, markdown: '# waiting' });
+  assert.deepEqual(stopPublicationQueue([done, failed, waiting]).map(item => item.id), ['done']);
+  const remaining = removePublishedImages(
+    [{ path: 'one.webp' }, { path: 'two.webp' }, { path: 'three.webp' }],
+    [{ path: 'one.webp' }, { path: 'three.webp' }]
+  );
+  assert.deepEqual(remaining.map(image => image.path), ['two.webp']);
+});
+
+test('固定操作列用の公開キュー表示は現在位置・待機数・停止・完了を要約する', () => {
+  const note = { ...newNote([]), slug: 'first', title: '最初' };
+  const done = { ...createPublicationJob({ id: 'done', note, markdown: '# done' }), state: 'done' };
+  const publishing = { ...createPublicationJob({ id: 'publishing', note: { ...note, slug: 'second', title: '次' }, markdown: '# next' }), state: 'publishing' };
+  const waiting = createPublicationJob({ id: 'waiting', note: { ...note, slug: 'third', title: '最後' }, markdown: '# last' });
+  assert.deepEqual(publicationActivity([done, publishing, waiting]), {
+    state: 'PUBLISHING', position: 2, total: 3, waiting: 1, completed: 1, title: '次'
+  });
+  assert.equal(publicationActivity([done, { ...waiting, state: 'error' }], true).state, 'STOPPED');
+  assert.deepEqual(publicationActivity([done]), {
+    state: 'COMPLETE', position: 1, total: 1, waiting: 0, completed: 1, title: '最初'
+  });
+  assert.equal(publicationActivity([]), null);
+});
+
+test('連続公開は直前に成功したcommit SHAを次の親として直列化する', async t => {
+  const originalFetch = globalThis.fetch;
+  let currentMain = 'base';
+  let commitNumber = 0;
+  const parents = [];
+  t.after(() => { globalThis.fetch = originalFetch; });
+  globalThis.fetch = async (url, options = {}) => {
+    const path = String(url);
+    const body = options.body ? JSON.parse(options.body) : null;
+    if (path.endsWith('/git/ref/heads/main')) return Response.json({ object: { sha: currentMain } });
+    if (path.includes('/git/commits/') && (options.method || 'GET') === 'GET') return Response.json({ tree: { sha: `tree-${currentMain}` } });
+    if (path.endsWith('/git/blobs')) return Response.json({ sha: `blob-${Date.now()}` }, { status: 201 });
+    if (path.endsWith('/git/trees')) return Response.json({ sha: `tree-new-${commitNumber + 1}` }, { status: 201 });
+    if (path.endsWith('/git/commits')) {
+      parents.push(body.parents[0]);
+      commitNumber += 1;
+      return Response.json({ sha: `commit-${commitNumber}` }, { status: 201 });
+    }
+    if (path.endsWith('/git/refs/heads/main') && options.method === 'PATCH') {
+      currentMain = body.sha;
+      return Response.json({ object: { sha: currentMain } });
+    }
+    return Response.json({ message: 'unexpected' }, { status: 500 });
+  };
+  const firstSha = await publishAtomic({ token: 'memory-only', baseSha: currentMain, slug: 'first-note', markdown: '# first', existing: true });
+  const secondSha = await publishAtomic({ token: 'memory-only', baseSha: firstSha, slug: 'second-note', markdown: '# second', existing: true });
+  assert.equal(secondSha, 'commit-2');
+  assert.deepEqual(parents, ['base', 'commit-1']);
+  assert.equal(currentMain, 'commit-2');
 });
 
 test('ローカル下書きはGitHub記事の変更、新規、削除済み、slug競合を区別する', () => {
@@ -339,6 +557,16 @@ test('専用エディターは記事ライブラリと複数タグUIを持つ', 
   assert.match(library, /DUPLICATE/);
   assert.match(library, /OPEN LIVE/);
   assert.match(library, /article-library-entry/);
+  assert.match(library, /className="library-filter-toggle"/);
+  assert.match(library, /aria-label="新規投稿を作成"/);
+  assert.match(library, /onNew\('text'\)/);
+  assert.match(library, /onNew\('photo'\)/);
+  assert.match(app, /newNote\(usedSlugs, requestedPostType\)/);
+  assert.match(app, /alt=\{alt\}/);
+  assert.match(app, /PHOTO UNAVAILABLE/);
+  assert.match(library, /aria-expanded=\{entryFiltersOpen\}/);
+  assert.match(library, /activeFilterCount/);
+  assert.match(library, /library-filters\$\{entry && entryFiltersOpen \? ' is-open' : ''\}/);
   assert.match(library, /LOCAL DRAFTS/);
   assert.match(library, /role="alertdialog"/);
   assert.match(library, /GitHub上の記事は削除されません/);
@@ -349,7 +577,7 @@ test('専用エディターは記事ライブラリと複数タグUIを持つ', 
   assert.match(app, /PARALLEL DRAFT KEPT/);
   assert.match(app, /別のタブで下書きが更新されました/);
   assert.match(library, /onDiscardDraft\(discardCandidate\)/);
-  assert.match(app, /hydrated\.sourceBaseSha !== baseSha/);
+  assert.match(app, /hydrated\.sourceBaseSha !== currentBaseSha/);
   assert.match(app, /差分を確認し、ローカル原稿を採用する/);
   assert.match(app, /タグ変更はGitHubへ保存済みです。端末下書きの後処理だけ失敗/);
   assert.match(app, /if \(baseReview \|\| \(note\?\.existing && editingBaseSha\.current !== baseSha\)\)/);
@@ -405,23 +633,33 @@ test('記事ライブラリと運用ツールはモーダルとしてフォー�
   assert.match(app, /aria-hidden=\{modalOpen \? 'true' : undefined\}/);
 });
 
-test('操作通知とローカル保存状態を分離し、処理中の原稿切替を止める', async () => {
-  const [app, operations, styles] = await Promise.all([
+test('操作通知とローカル保存状態を分離し、公開は順番待ち中も別原稿を編集できる', async () => {
+  const [app, operations, styles, queueHook, queueView] = await Promise.all([
     readFile(new URL('../notes-admin/src/App.jsx', import.meta.url), 'utf8'),
     readFile(new URL('../notes-admin/src/OperationsPanel.jsx', import.meta.url), 'utf8'),
-    readFile(new URL('../notes-admin/src/overrides.css', import.meta.url), 'utf8')
+    readFile(new URL('../notes-admin/src/overrides.css', import.meta.url), 'utf8'),
+    readFile(new URL('../notes-admin/src/usePublicationQueue.js', import.meta.url), 'utf8'),
+    readFile(new URL('../notes-admin/src/PublicationQueue.jsx', import.meta.url), 'utf8')
   ]);
   assert.match(app, /\[draftStatus, setDraftStatus\]/);
   assert.match(app, /setDraftStatus\('LOCAL CHANGES'\)/);
   assert.match(app, /setDraftStatus\('LOCAL DRAFT SAVED'\)/);
   assert.match(app, /setDraftStatus\('LOCAL DRAFT ERROR'\)/);
   assert.doesNotMatch(app, /setStatus\(previous => previous\.includes\('公開'\)/);
-  assert.match(app, /const interactionLocked = busy \|\| imageProcessing/);
-  assert.match(app, /if \(!note \|\| busy \|\| exclusiveActionActive\.current \|\| publicationActive\.current \|\| imageProcessing\) return/);
+  assert.match(app, /const interactionLocked = busy \|\| queueing \|\| imageProcessing/);
+  assert.match(app, /createPublicationJob/);
+  assert.match(app, /enqueuePublication\(job\)/);
+  assert.match(app, /baseSha: latestRemoteBaseSha\.current \|\| baseSha/);
+  assert.match(app, /別の記事へ切り替えて続けられます/);
+  assert.match(app, /publicationHasSlug\(note\.slug\)/);
+  assert.match(app, /publicationSummary\.active \? 'has-publication-queue' : ''/);
+  assert.match(app, /publicationSummary\.active \? <PublicationQueueActivity/);
+  assert.doesNotMatch(app, /publicationItems\.length \? 'has-publication-queue'/);
+  assert.doesNotMatch(app, /publicationActive\.current = true;\s+setBusy\(true\); setStatus\(note\.draft/);
   assert.match(app, /if \(!bulkTagSlugs\.length \|\| interactionLocked \|\| exclusiveActionActive\.current \|\| publicationActive\.current\) return/);
   assert.match(app, /publicationActive\.current = true;[\s\S]*activeDraftSnapshot = await persistDraftSnapshot\(note, images, true\)/);
   assert.match(app, /const runExclusiveAction = useCallback\(async action => \{[\s\S]*exclusiveActionActive\.current = true;[\s\S]*finally \{ exclusiveActionActive\.current = false; setBusy\(false\); \}/);
-  assert.match(app, /const selectNote = async slug => \{\s+if \(interactionLocked \|\| exclusiveActionActive\.current\) return;[\s\S]*return runExclusiveAction/);
+  assert.match(app, /const selectNote = async \(slug, requestedPostType = 'text'\) => \{\s+if \(interactionLocked \|\| exclusiveActionActive\.current\) return;[\s\S]*return runExclusiveAction/);
   assert.match(app, /const resumeLocalDraft = async key => \{\s+if \(interactionLocked \|\| exclusiveActionActive\.current\) return;[\s\S]*return runExclusiveAction/);
   assert.match(app, /const duplicate = async source => \{\s+if \(interactionLocked \|\| exclusiveActionActive\.current\) return;[\s\S]*return runExclusiveAction/);
   assert.match(app, /const reloadRepository = async \(\) => \{\s+if \(interactionLocked \|\| exclusiveActionActive\.current\) return;[\s\S]*return runExclusiveAction/);
@@ -431,8 +669,31 @@ test('操作通知とローカル保存状態を分離し、処理中の原稿�
   assert.ok((app.match(/disabled=\{interactionLocked\}/g) || []).length >= 7);
   assert.match(app, /inert=\{modalOpen \|\| interactionLocked \? true : undefined\}/);
   assert.match(operations, /disabled=\{disabled\}/);
-  assert.match(styles, /min-height: calc\(107px \+ env\(safe-area-inset-top\)\)/);
+  assert.match(queueHook, /nextPublication\(itemsRef\.current\)/);
+  assert.match(queueHook, /item\.id === id && item\.state === 'queued'/);
+  assert.match(queueHook, /removeQueuedPublication\(current, id\)/);
+  assert.match(queueHook, /setPaused\(true\)/);
+  assert.match(queueHook, /beforeunload/);
+  assert.match(queueView, /KEEP DRAFT/);
+  assert.match(queueView, /item\.state === 'queued'/);
+  assert.match(styles, /\.publication-queue li > button \{ grid-column: 2 \/ -1; min-height: 44px; \}/);
+  assert.match(app, /cancel: cancelPublication/);
+  assert.match(app, /publicationDraftKeys\.current\.delete\(cancelled\.draftKey\)/);
+  assert.match(app, /原稿と画像はLOCAL DRAFTSに残しています/);
+  assert.match(queueView, /STOP &amp; KEEP DRAFTS/);
+  assert.match(queueView, /上から順に1件ずつGitHubへコミット/);
+  assert.match(styles, /\.publication-queue li\.is-publishing/);
+  assert.match(styles, /min-height: calc\(111px \+ env\(safe-area-inset-top\)\)/);
+  assert.match(styles, /\.editor-top select \{ width: min\(260px, 34vw\); \}/);
+  assert.match(styles, /\.editor-top select \{[\s\S]*height: 44px/);
   assert.match(styles, /\.editor-top button \{[\s\S]*height: 44px/);
+  assert.match(app, /const selectedDocumentValue = note\.existing \? note\.slug : note\.postType === 'photo' \? '__new_photo__' : '__new_text__'/);
+  assert.match(app, /if \(selected === '__new_text__'\) \{ selectNote\('__new__', 'text'\); return; \}/);
+  assert.match(app, /if \(selected === '__new_photo__'\) \{ selectNote\('__new__', 'photo'\); return; \}/);
+  assert.match(app, /<option value="__new_text__">＋ NEW TEXT<\/option><option value="__new_photo__">＋ NEW PHOTO<\/option>/);
+  assert.doesNotMatch(styles, /\.is-photo \.editor-actions \{ grid-template-columns: 1\.35fr \.8fr 1\.1fr; \}/);
+  assert.match(app, /note\.postType === 'photo' && note\.photo \? '写真を置き換える' : '画像を選択する'/);
+  assert.match(app, /note\.postType === 'photo' && note\.photo \? 'REPLACE' : '＋ IMAGE'/);
 });
 
 test('記事運用ツールはタグ・画像・リンクの保守データを作る', () => {

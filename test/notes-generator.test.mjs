@@ -99,6 +99,15 @@ draft: true
   assert.match(html, /twitter:card" content="summary_large_image/);
   assert.match(html, /caption\.textContent=img\.title\|\|''/);
   assert.doesNotMatch(html, /caption\.textContent=img\.title\|\|img\.alt/);
+  assert.match(html, /class="breadcrumb-current" aria-current="page">最初の記事/);
+  assert.match(html, /class="entry-meta"/);
+  assert.match(html, /class="entry-folio">N\.001 \/ TEXT/);
+  assert.match(html, /\.topbar nav a\{min-height:44px/);
+  assert.match(html, /\.topbar nav a:hover,\.topbar nav a:focus-visible/);
+  assert.match(html, /nav\.replaceChildren\(\.\.\.links\)/);
+  assert.match(html, /copy\.textContent=title/);
+  assert.match(html, /className=`nav-\$\{kind\}`/);
+  assert.doesNotMatch(html, /nav\.innerHTML/);
 });
 
 test('エディタのテキスト階層を公開HTMLのブロック構造へ反映する', async t => {
@@ -136,6 +145,33 @@ date: 2026-08-16
   assert.match(html, /<pre><code>インデントコード\n<\/code><\/pre>/);
   const article = html.match(/<article class="entry[\s\S]*?<\/article>/)?.[0] || '';
   assert.doesNotMatch(article, /親ブロック\s*子ブロック/);
+});
+
+test('画像と同じMarkdown段落の文章を独立ブロックへ分離する', async t => {
+  const root = await makeSite({
+    'mixed-media.md': `---
+title: 画像と文章
+date: 2026-08-16
+---
+
+前の文章 ![作品写真](/assets/images/notes/sample.jpg "展示風景") 後ろの文章
+
+![](/assets/images/notes/sample.jpg)
+二枚目の続き
+`
+  }, { 'assets/images/notes/sample.jpg': Buffer.from([0xff, 0xd8, 0xff, 0xd9]) });
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+
+  const result = await runGenerator(root);
+  assert.equal(result.code, 0, result.stderr);
+  const html = await fs.readFile(path.join(root, 'notes', 'mixed-media.html'), 'utf8');
+  assert.match(html, /<p>前の文章<\/p><figure class="note-media"><img[^>]+loading="eager"[^>]*><figcaption>展示風景<\/figcaption>/);
+  assert.match(html, /<\/figure><p>後ろの文章<\/p>/);
+  assert.match(html, /<figure class="note-media"><img[^>]+loading="lazy"[^>]*><div class="note-media-error"/);
+  assert.match(html, /<\/figure><p>二枚目の続き<\/p>/);
+  assert.equal((html.match(/<figure class="note-media">/g) || []).length, 2);
+  assert.doesNotMatch(html, /<p>\s*<figure class="note-media">/);
+  assert.doesNotMatch(html, /<figcaption>作品写真<\/figcaption>/);
 });
 
 test('同じ公開日の記事はタイムスタンプslugの新しい順に並べる', async t => {
@@ -643,6 +679,11 @@ photo: /assets/images/notes/photo.jpg
   assert.match(html, /class="photo-page"/);
   assert.match(html, /class="photo-detail"/);
   assert.match(html, /data-post-type="photo"/);
+  assert.match(html, /<h1 class="sr-only">Photo 2026\.08\.16<\/h1>/);
+  assert.match(html, /class="entry-folio">P\.001 \/ PHOTO/);
+  assert.match(html, /alt="写真 2026\.08\.16"/);
+  assert.match(html, /max-height:min\(82svh,980px\);object-fit:contain/);
+  assert.match(html, /\.photo-page \.entry-nav a:focus-visible/);
   assert.doesNotMatch(html, /LOCAL GRAPH/);
 });
 
@@ -681,10 +722,23 @@ test('Notes一覧は内容別サイズと順序を守る空き詰めレイアウ
   const source = await fs.readFile(path.join(sourceRoot, 'notes', 'index.html'), 'utf8');
   assert.match(source, /data-type="\$\{type\}"/);
   assert.match(source, /const spans=\{s:\{s:2,m:3,l:4\},m:\{s:3,m:4,l:5\},l:\{s:4,m:5,l:7\}\}/);
-  assert.match(source, /autoSpans=\{s:\{plain:2,image:3,photo:4\},m:\{plain:3,image:3,photo:4\},l:\{plain:4,image:4,photo:6\}\}/);
+  assert.match(source, /data-copy="\$\{copy\}"/);
+  assert.match(source, /autoSpans=\{s:\{brief:2,standard:2,long:3,image:3,photo:4\},m:\{brief:2,standard:3,long:3,image:3,photo:5\},l:\{brief:3,standard:4,long:4,image:4,photo:6\}\}/);
+  assert.match(source, /compactAutoSpans=\{s:\{brief:3,standard:3,long:4,image:4,photo:5\},m:\{brief:3,standard:4,long:4,image:4,photo:6\},l:\{brief:4,standard:5,long:5,image:5,photo:8\}\}/);
   assert.match(source, /card\.dataset\.sizeMode==='auto'/);
   assert.match(source, /mode==='auto'\?\(type==='photo'\?'l':post\.image\?'m':'s'\)/);
   assert.match(source, /let sequenceFloor=0/);
+  assert.match(source, /index===cards\.length-1&&cards\.length>1&&span<=6/);
+  assert.match(source, /terminalTolerance=Math\.max\(1,Math\.ceil\(48\/row\)\)/);
+  assert.match(source, /distance=Math\.abs\(start-center\)/);
+  assert.match(source, /top<=terminalTop\+terminalTolerance&&distance<centerDistance/);
+  assert.match(source, /new ResizeObserver\(queueLayout\)/);
+  assert.match(source, /observeCardSizes\(\)/);
+  assert.match(source, /<summary aria-controls="filterOptions"><span>FILTERS<\/span>/);
+  assert.match(source, /if\(filterMore\.open&&!filterMore\.contains\(event\.target\)\)filterMore\.open=false/);
+  assert.match(source, /event\.key==='Escape'&&filterMore\.open/);
+  assert.match(source, /filterMore\.open=false;filterSummary\.focus\(\)/);
+  assert.match(source, /filterMore\.open=false;updateUrl\(\);search\.focus\(\)/);
   assert.match(source, /data-has-image=/);
   assert.match(source, /post\.postType==='photo'/);
   assert.match(source, /post-card\[data-type="photo"\]/);
@@ -704,7 +758,7 @@ test('Notes一覧は内容別サイズと順序を守る空き詰めレイアウ
   assert.match(source, /id="clearFilters"/);
   assert.match(source, /clearFilters\.hidden=!active/);
   assert.match(source, /filters\.addEventListener\('submit',event=>event\.preventDefault\(\)\)/);
-  assert.match(source, /clearFilters\.addEventListener\('click',\(\)=>\{clearTimeout\(timer\);search\.value='';tag\.value='';year\.value='';updateUrl\(\);search\.focus\(\)\}\)/);
+  assert.match(source, /clearFilters\.addEventListener\('click',\(\)=>\{clearTimeout\(timer\);search\.value='';tag\.value='';year\.value='';filterMore\.open=false;updateUrl\(\);search\.focus\(\)\}\)/);
   assert.match(source, /\.filter-options\{left:-1px;right:auto;min-width:0;width:min\(88vw,360px\);max-width:calc\(100vw - 24px\)\}/);
   assert.match(source, /filter-more\[open\] \.filter-options\{position:static/);
   assert.match(source, /id="postGrid" aria-label="投稿一覧"/);

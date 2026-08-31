@@ -43,7 +43,7 @@ function DraftDiscardDialog({ candidate, busy, error, onCancel, onConfirm }) {
   </>;
 }
 
-function LocalDraftRail({ entry, items, activeDraftKey, disabled, onResume, onRequestDiscard }) {
+function LocalDraftRail({ entry, items, activeDraftKey, disabled, onResume, onRequestDiscard, onEditorIntent }) {
   if (!items.length) return null;
   const rows = <div className="local-draft-list">
     {items.map((item, index) => {
@@ -55,7 +55,7 @@ function LocalDraftRail({ entry, items, activeDraftKey, disabled, onResume, onRe
           <small>{'SAVED ' + (item.localSavedAt ? savedTime.format(new Date(item.localSavedAt)) : 'UNKNOWN') + ' · ' + item.postType.toUpperCase() + ' · IMG ' + item.localImages.length}</small>
         </div>
         <div className="local-draft-actions">
-          <button type="button" disabled={disabled || active} onClick={() => onResume(item.localDraftKey)}>{active ? 'EDITING' : 'RESUME'}</button>
+          <button type="button" disabled={disabled || active} onPointerEnter={item.postType === 'text' ? onEditorIntent : undefined} onPointerDown={item.postType === 'text' ? onEditorIntent : undefined} onFocus={item.postType === 'text' ? onEditorIntent : undefined} onClick={() => onResume(item.localDraftKey)}>{active ? 'EDITING' : 'RESUME'}</button>
           <button type="button" disabled={disabled || active} onClick={() => onRequestDiscard(item.localDraftKey)}>DISCARD</button>
         </div>
       </article>;
@@ -86,13 +86,15 @@ export default function ArticleLibrary({
   onNew,
   onDuplicate,
   onResumeDraft,
-  onDiscardDraft
+  onDiscardDraft,
+  onEditorIntent
 }) {
   const [query, setQuery] = useState('');
   const [type, setType] = useState('all');
   const [status, setStatus] = useState('all');
   const [tag, setTag] = useState('');
   const [sort, setSort] = useState('newest');
+  const [entryFiltersOpen, setEntryFiltersOpen] = useState(false);
   const [discardKey, setDiscardKey] = useState('');
   const [discardBusy, setDiscardBusy] = useState(false);
   const [discardError, setDiscardError] = useState('');
@@ -110,6 +112,7 @@ export default function ArticleLibrary({
   const localOnlyTotal = useMemo(() => draftItems.reduce((total, item) => total + (item.kind === 'edit' ? 0 : 1), 0), [draftItems]);
   const folios = useMemo(() => articleFolios(documents), [documents]);
   const publicCount = useMemo(() => documents.reduce((total, document) => total + (document.draft ? 0 : 1), 0), [documents]);
+  const activeFilterCount = (type !== 'all' ? 1 : 0) + (status !== 'all' ? 1 : 0) + (tag ? 1 : 0) + (sort !== 'newest' ? 1 : 0);
   const discardCandidate = useMemo(() => draftItems.find(item => item.key === discardKey) || null, [draftItems, discardKey]);
   const { dialogRef, onDialogKeyDown } = useDialogFocus(open && !entry && !discardCandidate, '[data-dialog-initial-focus]', onClose);
 
@@ -140,23 +143,24 @@ export default function ArticleLibrary({
     <header><div><strong id={entry ? undefined : 'article-library-title'}>{entry ? 'NOTES EDITOR' : 'ARTICLE LIBRARY'}</strong><span id={entry ? undefined : 'article-library-description'}>{entry ? 'CHOOSE A NOTE OR START A NEW ONE' : documents.length + ' TOTAL · ' + publicCount + ' PUBLIC · ' + (documents.length - publicCount) + ' GITHUB DRAFT · ' + draftItems.length + ' LOCAL'}</span></div>{entry ? <span className="library-entry-mark">S / N</span> : <button type="button" onClick={onClose} aria-label="記事ライブラリを閉じる" data-dialog-initial-focus>×</button>}</header>
     {entry ? <div className={`library-entry-overview ${localOnly.length ? 'has-local-drafts' : ''}`}>
       <section className="library-entry-lede"><span>NOTES / WORKSPACE</span><h1>OPEN A NOTE</h1><p>過去の記事を選ぶか、新しい原稿を始めます。端末に保存中の原稿があれば、ここから続きを開けます。</p></section>
-      <LocalDraftRail entry items={localOnly} activeDraftKey={activeDraftKey} disabled={disabled} onResume={onResumeDraft} onRequestDiscard={requestDiscard}/>
+      <LocalDraftRail entry items={localOnly} activeDraftKey={activeDraftKey} disabled={disabled} onResume={onResumeDraft} onRequestDiscard={requestDiscard} onEditorIntent={onEditorIntent}/>
     </div> : null}
     {localDraftError ? <div className="local-drafts-error" role="alert"><strong>LOCAL DRAFTS UNAVAILABLE</strong><span>{localDraftError} この表示中は端末内の自動保存を確認できません。</span></div> : null}
-    <div className="library-search"><label>SEARCH<input value={query} onChange={event => setQuery(event.target.value)} placeholder="タイトル、本文、slug、タグ"/></label><button type="button" className="primary" onClick={onNew} disabled={disabled}>＋ NEW NOTE</button></div>
-    <div className="library-filters">
+    <div className="library-search"><label>SEARCH<input value={query} onChange={event => setQuery(event.target.value)} placeholder="タイトル、本文、slug、タグ"/></label><div className="library-new-actions" role="group" aria-label="新規投稿を作成"><button type="button" className="primary" onPointerEnter={onEditorIntent} onPointerDown={onEditorIntent} onFocus={onEditorIntent} onClick={() => onNew('text')} disabled={disabled}>＋ TEXT</button><button type="button" onClick={() => onNew('photo')} disabled={disabled}>＋ PHOTO</button></div></div>
+    {entry ? <button type="button" className="library-filter-toggle" aria-expanded={entryFiltersOpen} aria-controls="library-entry-filters" onClick={() => setEntryFiltersOpen(open => !open)}><span>FILTERS</span><small>{activeFilterCount ? `${activeFilterCount} ACTIVE` : 'ALL NOTES'} <b aria-hidden="true">{entryFiltersOpen ? '−' : '+'}</b></small></button> : null}
+    <div className={`library-filters${entry && entryFiltersOpen ? ' is-open' : ''}`} id={entry ? 'library-entry-filters' : undefined}>
       <label>TYPE<select value={type} onChange={event => setType(event.target.value)}><option value="all">ALL</option><option value="text">TEXT</option><option value="photo">PHOTO</option></select></label>
       <label>STATUS<select value={status} onChange={event => setStatus(event.target.value)}><option value="all">ALL</option><option value="public">PUBLIC</option><option value="draft">GITHUB DRAFT</option><option value="local">LOCAL CHANGES</option></select></label>
       <label>TAG<select value={tag} onChange={event => setTag(event.target.value)}><option value="">ALL TAGS</option>{tags.map(value => <option value={value} key={value}>{value}</option>)}</select></label>
       <label>SORT<select value={sort} onChange={event => setSort(event.target.value)}><option value="newest">NEWEST</option><option value="oldest">OLDEST</option><option value="title">TITLE</option></select></label>
     </div>
     <div className="library-results">
-      {!entry ? <LocalDraftRail items={localOnly} activeDraftKey={activeDraftKey} disabled={disabled} onResume={onResumeDraft} onRequestDiscard={requestDiscard}/> : null}
+      {!entry ? <LocalDraftRail items={localOnly} activeDraftKey={activeDraftKey} disabled={disabled} onResume={onResumeDraft} onRequestDiscard={requestDiscard} onEditorIntent={onEditorIntent}/> : null}
       <div className="library-result-count" role="status" aria-live="polite" aria-atomic="true">{localDraftError ? 'LOCAL DRAFTS UNAVAILABLE' : localDraftsLoaded ? filtered.length + localOnly.length + ' RESULTS · ' + draftItems.length + ' LOCAL' : 'LOCAL DRAFTS LOADING…'}</div>
       {filtered.length ? filtered.map(document => {
         const local = document.localDraftKey ? localIndex.get(document.slug) : null;
         return <article className={(document.slug === activeSlug ? 'active' : '') + (local ? ' has-local-draft' : '')} key={document.slug}>
-          <button type="button" className="library-open" disabled={disabled} onClick={() => local ? onResumeDraft(local.key) : onSelect(document.slug)}>
+          <button type="button" className="library-open" disabled={disabled} onPointerEnter={document.postType === 'text' ? onEditorIntent : undefined} onPointerDown={document.postType === 'text' ? onEditorIntent : undefined} onFocus={document.postType === 'text' ? onEditorIntent : undefined} onClick={() => local ? onResumeDraft(local.key) : onSelect(document.slug)}>
             <span className="library-type">{(document.draft ? 'D' : document.postType === 'photo' ? 'P' : 'N') + '.' + String(folios.get(document.slug) || 0).padStart(3, '0') + ' / ' + document.postType.toUpperCase() + ' · ' + (document.draft ? 'GITHUB DRAFT' : 'PUBLIC') + (local ? ` · LOCAL CHANGES${document.localDraftValue !== document.repoDraft ? ` → ${document.localDraftValue ? 'GITHUB DRAFT' : 'PUBLIC'}` : ''}` : '')}</span>
             <strong>{document.title || 'PHOTO / ' + document.date}</strong>
             <small>{document.date} · {document.slug}</small>
@@ -164,7 +168,7 @@ export default function ArticleLibrary({
             {document.tags?.length ? <div className="library-tags">{document.tags.map(value => <span key={value}>#{value}</span>)}</div> : null}
           </button>
           <div className="library-row-actions">
-            <button type="button" disabled={disabled} onClick={() => onDuplicate(document)}>DUPLICATE</button>
+            <button type="button" disabled={disabled} onPointerEnter={document.postType === 'text' ? onEditorIntent : undefined} onPointerDown={document.postType === 'text' ? onEditorIntent : undefined} onFocus={document.postType === 'text' ? onEditorIntent : undefined} onClick={() => onDuplicate(document)}>DUPLICATE</button>
             {!document.repoDraft ? <a href={'/notes/' + document.slug + '.html'} target="_blank" rel="noreferrer">OPEN LIVE ↗</a> : null}
             {local ? <button type="button" disabled={disabled || local.key === activeDraftKey} onClick={() => requestDiscard(local.key)}>{local.key === activeDraftKey ? 'EDITING' : 'DISCARD LOCAL'}</button> : null}
           </div>

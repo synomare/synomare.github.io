@@ -1,9 +1,10 @@
+import { useState } from 'react';
 import { documentStats, outlineFromBody } from './editorTools.js';
 
 const tools = [
   ['H2', 'h2', '見出し2'], ['H3', 'h3', '見出し3'], ['B', 'bold', '太字（⌘B）'], ['LINK', 'link', 'リンク（⌘K）'],
   ['[[ ]]', 'wikilink', '内部リンク（⌘⇧K）'], ['❯', 'quote', '引用'], ['•', 'bullet', '箇条書き'], ['1.', 'ordered', '番号付きリスト'],
-  ['[ ]', 'task', 'タスクリスト'], ['` `', 'code', 'コード'], ['—', 'divider', '区切り線'], ['↶', 'undo', '元に戻す'], ['↷', 'redo', 'やり直す']
+  ['[ ]', 'task', 'タスクリスト'], ['` `', 'code', 'コード'], ['—', 'divider', '区切り線'], ['FIND', 'search', '本文内を検索・置換（⌘F）'], ['↶', 'undo', '元に戻す'], ['↷', 'redo', 'やり直す']
 ];
 
 const hierarchyTools = [
@@ -13,13 +14,22 @@ const hierarchyTools = [
   ['LEVEL +', 'headingUp', '見出しレベルを深く']
 ];
 
-export function EditorToolbar({ mode, onMode, focusMode, onFocusMode, onCommand }) {
-  return <div className="editor-toolbar" role="toolbar" aria-label="Markdown書式">
-    <div className="format-tools">
-      <div className="format-group hierarchy-tools" aria-label="テキスト階層">{hierarchyTools.map(([label, action, title]) => <button type="button" key={action} title={title} aria-label={title} onMouseDown={event => event.preventDefault()} onClick={() => onCommand(action)}>{label}</button>)}</div>
-      <div className="format-group">{tools.map(([label, action, title]) => <button type="button" key={action} title={title} aria-label={title} onMouseDown={event => event.preventDefault()} onClick={() => onCommand(action)}>{label}</button>)}</div>
+export function EditorToolbar({ mode, onMode, focusMode, onFocusMode, onCommand, onPreviewIntent }) {
+  const [formatOpen, setFormatOpen] = useState(false);
+  const runCommand = action => {
+    onCommand(action);
+    setFormatOpen(false);
+  };
+  const changeMode = value => {
+    setFormatOpen(false);
+    onMode(value);
+  };
+  return <div className={`editor-toolbar ${formatOpen ? 'formats-open' : ''}`} role="toolbar" aria-label="Markdown書式">
+    <div className="format-tools" id="markdown-format-tools">
+      <div className="format-group hierarchy-tools" aria-label="テキスト階層">{hierarchyTools.map(([label, action, title]) => <button type="button" key={action} title={title} aria-label={title} onMouseDown={event => event.preventDefault()} onClick={() => runCommand(action)}>{label}</button>)}</div>
+      <div className="format-group">{tools.map(([label, action, title]) => <button type="button" key={action} title={title} aria-label={title} onMouseDown={event => event.preventDefault()} onClick={() => runCommand(action)}>{label}</button>)}</div>
     </div>
-    <div className="editor-modes" aria-label="表示モード">{['edit', 'split', 'preview'].map(value => <button type="button" key={value} className={mode === value ? 'active' : ''} aria-pressed={mode === value} onClick={() => onMode(value)}>{value.toUpperCase()}</button>)}<button type="button" className={focusMode ? 'active' : ''} aria-pressed={focusMode} onClick={onFocusMode}>FOCUS</button></div>
+    <div className="editor-modes" aria-label="表示モード"><button type="button" className={`format-toggle ${formatOpen ? 'active' : ''}`} aria-expanded={formatOpen} aria-controls="markdown-format-tools" onClick={() => setFormatOpen(current => !current)}>FORMAT</button>{['edit', 'split', 'preview'].map(value => <button type="button" key={value} className={mode === value ? 'active' : ''} aria-pressed={mode === value} onPointerEnter={value === 'edit' ? undefined : onPreviewIntent} onPointerDown={value === 'edit' ? undefined : onPreviewIntent} onFocus={value === 'edit' ? undefined : onPreviewIntent} onClick={() => changeMode(value)}>{value.toUpperCase()}</button>)}<button type="button" className={focusMode ? 'active' : ''} aria-pressed={focusMode} onClick={() => { setFormatOpen(false); onFocusMode(); }}>FOCUS</button></div>
   </div>;
 }
 

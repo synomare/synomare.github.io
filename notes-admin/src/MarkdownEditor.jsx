@@ -1,10 +1,108 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import { EditorState, Transaction } from '@codemirror/state';
-import { EditorView, keymap, placeholder } from '@codemirror/view';
+import { Decoration, EditorView, keymap, placeholder, ViewPlugin, WidgetType } from '@codemirror/view';
 import { defaultKeymap, history, historyKeymap, redo, undo } from '@codemirror/commands';
 import { autocompletion, closeBrackets, closeBracketsKeymap, startCompletion } from '@codemirror/autocomplete';
 import { markdown } from '@codemirror/lang-markdown';
-import { changeHeadingLevel, changeLineDepth, continueMarkdownBlock, hierarchyDepthAt, noteCompletionOptions, selectionSupportsHierarchyTab } from './editorTools.js';
+import { openSearchPanel, search, searchKeymap } from '@codemirror/search';
+import { changeHeadingLevel, changeLineDepth, continueMarkdownBlock, hierarchyDepthAt, imageMarkdownRanges, noteCompletionOptions, selectionSupportsHierarchyTab, slashCommandOptions } from './editorTools.js';
+
+const searchPhrases = EditorState.phrases.of({
+  Find: '本文を検索',
+  Replace: '置換後の文字',
+  next: '次へ',
+  previous: '前へ',
+  all: 'すべて選択',
+  'match case': '大文字小文字',
+  regexp: '正規表現',
+  'by word': '単語単位',
+  replace: '置換',
+  'replace all': 'すべて置換',
+  close: '閉じる'
+});
+
+const slashCompletionOptions = slashCommandOptions().map(command => ({
+  label: command.label,
+  detail: command.detail,
+  type: 'keyword',
+  apply: (view, _completion, from, to) => {
+    const anchor = from + command.cursorOffset;
+    view.dispatch({
+      changes: { from, to, insert: command.insert },
+      selection: { anchor },
+      scrollIntoView: true,
+      annotations: Transaction.userEvent.of('input.complete')
+    });
+  }
+}));
+
+class ImageMarkdownWidget extends WidgetType {
+  constructor(range) {
+    super();
+    this.range = range;
+  }
+
+  eq(other) {
+    return this.range.from === other.range.from && this.range.to === other.range.to && this.range.index === other.range.index && this.range.alt === other.range.alt;
+  }
+
+  toDOM(view) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'cm-image-token';
+    button.dataset.imageFrom = String(this.range.from);
+    button.setAttribute('aria-label', `画像${this.range.index}のMarkdownを編集`);
+    const label = document.createElement('span');
+    label.textContent = `IMAGE ${String(this.range.index).padStart(2, '0')}`;
+    const action = document.createElement('small');
+    action.textContent = this.range.alt ? `${this.range.alt} / EDIT` : 'EDIT MARKDOWN';
+    button.append(label, action);
+    const activate = event => {
+      event.preventDefault();
+      revealImageMarkdownAt(this.range.from, view);
+    };
+    button.addEventListener('click', activate);
+    button.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') activate(event);
+    });
+    return button;
+  }
+
+  ignoreEvent() {
+    return true;
+  }
+}
+
+function imageMarkdownDecorations(view) {
+  const selection = view.state.selection.main;
+  const cursor = selection.head;
+  const ranges = imageMarkdownRanges(view.state.doc.toString()).flatMap(range => {
+    const selected = selection.from !== selection.to
+      ? selection.from < range.to && selection.to > range.from
+      : cursor > range.from && cursor < range.to;
+    return selected ? [] : [Decoration.replace({ widget: new ImageMarkdownWidget(range) }).range(range.from, range.to)];
+  });
+  return Decoration.set(ranges, true);
+}
+
+const imageMarkdownPlugin = ViewPlugin.fromClass(class {
+  constructor(view) {
+    this.decorations = imageMarkdownDecorations(view);
+  }
+
+  update(update) {
+    if (update.docChanged || update.selectionSet || update.viewportChanged) this.decorations = imageMarkdownDecorations(update.view);
+  }
+}, { decorations: instance => instance.decorations });
+
+function revealImageMarkdownAt(from, view) {
+  view.dispatch({ selection: { anchor: Math.min(from + 2, view.state.doc.length) }, scrollIntoView: true });
+  view.focus();
+}
+
+function shouldStartCompletion(tail) {
+  return /\[\[[^\]\n]*$/.test(tail) || /(?:^|\n)[ \t]*\/[a-z0-9-]*$/i.test(tail);
+}
 
 function replaceSelection(view, before, after = before, placeholderText = '') {
   const { from, to } = view.state.selection.main;
@@ -66,6 +164,7 @@ function runCommand(view, command) {
     const { from, to } = view.state.selection.main; const selected = view.state.sliceDoc(from, to);
     replaceSelection(view, selected.includes('\n') ? '```\n' : '`', selected.includes('\n') ? '\n```' : '`', 'code');
   } else if (command === 'divider') replaceSelection(view, '\n\n---\n\n', '', '');
+  else if (command === 'search') openSearchPanel(view);
   else if (command === 'undo') undo(view);
   else if (command === 'redo') redo(view);
 }
@@ -100,12 +199,20 @@ const MarkdownEditor = forwardRef(function MarkdownEditor({ value, onChange, not
   }), []);
 
   useEffect(() => {
-    const source = context => {
+    const wikilinkSource = context => {
       if (context.view?.composing) return null;
       const before = context.matchBefore(/\[\[[^\]\n]*/);
       if (!before) return null;
       const options = noteCompletionOptions(notesRef.current, before.text.slice(2));
       return { from: before.from + 2, options, validFor: /^[^\]\n]*$/ };
+    };
+    const slashSource = context => {
+      if (context.view?.composing) return null;
+      const line = context.state.doc.lineAt(context.pos);
+      const before = context.state.sliceDoc(line.from, context.pos);
+      const match = before.match(/^([ \t]*)\/[a-z0-9-]*$/i);
+      if (!match) return null;
+      return { from: line.from + match[1].length, options: slashCompletionOptions, validFor: /^\/[a-z0-9-]*$/i };
     };
     const updateListener = EditorView.updateListener.of(update => {
       if (update.docChanged) changeRef.current(update.state.doc.toString());
@@ -115,14 +222,15 @@ const MarkdownEditor = forwardRef(function MarkdownEditor({ value, onChange, not
       if (!update.docChanged || update.view.composing) return;
       const cursor = update.state.selection.main.head;
       const tail = update.state.sliceDoc(Math.max(0, cursor - 100), cursor);
-      if (/\[\[[^\]\n]*$/.test(tail)) queueMicrotask(() => startCompletion(update.view));
+      if (shouldStartCompletion(tail)) queueMicrotask(() => startCompletion(update.view));
     });
     const view = new EditorView({
       parent: host.current,
       state: EditorState.create({
         doc: value,
         extensions: [
-          history(), markdown(), closeBrackets(), autocompletion({ override: [source], activateOnTyping: true }),
+          history(), markdown(), imageMarkdownPlugin, closeBrackets(), autocompletion({ override: [wikilinkSource, slashSource], activateOnTyping: true }),
+          search({ top: true }), searchPhrases,
           placeholder('本文を書く。[[ で別の記事につなぐ。'),
           keymap.of([
             { key: 'Mod-Enter', run: editor => { if (!editor.composing) publishRef.current(); return true; } },
@@ -134,10 +242,10 @@ const MarkdownEditor = forwardRef(function MarkdownEditor({ value, onChange, not
             { key: 'Mod-]', run: editor => { runCommand(editor, 'indent'); return true; } },
             { key: 'Mod-[', run: editor => { runCommand(editor, 'outdent'); return true; } },
             { key: 'Enter', run: editor => editor.composing ? false : continueMarkdownBlock(editor) },
-            ...closeBracketsKeymap, ...defaultKeymap, ...historyKeymap
+            ...searchKeymap, ...closeBracketsKeymap, ...defaultKeymap, ...historyKeymap
           ]),
           EditorView.domEventHandlers({
-            compositionend: (_event, view) => { const cursor = view.state.selection.main.head; const tail = view.state.sliceDoc(Math.max(0, cursor - 100), cursor); if (/\[\[[^\]\n]*$/.test(tail)) queueMicrotask(() => startCompletion(view)); return false; },
+            compositionend: (_event, view) => { const cursor = view.state.selection.main.head; const tail = view.state.sliceDoc(Math.max(0, cursor - 100), cursor); if (shouldStartCompletion(tail)) queueMicrotask(() => startCompletion(view)); return false; },
             paste: event => { const files = [...(event.clipboardData?.files || [])].filter(file => file.type.startsWith('image/') || /\.(?:heic|heif|jpe?g|png|gif|webp|avif|bmp|svg)$/i.test(file.name)); if (!files.length) return false; event.preventDefault(); filesRef.current?.(files); return true; },
             drop: event => { const files = [...(event.dataTransfer?.files || [])].filter(file => file.type.startsWith('image/') || /\.(?:heic|heif|jpe?g|png|gif|webp|avif|bmp|svg)$/i.test(file.name)); if (!files.length) return false; event.preventDefault(); filesRef.current?.(files); return true; }
           }),

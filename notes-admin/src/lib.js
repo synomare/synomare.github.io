@@ -48,6 +48,6 @@ export function parseOAuthMessage(message) {
 export function outgoingFromBody(body) {
   return [...String(body).matchAll(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g)].map(match => ({ target: match[1].trim(), label: (match[2] || match[1]).trim() }));
 }
-export function newNote(existing = []) {
-  return { slug: generateSlug(existing), postType: 'text', photo: '', title: '', date: jstDate(), summary: '', tags: [], aliases: [], relatedNotes: [], relatedExclude: [], cardSize: 'auto', cardExcerpt: '', draft: false, body: '', existing: false };
+export function newNote(existing = [], postType = 'text') {
+  return { slug: generateSlug(existing), postType: postType === 'photo' ? 'photo' : 'text', photo: '', title: '', date: jstDate(), summary: '', tags: [], aliases: [], relatedNotes: [], relatedExclude: [], cardSize: 'auto', cardExcerpt: '', draft: false, body: '', existing: false };
 }

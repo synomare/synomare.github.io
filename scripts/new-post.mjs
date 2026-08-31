@@ -174,6 +174,34 @@ function transformEmbeds(tokens) {
     if (token.tokens) transformEmbeds(token.tokens);
   }
 }
+function filenameLike(value) {
+  const text = String(value || '').trim(); if (!text) return false;
+  const name = text.split(/[?#]/)[0].split('/').pop();
+  return /\.(?:jpe?g|png|gif|webp|avif|bmp|svg|heic|heif)$/i.test(name) || /^(?:img|dsc|pxl|image|photo|写真)[-_ ]?\d+/i.test(name);
+}
+function mediaFigureHtml(image, index) {
+  const href = escapeHtml(image.href); const alt = String(image.text || ''); const detail = alt && !filenameLike(alt) ? alt : '画像を読み込めませんでした。';
+  const loading = index === 0 ? 'eager' : 'lazy'; const priority = index === 0 ? 'high' : 'auto';
+  const caption = image.title ? `<figcaption>${escapeHtml(image.title)}</figcaption>` : '';
+  return `<figure class="note-media"><img src="${href}" alt="${escapeHtml(alt)}" loading="${loading}" decoding="async" fetchpriority="${priority}">${caption}<div class="note-media-error" role="status"><strong>IMAGE COULD NOT BE DISPLAYED</strong><span>${escapeHtml(detail)}</span><a href="${href}" target="_blank" rel="noopener noreferrer">画像ファイルを開く</a></div></figure>`;
+}
+function splitTopLevelMedia(tokens) {
+  const output = []; let imageIndex = 0;
+  for (const token of tokens) {
+    if (token.type !== 'paragraph' || !token.tokens?.some(child => child.type === 'image')) { output.push(token); continue; }
+    let inlineSource = '';
+    const flushInline = () => {
+      const source = inlineSource.trim(); inlineSource = '';
+      if (source) output.push({ type: 'html', raw: source, text: `<p>${marked.parseInline(source)}</p>` });
+    };
+    for (const child of token.tokens) {
+      if (child.type === 'image') { flushInline(); output.push({ type: 'html', raw: child.raw, text: mediaFigureHtml(child, imageIndex++) }); }
+      else inlineSource += child.raw ?? child.text ?? '';
+    }
+    flushInline();
+  }
+  return output;
+}
 function relatedRefItems(values, resolver, post, file, field, allResolver) {
   const refs = []; const seen = new Set();
   for (const target of values) {
@@ -267,7 +295,8 @@ function relationsHtml(post) {
 }
 function photoHtml(post) {
   const caption = post.title || (post.summary.startsWith('写真 ') ? '' : post.summary);
-  return `<figure class="photo-detail"><img src="${escapeHtml(post.image)}" alt="${escapeHtml(post.title)}" decoding="async" fetchpriority="high"><div class="photo-detail-error" role="status"><strong>IMAGE COULD NOT BE DISPLAYED</strong><span>写真を読み込めませんでした。</span><a href="${escapeHtml(post.image)}" target="_blank" rel="noopener noreferrer">画像ファイルを開く</a></div>${caption ? `<figcaption>${escapeHtml(caption)}</figcaption>` : ''}</figure>`;
+  const alt = post.title || post.summary || post.displayTitle;
+  return `<figure class="photo-detail"><img src="${escapeHtml(post.image)}" alt="${escapeHtml(alt)}" decoding="async" fetchpriority="high"><div class="photo-detail-error" role="status"><strong>IMAGE COULD NOT BE DISPLAYED</strong><span>写真を読み込めませんでした。</span><a href="${escapeHtml(post.image)}" target="_blank" rel="noopener noreferrer">画像ファイルを開く</a></div>${caption ? `<figcaption>${escapeHtml(caption)}</figcaption>` : ''}</figure>`;
 }
 async function readPosts({ writeAssets = false } = {}) {
   const files = (await fs.readdir(contentDir)).filter(file => file.endsWith('.md')); const rawPosts = [];
@@ -296,7 +325,7 @@ async function readPosts({ writeAssets = false } = {}) {
       ? await prepareImageHref(post.photo, { sourceFile: `notes/content/${post.slug}.md`, writeAssets })
       : findThumbnail(tokens);
     post.cardSize = post.cardSizeMode === 'auto' ? (post.postType === 'photo' ? 'l' : post.image ? 'm' : 's') : post.cardSizeMode;
-    transformEmbeds(tokens); post.contentHtml = post.postType === 'photo' ? photoHtml(post) : marked.parser(tokens); post.graph = graphFor(post);
+    transformEmbeds(tokens); post.contentHtml = post.postType === 'photo' ? photoHtml(post) : marked.parser(splitTopLevelMedia(tokens)); post.graph = graphFor(post);
   }
   return { all: rawPosts, published };
 }
@@ -311,9 +340,10 @@ async function writeData(posts) {
 async function previousSlugs() { try { return JSON.parse(await fs.readFile(postsJsonPath, 'utf8')).map(post => post.slug).filter(Boolean); } catch (error) { if (error.code === 'ENOENT') return []; throw error; } }
 async function writeHtml(post) {
   let html = await fs.readFile(templatePath, 'utf8');
+  const folio = `${post.postType === 'photo' ? 'P' : 'N'}.${String(post.archiveNumber).padStart(3, '0')} / ${post.postType.toUpperCase()}`;
   const entryHead = post.postType === 'photo'
-    ? `<header class="entry-head photo-head">${post.title ? `<h1>${escapeHtml(post.title)}</h1>` : ''}<time class="entry-date" datetime="${escapeHtml(post.date)}">${escapeHtml(post.date)}</time><span class="photo-kind">PHOTO</span></header>`
-    : `<header class="entry-head"><h1>${escapeHtml(post.title)}</h1><time class="entry-date" datetime="${escapeHtml(post.date)}">${escapeHtml(post.date)}</time></header>`;
+    ? `<header class="entry-head photo-head"><h1${post.title ? '' : ' class="sr-only"'}>${escapeHtml(post.title || post.displayTitle)}</h1><div class="entry-meta"><time class="entry-date" datetime="${escapeHtml(post.date)}">${escapeHtml(post.date)}</time><span class="entry-folio">${escapeHtml(folio)}</span></div></header>`
+    : `<header class="entry-head"><h1>${escapeHtml(post.title)}</h1><div class="entry-meta"><time class="entry-date" datetime="${escapeHtml(post.date)}">${escapeHtml(post.date)}</time><span class="entry-folio">${escapeHtml(folio)}</span></div></header>`;
   const replacements = { '{{TITLE}}': escapeHtml(post.displayTitle), '{{BREADCRUMB_TITLE}}': escapeHtml(post.title || 'PHOTO'), '{{DATE}}': escapeHtml(post.date), '{{SUMMARY}}': escapeHtml(post.summary), '{{SLUG}}': escapeHtml(post.slug), '{{POST_TYPE}}': escapeHtml(post.postType), '{{BODY_CLASS}}': post.postType === 'photo' ? 'photo-page' : 'text-page', '{{ENTRY_CLASS}}': post.postType === 'photo' ? 'photo-entry' : 'text-entry', '{{ENTRY_HEAD}}': entryHead, '{{TWITTER_CARD}}': post.image ? 'summary_large_image' : 'summary', '{{IMAGE_META}}': imageMeta(post.image), '{{CONTENT}}': post.contentHtml, '{{RELATIONS}}': post.postType === 'photo' ? '' : relationsHtml(post) };
   for (const [key, value] of Object.entries(replacements)) html = html.replace(new RegExp(escapeRegExp(key), 'g'), () => value);
   await fs.writeFile(path.join(notesDir, `${post.slug}.html`), html, 'utf8');

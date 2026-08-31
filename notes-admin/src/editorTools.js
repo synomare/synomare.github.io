@@ -132,6 +132,17 @@ export function documentStats(body) {
   return { characters, words, headings, minutes: Math.max(1, Math.ceil(characters / 500)) };
 }
 
+export function imageMarkdownRanges(body) {
+  const source = String(body || '');
+  const pattern = /!\[([^\]\n]*)\]\(([^)\n]+)\)/g;
+  const ranges = [];
+  let match;
+  while ((match = pattern.exec(source))) {
+    ranges.push({ from: match.index, to: match.index + match[0].length, alt: match[1].trim(), index: ranges.length + 1 });
+  }
+  return ranges;
+}
+
 export function outlineFromBody(body) {
   return String(body || '').split(/\r?\n/).flatMap((line, index) => {
     const match = line.match(/^(#{1,6})\s+(.+?)\s*#*$/);
@@ -156,6 +167,22 @@ export function noteCompletionOptions(notes = [], query = '', limit = 12) {
       const target = ambiguousTitle ? note.slug : title || note.slug;
       return { label: title || note.slug, detail: `${note.draft ? 'DRAFT' : 'PUBLIC'} · ${note.slug}`, apply: `${target}]]` };
     });
+}
+
+const SLASH_COMMANDS = Object.freeze([
+  Object.freeze({ label: '/h2', detail: '見出し2', insert: '## ', cursorOffset: 3 }),
+  Object.freeze({ label: '/h3', detail: '見出し3', insert: '### ', cursorOffset: 4 }),
+  Object.freeze({ label: '/bullet', detail: '箇条書き', insert: '- ', cursorOffset: 2 }),
+  Object.freeze({ label: '/number', detail: '番号付きリスト', insert: '1. ', cursorOffset: 3 }),
+  Object.freeze({ label: '/task', detail: 'タスクリスト', insert: '- [ ] ', cursorOffset: 6 }),
+  Object.freeze({ label: '/quote', detail: '引用', insert: '> ', cursorOffset: 2 }),
+  Object.freeze({ label: '/code', detail: 'コードブロック', insert: '```\n\n```', cursorOffset: 4 }),
+  Object.freeze({ label: '/divider', detail: '区切り線', insert: '---\n', cursorOffset: 4 }),
+  Object.freeze({ label: '/wikilink', detail: '内部リンク', insert: '[[]]', cursorOffset: 2 })
+]);
+
+export function slashCommandOptions() {
+  return SLASH_COMMANDS;
 }
 
 export function preflightIssues(note, documents = [], imageProcessing = false) {

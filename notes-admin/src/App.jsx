@@ -1,10 +1,15 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import MarkdownEditor from './MarkdownEditorLazy.jsx';
-import MarkdownPreview from './MarkdownPreviewLazy.jsx';
+import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
+import MarkdownEditor, { preloadMarkdownEditor } from './MarkdownEditorLazy.jsx';
+import MarkdownPreview, { preloadMarkdownPreview } from './MarkdownPreviewLazy.jsx';
 import ArticleLibrary from './ArticleLibrary.jsx';
 import OperationsPanel from './OperationsPanel.jsx';
 import TokenEditor from './TokenEditor.jsx';
 import RelatedNotesEditor from './RelatedNotesEditor.jsx';
+import PublicationQueue, { PublicationQueueActivity } from './PublicationQueue.jsx';
+import ChangeReview from './ChangeReview.jsx';
+import usePublicationQueue from './usePublicationQueue.js';
+import { createPublicationJob, removePublishedImages } from './publicationQueue.js';
+import { compareNotes } from './changeReview.js';
 import {
   createLocalDraftKey,
   deleteDraftIfUnchanged,
@@ -26,6 +31,7 @@ import { renameTagInDocuments } from './operations.js';
 import { relatedState } from './relatedNotes.js';
 
 const OAUTH_ORIGIN = 'https://synomare-notes-oauth.decap-oauth.workers.dev';
+const SLOW_EFFECTIVE_TYPE = /(^|-)2g$/;
 const QA_PREVIEW = ['127.0.0.1', 'localhost'].includes(location.hostname) && new URLSearchParams(location.search).has('demo');
 const QA_DOCUMENTS = [
   { slug: 'field-notes', postType: 'text', photo: '', title: '境界に置かれた言葉', date: '2026-08-16', summary: '場所と文章の距離について。', tags: ['思考', '制作'], aliases: ['フィールドノート'], cardSize: 'l', cardExcerpt: '', draft: false, body: '![](/assets/images/notes/1786878777173-3828089f17bd-img-0487.webp)\n\n地図の縁に残った言葉を拾いながら、[[小さな信号]]について考える。\n\n## 境界について\n\n読むことと歩くことの間には、まだ名前のない編集がある。', existing: true },
@@ -90,13 +96,17 @@ function ImageQueue({ images, onRemove }) {
 function PhotoStage({ note, images }) {
   const pending = images.at(-1);
   const [preview, setPreview] = useState('');
+  const [failedSource, setFailedSource] = useState('');
   useEffect(() => {
     if (!pending?.file || pending.needsBuildConversion) { setPreview(''); return; }
     const url = URL.createObjectURL(pending.file); setPreview(url); return () => URL.revokeObjectURL(url);
   }, [pending]);
   const source = preview || (!pending ? note.photo : '');
+  useEffect(() => { setFailedSource(''); }, [source]);
+  const failed = Boolean(source && failedSource === source);
+  const alt = note.title.trim() || note.summary.trim() || `公開予定の写真 ${note.date}`;
   return <div className={`photo-stage ${source ? 'has-photo' : ''}`}>
-    {source ? <img src={source} alt=""/> : pending && !pending.file ? <div className="photo-stage-placeholder">FILE MISSING<br/><small>IMAGEから写真を選び直してください</small></div> : pending?.needsBuildConversion ? <div className="photo-stage-placeholder">HEIC<br/><small>公開時にJPEGへ変換します</small></div> : <div className="photo-stage-placeholder">PHOTO ONLY<br/><small>下の IMAGE から写真を1枚選択</small></div>}
+    {source && !failed ? <img src={source} alt={alt} onError={() => setFailedSource(source)}/> : source ? <div className="photo-stage-placeholder" role="status">PHOTO UNAVAILABLE<br/><small>IMAGEから写真を選び直してください</small></div> : pending && !pending.file ? <div className="photo-stage-placeholder" role="status">FILE MISSING<br/><small>IMAGEから写真を選び直してください</small></div> : pending?.needsBuildConversion ? <div className="photo-stage-placeholder">HEIC<br/><small>公開時にJPEGへ変換します</small></div> : <div className="photo-stage-placeholder">PHOTO ONLY<br/><small>下の IMAGE から写真を1枚選択</small></div>}
   </div>;
 }
 
@@ -135,8 +145,12 @@ function BaseReview({ review, onAccept }) {
 }
 
 export default function App() {
-  const [token, setToken] = useState(QA_PREVIEW ? 'qa-preview' : ''); const [baseSha, setBaseSha] = useState(QA_PREVIEW ? 'qa-base' : ''); const [documents, setDocuments] = useState(QA_PREVIEW ? QA_DOCUMENTS : []); const [localDrafts, setLocalDrafts] = useState([]); const [localDraftsLoaded, setLocalDraftsLoaded] = useState(false); const [localDraftError, setLocalDraftError] = useState(''); const [note, setNote] = useState(null); const [repositoryLoaded, setRepositoryLoaded] = useState(QA_PREVIEW); const [images, setImages] = useState([]); const [status, setStatus] = useState(QA_PREVIEW ? 'LOCAL DESIGN PREVIEW' : ''); const [draftStatus, setDraftStatus] = useState(QA_PREVIEW ? 'READY' : ''); const [baseReview, setBaseReview] = useState(null); const [busy, setBusy] = useState(false); const [imageProcessing, setImageProcessing] = useState(false); const [advanced, setAdvanced] = useState(false); const [viewMode, setViewMode] = useState('edit'); const [focusMode, setFocusMode] = useState(false); const [libraryOpen, setLibraryOpen] = useState(false); const [operationsOpen, setOperationsOpen] = useState(false); const [operationsTab, setOperationsTab] = useState('tags'); const [bulkTagSlugs, setBulkTagSlugs] = useState([]); const [bulkTagSnapshot, setBulkTagSnapshot] = useState(null); const [copied, setCopied] = useState(false); const [hierarchyDepth, setHierarchyDepth] = useState(0); const draftEpoch = useRef(0); const activeDraftKey = useRef(''); const activeSourceSlug = useRef(''); const editingBaseSha = useRef(QA_PREVIEW ? 'qa-base' : ''); const persistedDraftFingerprint = useRef(''); const draftWriteQueue = useRef(Promise.resolve()); const publicationActive = useRef(false); const exclusiveActionActive = useRef(false); const bulkTagNoteSnapshot = useRef(null); const editorRef = useRef(null); const imageInputRef = useRef(null);
-  const interactionLocked = busy || imageProcessing;
+  const [token, setToken] = useState(QA_PREVIEW ? 'qa-preview' : ''); const [baseSha, setBaseSha] = useState(QA_PREVIEW ? 'qa-base' : ''); const [documents, setDocuments] = useState(QA_PREVIEW ? QA_DOCUMENTS : []); const [localDrafts, setLocalDrafts] = useState([]); const [localDraftsLoaded, setLocalDraftsLoaded] = useState(false); const [localDraftError, setLocalDraftError] = useState(''); const [note, setNote] = useState(null); const [repositoryLoaded, setRepositoryLoaded] = useState(QA_PREVIEW); const [images, setImages] = useState([]); const [status, setStatus] = useState(QA_PREVIEW ? 'LOCAL DESIGN PREVIEW' : ''); const [draftStatus, setDraftStatus] = useState(QA_PREVIEW ? 'READY' : ''); const [baseReview, setBaseReview] = useState(null); const [busy, setBusy] = useState(false); const [queueing, setQueueing] = useState(false); const [imageProcessing, setImageProcessing] = useState(false); const [advanced, setAdvanced] = useState(false); const [viewMode, setViewMode] = useState('edit'); const [focusMode, setFocusMode] = useState(false); const [libraryOpen, setLibraryOpen] = useState(false); const [operationsOpen, setOperationsOpen] = useState(false); const [operationsTab, setOperationsTab] = useState('tags'); const [bulkTagSlugs, setBulkTagSlugs] = useState([]); const [bulkTagSnapshot, setBulkTagSnapshot] = useState(null); const [copied, setCopied] = useState(false); const [hierarchyDepth, setHierarchyDepth] = useState(0); const draftEpoch = useRef(0); const activeDraftKey = useRef(''); const activeSourceSlug = useRef(''); const editingBaseSha = useRef(QA_PREVIEW ? 'qa-base' : ''); const latestRemoteBaseSha = useRef(QA_PREVIEW ? 'qa-base' : ''); const persistedDraftFingerprint = useRef(''); const draftWriteQueue = useRef(Promise.resolve()); const publicationActive = useRef(false); const publicationDraftKeys = useRef(new Set()); const queueingActive = useRef(false); const exclusiveActionActive = useRef(false); const bulkTagNoteSnapshot = useRef(null); const editorRef = useRef(null); const imageInputRef = useRef(null); const publicationQueueRef = useRef(null); const noteRef = useRef(note); const imagesRef = useRef(images);
+  noteRef.current = note;
+  imagesRef.current = images;
+  const prepareEditor = useCallback(() => { preloadMarkdownEditor().catch(() => {}); }, []);
+  const preparePreview = useCallback(() => { preloadMarkdownPreview().catch(() => {}); }, []);
+  const interactionLocked = busy || queueing || imageProcessing;
   const runExclusiveAction = useCallback(async action => {
     if (busy || imageProcessing || publicationActive.current || exclusiveActionActive.current) return false;
     exclusiveActionActive.current = true;
@@ -185,6 +199,7 @@ export default function App() {
     try {
       const repo = await loadRepository(activeToken);
       const docs = repo.documents.map(doc => parseDocument(doc.source, doc.slug));
+      latestRemoteBaseSha.current = repo.baseSha;
       setDocuments(docs); setBaseSha(repo.baseSha); setBulkTagSlugs([]); setBulkTagSnapshot(null); bulkTagNoteSnapshot.current = null; setRepositoryLoaded(true);
       if (replaceActive) {
         setImages([]);
@@ -208,13 +223,24 @@ export default function App() {
   }, []);
   useEffect(() => { if (token && !QA_PREVIEW) refresh(token); }, [token, refresh]);
   useEffect(() => {
+    if (!token || !repositoryLoaded || note) return undefined;
+    const connection = navigator.connection;
+    if (connection?.saveData || SLOW_EFFECTIVE_TYPE.test(connection?.effectiveType || '')) return undefined;
+    if ('requestIdleCallback' in window) {
+      const idleId = window.requestIdleCallback(prepareEditor, { timeout: 1600 });
+      return () => window.cancelIdleCallback?.(idleId);
+    }
+    const timer = window.setTimeout(prepareEditor, 900);
+    return () => window.clearTimeout(timer);
+  }, [note, prepareEditor, repositoryLoaded, token]);
+  useEffect(() => {
     if (!token) return;
     setLocalDraftsLoaded(false);
     refreshLocalDrafts().catch(() => setDraftStatus('LOCAL DRAFT ERROR'));
   }, [token, refreshLocalDrafts]);
   useEffect(() => {
     if (!repositoryLoaded || !localDraftsLoaded || bulkTagSlugs.length || publicationActive.current) return undefined;
-    const candidates = unchangedDraftRecords(localDrafts, documents).filter(record => record.key !== activeDraftKey.current);
+    const candidates = unchangedDraftRecords(localDrafts, documents).filter(record => record.key !== activeDraftKey.current && !publicationDraftKeys.current.has(record.key));
     if (!candidates.length) return undefined;
     let cancelled = false;
     queueDraftOperation(async () => {
@@ -266,26 +292,28 @@ export default function App() {
     scrollTo({ top: 0, left: 0, behavior: 'auto' });
     editorRef.current?.resetScroll?.();
   });
-  const selectNote = async slug => {
+  const selectNote = async (slug, requestedPostType = 'text') => {
     if (interactionLocked || exclusiveActionActive.current) return;
+    if (slug !== '__new__' && publicationHasSlug(slug)) { setStatus('この記事は公開キューで処理中です。完了後に開き直してください。'); setLibraryOpen(false); return; }
     if (bulkTagSlugs.length) { setStatus('先にTOOLS / TAGSで一括変更を保存または取り消してください。'); setLibraryOpen(false); setOperationsOpen(true); setOperationsTab('tags'); return; }
     return runExclusiveAction(async () => {
       try { await persistActiveDraft(); }
       catch { setStatus('ERROR — 現在の原稿をローカル保存できなかったため、記事の切替を中止しました。'); return; }
       draftEpoch.current += 1;
       const usedSlugs = [...documents.map(doc => doc.slug), ...localDrafts.map(record => record.note?.slug).filter(Boolean), ...(!note?.existing && note?.slug ? [note.slug] : [])];
-      const selected = slug === '__new__' ? newNote(usedSlugs) : documents.find(doc => doc.slug === slug); if (!selected) return;
+      const selected = slug === '__new__' ? newNote(usedSlugs, requestedPostType) : documents.find(doc => doc.slug === slug); if (!selected) return;
       let recovered = null;
       let hydrated = null;
       if (slug === '__new__') {
         activeDraftKey.current = createLocalDraftKey();
         activeSourceSlug.current = '';
-        editingBaseSha.current = baseSha;
+        editingBaseSha.current = latestRemoteBaseSha.current || baseSha;
         persistedDraftFingerprint.current = '';
       } else {
         const candidate = localDrafts.find(record => (record.sourceSlug || (record.note?.existing ? record.note.slug : '')) === selected.slug);
         recovered = await loadDraft(candidate?.key || draftKeyFor(selected)).catch(() => null);
-        hydrated = recovered ? hydrateDraftForResume(recovered, documents, baseSha) : null;
+        const currentBaseSha = latestRemoteBaseSha.current || baseSha;
+        hydrated = recovered ? hydrateDraftForResume(recovered, documents, currentBaseSha) : null;
         if (recovered && hydrated) {
           const previousKey = recovered.key;
           const sessionKey = createLocalDraftKey();
@@ -296,24 +324,28 @@ export default function App() {
         }
         activeDraftKey.current = recovered?.key || createLocalDraftKey();
         activeSourceSlug.current = selected.slug;
-        editingBaseSha.current = hydrated ? (hydrated.baseKnown ? hydrated.sourceBaseSha : '') : baseSha;
+        editingBaseSha.current = hydrated ? (hydrated.baseKnown ? hydrated.sourceBaseSha : '') : currentBaseSha;
       }
       const next = hydrated?.note || selected;
       const nextImages = hydrated?.images || [];
       if (slug !== '__new__') persistedDraftFingerprint.current = draftFingerprint(next, nextImages);
-      const needsBaseReview = Boolean(hydrated?.sourceSlug && (!hydrated.baseKnown || hydrated.sourceBaseSha !== baseSha));
-      setBaseReview(needsBaseReview ? { reason: hydrated.baseKnown ? 'conflict' : 'legacy', baseSha, remote: documents.find(document => document.slug === hydrated.sourceSlug) || null, local: next } : null);
-      setNote(next); setImages(nextImages); setViewMode('edit'); setLibraryOpen(false); setOperationsOpen(false); setStatus(recovered ? `ローカル下書きを復元しました。${needsBaseReview ? ' GitHub版との差分を確認して基準を選んでください。' : ''}` : slug === '__new__' ? 'NEW NOTE' : `${selected.title || selected.slug}を編集中です。`); setDraftStatus(recovered ? 'LOCAL DRAFT RESTORED' : 'READY'); resetEditingPosition();
+      const currentBaseSha = latestRemoteBaseSha.current || baseSha;
+      const needsBaseReview = Boolean(hydrated?.sourceSlug && (!hydrated.baseKnown || hydrated.sourceBaseSha !== currentBaseSha));
+      setBaseReview(needsBaseReview ? { reason: hydrated.baseKnown ? 'conflict' : 'legacy', baseSha: currentBaseSha, remote: documents.find(document => document.slug === hydrated.sourceSlug) || null, local: next } : null);
+      setNote(next); setImages(nextImages); setViewMode('edit'); setLibraryOpen(false); setOperationsOpen(false); setStatus(recovered ? `ローカル下書きを復元しました。${needsBaseReview ? ' GitHub版との差分を確認して基準を選んでください。' : ''}` : slug === '__new__' ? `NEW ${next.postType.toUpperCase()}` : `${selected.title || selected.slug}を編集中です。`); setDraftStatus(recovered ? 'LOCAL DRAFT RESTORED' : 'READY'); resetEditingPosition();
     });
   };
   const resumeLocalDraft = async key => {
     if (interactionLocked || exclusiveActionActive.current) return;
+    const queuedDraftCandidate = localDrafts.find(record => record.key === key);
+    if (publicationHasDraft(key) || publicationHasSlug(queuedDraftCandidate?.note?.slug)) { setStatus('このslugは公開キューで処理中です。完了または停止後に再開できます。'); setLibraryOpen(false); return; }
     if (bulkTagSlugs.length) { setStatus('先にTOOLS / TAGSで一括変更を保存または取り消してください。'); setLibraryOpen(false); setOperationsOpen(true); setOperationsTab('tags'); return; }
     return runExclusiveAction(async () => {
       try { await persistActiveDraft(); }
       catch { setStatus('ERROR — 現在の原稿をローカル保存できなかったため、切替を中止しました。'); return; }
       const record = await loadDraft(key).catch(() => null);
-      const hydrated = hydrateDraftForResume(record, documents, baseSha);
+      const currentBaseSha = latestRemoteBaseSha.current || baseSha;
+      const hydrated = hydrateDraftForResume(record, documents, currentBaseSha);
       if (!record || !hydrated) { setStatus('ERROR — ローカル下書きを読み込めませんでした。'); await refreshLocalDrafts().catch(() => {}); return; }
       const sessionKey = createLocalDraftKey();
       let sessionRecord;
@@ -326,14 +358,15 @@ export default function App() {
       activeSourceSlug.current = hydrated.sourceSlug;
       editingBaseSha.current = hydrated.baseKnown ? hydrated.sourceBaseSha : '';
       persistedDraftFingerprint.current = draftFingerprint(hydrated.note, hydrated.images);
-      const needsBaseReview = Boolean(hydrated.sourceSlug && (!hydrated.baseKnown || hydrated.sourceBaseSha !== baseSha));
-      setBaseReview(needsBaseReview ? { reason: hydrated.baseKnown ? 'conflict' : 'legacy', baseSha, remote: documents.find(document => document.slug === hydrated.sourceSlug) || null, local: hydrated.note } : null);
+      const needsBaseReview = Boolean(hydrated.sourceSlug && (!hydrated.baseKnown || hydrated.sourceBaseSha !== currentBaseSha));
+      setBaseReview(needsBaseReview ? { reason: hydrated.baseKnown ? 'conflict' : 'legacy', baseSha: currentBaseSha, remote: documents.find(document => document.slug === hydrated.sourceSlug) || null, local: hydrated.note } : null);
       setNote(hydrated.note); setImages(hydrated.images); setViewMode('edit'); setLibraryOpen(false); setOperationsOpen(false); setStatus(`ローカル下書きを復元しました。${needsBaseReview ? ' GitHub版との差分を確認して基準を選んでください。' : ''}`); setDraftStatus(hydrated.state === 'conflict' ? 'SLUG CONFLICT' : hydrated.state === 'missing' ? 'REMOTE MISSING' : 'LOCAL DRAFT RESTORED'); resetEditingPosition();
     });
   };
   const discardLocalDraft = async candidate => {
     const key = candidate?.key;
     if (!key) return;
+    if (publicationHasDraft(key)) throw new Error('公開キューにある下書きは破棄できません。完了または停止後に操作してください。');
     if (key === activeDraftKey.current) throw new Error('編集中の下書きは破棄できません。別の記事へ移動してから操作してください。');
     const deleted = await queueDraftOperation(() => deleteDraftIfUnchanged(key, candidate.savedAt, draftFingerprint(candidate.note, candidate.images)));
     if (!deleted) { await refreshLocalDrafts().catch(() => {}); throw new Error('別のタブで下書きが更新されました。一覧を更新したので、内容を確認してもう一度破棄してください。'); }
@@ -350,51 +383,121 @@ export default function App() {
     return result;
   }, [note, documents, localDrafts, images, imageProcessing, baseReview]);
   const blockingIssue = issues.find(issue => issue.level === 'error') || null;
+  const executePublication = useCallback(async job => {
+    if (QA_PREVIEW) {
+      await new Promise(resolve => setTimeout(resolve, 2200));
+      return `qa-${job.id}`;
+    }
+    return publishAtomic({
+      token,
+      baseSha: latestRemoteBaseSha.current || baseSha,
+      slug: job.slug,
+      markdown: job.markdown,
+      images: job.images,
+      existing: job.existing
+    });
+  }, [token, baseSha]);
+  const handlePublicationSuccess = useCallback(async (job, committedSha) => {
+    const publishedNote = { ...job.note, existing: true };
+    const activeMatches = activeDraftKey.current === job.draftKey && noteRef.current?.slug === job.slug;
+    const activeChanged = activeMatches && draftFingerprint(noteRef.current, imagesRef.current) !== job.draftFingerprint;
+    latestRemoteBaseSha.current = committedSha;
+    editingBaseSha.current = committedSha;
+    setBaseSha(committedSha);
+    let activeSaveFailed = false;
+    if (activeChanged) {
+      try { await persistDraftSnapshot(noteRef.current, imagesRef.current, true); }
+      catch { activeSaveFailed = true; }
+    }
+    let cleanupState = activeSaveFailed ? 'error' : 'clean';
+    if (!activeSaveFailed) {
+      try {
+        const deleted = job.draftKey && job.draftSavedAt
+          ? await queueDraftOperation(() => deleteDraftIfUnchanged(job.draftKey, job.draftSavedAt, job.draftFingerprint))
+          : false;
+        if (deleted) setLocalDrafts(current => current.filter(record => record.key !== job.draftKey));
+        else if (job.draftKey) { cleanupState = 'preserved'; await refreshLocalDrafts().catch(() => {}); }
+      } catch { cleanupState = 'error'; }
+    }
+    setDocuments(current => {
+      const exists = current.some(document => document.slug === publishedNote.slug);
+      return exists ? current.map(document => document.slug === publishedNote.slug ? publishedNote : document) : [publishedNote, ...current];
+    });
+    if (activeMatches) {
+      const remainingImages = removePublishedImages(imagesRef.current, job.images);
+      const nextNote = { ...noteRef.current, existing: true };
+      activeSourceSlug.current = job.slug;
+      setNote(nextNote);
+      setImages(remainingImages);
+      setBaseReview(null);
+      if (!activeChanged && cleanupState === 'clean') {
+        persistedDraftFingerprint.current = draftFingerprint(nextNote, remainingImages);
+        setDraftStatus('SYNCED');
+      } else {
+        persistedDraftFingerprint.current = '';
+        setDraftStatus(cleanupState === 'error' ? 'LOCAL CLEANUP ERROR' : 'LOCAL CHANGES KEPT');
+      }
+    }
+    const success = job.note.draft ? 'GitHub下書きを保存しました。' : '公開コミットを作成しました。数分後にサイトへ反映されます。';
+    setStatus(cleanupState === 'error' ? `${job.title}: ${success} 端末内下書きの後片付けだけ失敗しました。` : cleanupState === 'preserved' ? `${job.title}: ${success} 公開後の変更を含む端末下書きは残しています。` : `${job.title}: ${success}`);
+    publicationDraftKeys.current.delete(job.draftKey);
+  }, [persistDraftSnapshot, queueDraftOperation, refreshLocalDrafts]);
+  const handlePublicationError = useCallback((job, error) => {
+    if (activeDraftKey.current === job.draftKey) setDraftStatus('QUEUE STOPPED / DRAFT KEPT');
+    setStatus(`${error?.code === 'CONFLICT' ? 'CONFLICT' : 'ERROR'} — ${job.title}で公開キューを停止しました。${error?.message || '公開処理に失敗しました。'} 原稿はLOCAL DRAFTSに残っています。`);
+  }, []);
+  const {
+    items: publicationItems,
+    paused: publicationPaused,
+    summary: publicationSummary,
+    enqueue: enqueuePublication,
+    retry: retryPublication,
+    cancel: cancelPublication,
+    stop: stopPublication,
+    clearCompleted: clearPublishedQueue,
+    hasSlug: publicationHasSlug,
+    hasDraft: publicationHasDraft
+  } = usePublicationQueue({
+    enabled: Boolean(token && repositoryLoaded && !busy && !queueing && !publicationActive.current),
+    execute: executePublication,
+    onSuccess: handlePublicationSuccess,
+    onError: handlePublicationError
+  });
   const publish = useCallback(async () => {
-    if (!note || busy || exclusiveActionActive.current || publicationActive.current || imageProcessing) return; if (QA_PREVIEW) { setStatus('DESIGN PREVIEW — 公開処理は実行しません。'); return; }
+    if (!note || busy || queueingActive.current || exclusiveActionActive.current || publicationActive.current || imageProcessing) return;
+    if (publicationHasSlug(note.slug)) { setStatus('このslugはすでに公開キューにあります。完了後にもう一度追加できます。'); return; }
     if (bulkTagSlugs.length) { setStatus('先にTOOLS / TAGSから一括変更を保存してください。'); setOperationsOpen(true); setOperationsTab('tags'); return; }
     const blocking = issues.find(issue => issue.level === 'error'); if (blocking) { setStatus(`ERROR — ${blocking.text}`); return; }
-    const key = activeDraftKey.current;
-    const publishBaseSha = editingBaseSha.current || baseSha;
-    draftEpoch.current += 1;
-    exclusiveActionActive.current = true;
-    publicationActive.current = true;
-    setBusy(true); setStatus(note.draft ? '下書きをGitHubへ保存しています…' : '公開コミットを作成しています…');
+    queueingActive.current = true;
+    setQueueing(true);
+    setStatus('原稿を公開キューへ追加しています…');
     try {
       const publishedDraftRecord = await persistDraftSnapshot(note, images, true);
-      const success = note.draft ? 'GitHub下書きを保存しました。' : '公開しました。数分後にサイトへ反映されます。';
-      const committedSha = await publishAtomic({ token, baseSha: publishBaseSha, slug: note.slug, markdown: serializeDocument(note), images, existing: note.existing });
-      const publishedNote = { ...note, existing: true };
-      let cleanupState = 'clean';
-      try {
-        const deleted = publishedDraftRecord ? await queueDraftOperation(() => deleteDraftIfUnchanged(key, publishedDraftRecord.savedAt, draftFingerprint(publishedDraftRecord.note, publishedDraftRecord.images))) : false;
-        if (deleted) setLocalDrafts(current => current.filter(record => record.key !== key));
-        else { cleanupState = 'preserved'; await refreshLocalDrafts().catch(() => {}); }
-      } catch { cleanupState = 'error'; }
-      activeDraftKey.current = createLocalDraftKey();
-      activeSourceSlug.current = note.slug;
-      editingBaseSha.current = committedSha;
-      persistedDraftFingerprint.current = draftFingerprint(publishedNote, []);
-      setBaseSha(committedSha); setNote(publishedNote); setImages([]); setBaseReview(null);
-      setDocuments(current => {
-        const exists = current.some(document => document.slug === publishedNote.slug);
-        return exists ? current.map(document => document.slug === publishedNote.slug ? publishedNote : document) : [publishedNote, ...current];
+      if (!publishedDraftRecord) throw new Error('端末内下書きを作成できませんでした。');
+      const job = createPublicationJob({
+        note,
+        images,
+        markdown: serializeDocument(note),
+        draftRecord: {
+          ...publishedDraftRecord,
+          fingerprint: draftFingerprint(publishedDraftRecord.note, publishedDraftRecord.images)
+        }
       });
-      const reloaded = await refresh(token, { replaceActive: true, manageBusy: false });
-      setStatus(cleanupState === 'error' ? `${success} 端末内下書きの後片付けだけ失敗したため、次回一覧で破棄してください。` : cleanupState === 'preserved' ? `${success} 別タブで更新された端末下書きは削除せずLOCAL DRAFTSへ残しました。` : reloaded ? success : `${success} GitHubからの再読み込みだけ失敗しました。`); setDraftStatus(cleanupState === 'error' ? 'LOCAL CLEANUP ERROR' : cleanupState === 'preserved' ? 'PARALLEL DRAFT KEPT' : 'SYNCED');
+      if (!enqueuePublication(job)) { setStatus('このslugはすでに公開キューにあります。'); return; }
+      publicationDraftKeys.current.add(job.draftKey);
+      setDraftStatus('QUEUED / LOCAL DRAFT SAVED');
+      setStatus(`${job.title}を公開キューへ追加しました。別の記事へ切り替えて続けられます。`);
+    } catch (error) {
+      setDraftStatus('LOCAL DRAFT ERROR');
+      setStatus(`ERROR — ${error.message}`);
+    } finally {
+      queueingActive.current = false;
+      setQueueing(false);
     }
-    catch (error) {
-      if (error.code === 'CONFLICT') {
-        const latest = await refresh(token, { manageBusy: false });
-        const sourceSlug = activeSourceSlug.current || note.slug;
-        setBaseReview({ reason: 'conflict', baseSha: latest?.baseSha || '', remote: latest?.documents.find(document => document.slug === sourceSlug) || null, local: note });
-        setStatus(`CONFLICT — ${error.message} GitHub版を比較して基準を選んでください。`);
-      } else setStatus(`ERROR — ${error.message}`);
-    }
-    finally { publicationActive.current = false; exclusiveActionActive.current = false; setBusy(false); }
-  }, [note, busy, imageProcessing, issues, token, baseSha, images, refresh, bulkTagSlugs, persistDraftSnapshot, queueDraftOperation]);
+  }, [note, busy, imageProcessing, issues, images, bulkTagSlugs, persistDraftSnapshot, publicationHasSlug, enqueuePublication]);
   const publishBulkTags = useCallback(async () => {
     if (!bulkTagSlugs.length || interactionLocked || exclusiveActionActive.current || publicationActive.current) return;
+    if (publicationSummary.active) { setStatus('公開キューの完了または停止後にタグの一括変更を保存してください。'); return; }
     if (baseReview || (note?.existing && editingBaseSha.current !== baseSha)) {
       const sourceSlug = activeSourceSlug.current || note?.slug;
       setBaseReview(current => current || { reason: 'conflict', baseSha, remote: documents.find(document => document.slug === sourceSlug) || null, local: note });
@@ -416,7 +519,7 @@ export default function App() {
         return;
       }
       const committedSha = await publishBatch({ token, baseSha, entries: documents.filter(document => bulkTagSlugs.includes(document.slug)).map(document => ({ slug: document.slug, markdown: serializeDocument(document) })), message: `content: rename tags (${bulkTagSlugs.length} Notes)` });
-      setBaseSha(committedSha); editingBaseSha.current = committedSha; setBulkTagSlugs([]); setBulkTagSnapshot(null); bulkTagNoteSnapshot.current = null;
+      latestRemoteBaseSha.current = committedSha; setBaseSha(committedSha); editingBaseSha.current = committedSha; setBulkTagSlugs([]); setBulkTagSnapshot(null); bulkTagNoteSnapshot.current = null;
       let localAftercareFailed = false;
       let parallelDraftPreserved = false;
       const remoteVersion = note?.existing ? documents.find(document => document.slug === note.slug) : null;
@@ -446,9 +549,10 @@ export default function App() {
       else setStatus(`ERROR — ${error.message}`);
     }
     finally { publicationActive.current = false; exclusiveActionActive.current = false; setBusy(false); }
-  }, [bulkTagSlugs, interactionLocked, baseReview, token, baseSha, documents, note, images, refresh, persistDraftSnapshot, queueDraftOperation]);
+  }, [bulkTagSlugs, interactionLocked, baseReview, token, baseSha, documents, note, images, refresh, persistDraftSnapshot, queueDraftOperation, publicationSummary.active]);
   const renameTag = (from, to) => {
     if (interactionLocked) return;
+    if (publicationSummary.active) { setStatus('公開キューの完了または停止後にタグ管理を変更してください。'); return; }
     const result = renameTagInDocuments(documents, from, to);
     if (!result.changedSlugs.length) return;
     if (!bulkTagSnapshot) { setBulkTagSnapshot(documents); bulkTagNoteSnapshot.current = note ? { key: activeDraftKey.current, slug: note.slug, tags: [...(note.tags || [])] } : null; }
@@ -499,6 +603,9 @@ export default function App() {
   const jumpToLine = line => { setViewMode('edit'); requestAnimationFrame(() => editorRef.current?.goToLine(line)); };
   const relationNotes = useMemo(() => documents.filter(doc => doc.slug !== note?.slug), [documents, note?.slug]);
   const toolDocuments = useMemo(() => note?.existing ? documents.map(document => document.slug === note.slug ? note : document) : documents, [documents, note]);
+  const deferredReviewNote = useDeferredValue(note);
+  const sourceDocument = useMemo(() => deferredReviewNote ? documents.find(document => document.slug === (activeSourceSlug.current || deferredReviewNote.slug)) || null : null, [documents, deferredReviewNote]);
+  const changeComparison = useMemo(() => compareNotes(sourceDocument, deferredReviewNote), [sourceDocument, deferredReviewNote]);
   const tagSuggestions = useMemo(() => collectTags(documents), [documents]);
   const aliasSuggestions = useMemo(() => [...new Set(documents.flatMap(document => document.aliases || []))].sort((a, b) => a.localeCompare(b, 'ja')), [documents]);
   const duplicate = async source => {
@@ -523,7 +630,7 @@ export default function App() {
       draftEpoch.current += 1;
       activeDraftKey.current = createLocalDraftKey();
       activeSourceSlug.current = '';
-      editingBaseSha.current = baseSha;
+      editingBaseSha.current = latestRemoteBaseSha.current || baseSha;
       persistedDraftFingerprint.current = '';
       setBaseReview(null); setNote(copy); setImages(sourceImages.map(image => ({ ...image }))); setViewMode('edit'); setAdvanced(true); setLibraryOpen(false); setStatus(`記事を下書きとして複製しました。${sourceImages.length ? `未送信画像${sourceImages.length}点もコピーしています。` : ''}タイトルと内容を確認してください。`); setDraftStatus('LOCAL CHANGES'); resetEditingPosition();
     });
@@ -537,6 +644,7 @@ export default function App() {
   };
   const reloadRepository = async () => {
     if (interactionLocked || exclusiveActionActive.current) return;
+    if (publicationSummary.active) { setStatus('公開キューの完了またはSTOP & KEEP DRAFTS後にRELOADしてください。'); return; }
     if (bulkTagSlugs.length) { setStatus('先にTOOLS / TAGSで一括変更を保存または取り消してください。'); setOperationsOpen(true); setOperationsTab('tags'); return; }
     return runExclusiveAction(async () => {
       try { await persistActiveDraft(); }
@@ -581,6 +689,7 @@ export default function App() {
   };
   const logout = async () => {
     if (interactionLocked || exclusiveActionActive.current) return;
+    if (publicationSummary.active) { setStatus('公開キューの完了またはSTOP & KEEP DRAFTS後にログアウトしてください。'); return; }
     if (bulkTagSlugs.length) { setStatus('先にTOOLS / TAGSで一括変更を保存または取り消してください。'); setOperationsOpen(true); setOperationsTab('tags'); return; }
     return runExclusiveAction(async () => {
       try { await persistActiveDraft(); }
@@ -591,19 +700,33 @@ export default function App() {
   if (!token) return <Login onToken={setToken} />;
   if (!note) {
     if (!repositoryLoaded) return <main className="login"><p>{status || 'LOADING…'}</p></main>;
-    return <ArticleLibrary entry disabled={interactionLocked} documents={documents} localDrafts={localDrafts} localDraftsLoaded={localDraftsLoaded} localDraftError={localDraftError} activeSlug="" activeDraftKey="" onClose={() => {}} onSelect={selectNote} onNew={() => selectNote('__new__')} onDuplicate={duplicate} onResumeDraft={resumeLocalDraft} onDiscardDraft={discardLocalDraft}/>;
+    return <ArticleLibrary entry disabled={interactionLocked} documents={documents} localDrafts={localDrafts} localDraftsLoaded={localDraftsLoaded} localDraftError={localDraftError} activeSlug="" activeDraftKey="" onClose={() => {}} onSelect={selectNote} onNew={postType => selectNote('__new__', postType)} onDuplicate={duplicate} onResumeDraft={resumeLocalDraft} onDiscardDraft={discardLocalDraft} onEditorIntent={prepareEditor}/>;
   }
   const modalOpen = libraryOpen || operationsOpen;
   const openLibrary = () => { if (!interactionLocked) { setOperationsOpen(false); setLibraryOpen(true); } };
   const openOperations = () => { if (!interactionLocked) { setLibraryOpen(false); setOperationsOpen(true); } };
-  return <div className={`app-shell ${focusMode ? 'is-focus' : ''}`}>
+  const selectedDocumentValue = note.existing ? note.slug : note.postType === 'photo' ? '__new_photo__' : '__new_text__';
+  const selectDocument = event => {
+    const selected = event.target.value;
+    if (selected === '__new_text__') { selectNote('__new__', 'text'); return; }
+    if (selected === '__new_photo__') { selectNote('__new__', 'photo'); return; }
+    selectNote(selected);
+  };
+  const revealPublicationQueue = () => {
+    const panel = publicationQueueRef.current;
+    if (!panel) return;
+    panel.open = true;
+    panel.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' });
+    panel.querySelector('summary')?.focus({ preventScroll: true });
+  };
+  return <div className={`app-shell ${focusMode ? 'is-focus' : ''} ${publicationSummary.active ? 'has-publication-queue' : ''}`}>
     {interactionLocked ? <span className="sr-only" role="status" aria-live="polite">{status}</span> : null}
-    {libraryOpen ? <ArticleLibrary open disabled={interactionLocked} documents={documents} localDrafts={localDrafts} localDraftsLoaded={localDraftsLoaded} localDraftError={localDraftError} activeSlug={note.slug} activeDraftKey={activeDraftKey.current} onClose={() => setLibraryOpen(false)} onSelect={selectNote} onNew={() => selectNote('__new__')} onDuplicate={duplicate} onResumeDraft={resumeLocalDraft} onDiscardDraft={discardLocalDraft}/> : null}
+    {libraryOpen ? <ArticleLibrary open disabled={interactionLocked} documents={documents} localDrafts={localDrafts} localDraftsLoaded={localDraftsLoaded} localDraftError={localDraftError} activeSlug={note.slug} activeDraftKey={activeDraftKey.current} onClose={() => setLibraryOpen(false)} onSelect={selectNote} onNew={postType => selectNote('__new__', postType)} onDuplicate={duplicate} onResumeDraft={resumeLocalDraft} onDiscardDraft={discardLocalDraft} onEditorIntent={prepareEditor}/> : null}
     {operationsOpen ? <OperationsPanel open disabled={interactionLocked} tab={operationsTab} onTabChange={setOperationsTab} documents={toolDocuments} onClose={() => setOperationsOpen(false)} onSelect={selectNote} onUseImage={useImage} onRenameTag={renameTag} pendingTagChanges={bulkTagSlugs.length} onSaveTagChanges={publishBulkTags} onDiscardTagChanges={discardTagChanges}/> : null}
     <header className="editor-top" inert={modalOpen ? true : undefined} aria-hidden={modalOpen ? 'true' : undefined} aria-busy={interactionLocked}>
       <div className="editor-brand"><a href="/" data-dialog-return-fallback>SYNOMARE</a><span>NOTES</span></div>
-      <select aria-label="記事を選ぶ" value={note.existing ? note.slug : '__new__'} disabled={interactionLocked} onChange={event => selectNote(event.target.value)}><option value="__new__">＋ NEW NOTE</option>{documents.map(doc => <option key={doc.slug} value={doc.slug}>{doc.title || (doc.postType === 'photo' ? `PHOTO / ${doc.date}` : doc.slug)}</option>)}</select>
-      <div className="editor-session"><button aria-label="記事ライブラリを開く" onClick={openLibrary} disabled={interactionLocked}>LIBRARY</button><button aria-label="記事運用ツールを開く" onClick={openOperations} disabled={interactionLocked}>TOOLS</button><button aria-label="GitHubから記事を再読み込み" onClick={reloadRepository} disabled={interactionLocked}>RELOAD</button><button aria-label="ログアウト" onClick={logout} disabled={interactionLocked}>LOG OUT</button></div>
+      <select aria-label="記事を選ぶ" value={selectedDocumentValue} disabled={interactionLocked} onChange={selectDocument}><option value="__new_text__">＋ NEW TEXT</option><option value="__new_photo__">＋ NEW PHOTO</option>{documents.map(doc => <option key={doc.slug} value={doc.slug}>{doc.title || (doc.postType === 'photo' ? `PHOTO / ${doc.date}` : doc.slug)}</option>)}</select>
+      <div className="editor-session"><button aria-label="記事ライブラリを開く" onClick={openLibrary} disabled={interactionLocked}>LIBRARY</button><button aria-label="記事運用ツールを開く" onClick={openOperations} disabled={interactionLocked}>TOOLS</button><button aria-label="GitHubから記事を再読み込み" onClick={reloadRepository} disabled={interactionLocked || Boolean(publicationSummary.active)}>RELOAD</button><button aria-label="ログアウト" onClick={logout} disabled={interactionLocked || Boolean(publicationSummary.active)}>LOG OUT</button></div>
     </header>
     <main className={`workspace is-${note.postType} mode-${viewMode} ${interactionLocked ? 'is-locked' : ''}`} inert={modalOpen || interactionLocked ? true : undefined} aria-hidden={modalOpen ? 'true' : undefined} aria-busy={interactionLocked}>
       <section className="writing">
@@ -613,7 +736,7 @@ export default function App() {
           <div className="document-meta"><span>{note.date}</span><span>{note.slug}</span><span>{note.postType.toUpperCase()} / CARD {note.cardSize === 'auto' ? `AUTO → ${note.postType === 'photo' ? 'L' : 'S / M'}` : note.cardSize.toUpperCase()}</span></div>
         </div>
         {note.postType === 'photo' ? <PhotoStage note={note} images={images}/> : <>
-          <EditorToolbar mode={viewMode} onMode={setViewMode} focusMode={focusMode} onFocusMode={() => setFocusMode(value => !value)} onCommand={command => editorRef.current?.command(command)}/>
+          <EditorToolbar mode={viewMode} onMode={setViewMode} focusMode={focusMode} onFocusMode={() => setFocusMode(value => !value)} onCommand={command => editorRef.current?.command(command)} onPreviewIntent={preparePreview}/>
           <div className="editor-surface">
             <MarkdownEditor key={activeDraftKey.current || note.slug} ref={editorRef} value={note.body} onChange={body => update({ body })} onDepthChange={setHierarchyDepth} notes={relationNotes} onPublish={publish} onFiles={handleImageFiles}/>
             {viewMode !== 'edit' ? <MarkdownPreview body={note.body}/> : null}
@@ -623,13 +746,33 @@ export default function App() {
         </>}
         {advanced ? <section className="details"><label>SLUG<input value={note.slug} readOnly={note.existing} onChange={event => update({ slug: event.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '') })}/></label><label>DATE<input type="date" value={note.date} onChange={event => update({ date: event.target.value })}/></label><label>CARD SIZE<select value={note.cardSize} onChange={event => update({ cardSize: event.target.value })}><option value="auto">AUTO / CONTENT</option><option value="s">S / SMALL</option><option value="m">M / MEDIUM</option><option value="l">L / LARGE</option></select></label><label>VISIBILITY<select value={note.draft ? 'draft' : 'public'} onChange={event => update({ draft: event.target.value === 'draft' })}><option value="public">PUBLIC</option><option value="draft">GITHUB DRAFT</option></select></label><label className="wide">{note.postType === 'photo' ? 'CAPTION / DESCRIPTION' : 'SUMMARY'}<input value={note.summary} placeholder={note.postType === 'photo' ? '未入力でも公開できます' : excerptFromBody(note.body)} onChange={event => update({ summary: event.target.value })}/></label>{note.postType === 'text' ? <label className="wide">CARD EXCERPT<input value={note.cardExcerpt} placeholder="概要を使用" onChange={event => update({ cardExcerpt: event.target.value })}/></label> : null}<TokenEditor label="TAGS" values={note.tags} suggestions={tagSuggestions} placeholder={note.postType === 'photo' ? '写真' : 'タグを入力してEnter'} onChange={tags => update({ tags })}/><TokenEditor label="ALIASES" values={note.aliases} suggestions={aliasSuggestions} placeholder="別名を入力してEnter" onChange={aliases => update({ aliases })}/>{note.postType === 'text' ? <RelatedNotesEditor note={note} documents={toolDocuments} onChange={update}/> : null}</section> : null}
     <BaseReview review={baseReview ? { ...baseReview, local: note } : null} onAccept={acceptLatestBase}/>
+        <PublicationQueue
+          detailsRef={publicationQueueRef}
+          items={publicationItems}
+          paused={publicationPaused}
+          summary={publicationSummary}
+          onRetry={id => { if (retryPublication(id)) setStatus('停止した項目から公開キューを再開します。'); }}
+          onCancel={id => {
+            const cancelled = cancelPublication(id);
+            if (!cancelled) { setStatus('この項目はすでに処理を開始しているため、公開キューから外せません。'); return; }
+            publicationDraftKeys.current.delete(cancelled.draftKey);
+            if (activeDraftKey.current === cancelled.draftKey) setDraftStatus('LOCAL DRAFT SAVED');
+            setStatus(`${cancelled.title}を公開キューから外しました。原稿と画像はLOCAL DRAFTSに残しています。`);
+          }}
+          onStop={() => { publicationItems.filter(item => item.state !== 'done').forEach(item => publicationDraftKeys.current.delete(item.draftKey)); stopPublication(); setStatus('公開キューを停止しました。未完了の原稿はLOCAL DRAFTSに残しています。'); }}
+          onClear={clearPublishedQueue}
+        />
+        <ChangeReview comparison={changeComparison}/>
         <PublishCheck issues={issues}/>
         <div className="editor-actions">
-          <span className={`save-status ${status.startsWith('ERROR') || status.startsWith('CONFLICT') || blockingIssue ? 'error' : ''}`} role="status" aria-live="polite" aria-atomic="true"><span>{blockingIssue ? `BLOCKED — ${blockingIssue.text}` : status}</span>{draftStatus ? <small className={draftStatus.endsWith('ERROR') ? 'error' : ''}>{draftStatus}</small> : null}</span>
-          <button type="button" className={`upload ${imageProcessing ? 'is-busy' : ''}`} disabled={imageProcessing || busy} onClick={() => imageInputRef.current?.click()}>＋ {imageProcessing ? 'PROCESSING…' : note.postType === 'photo' && note.photo ? 'REPLACE PHOTO' : 'IMAGE'}</button><input ref={imageInputRef} className="file-input-proxy" type="file" accept={IMAGE_ACCEPT} multiple={note.postType === 'text'} disabled={imageProcessing || busy} onChange={imageInput}/>
+          <div className="action-feedback">
+            {publicationSummary.active ? <PublicationQueueActivity items={publicationItems} paused={publicationPaused} onOpen={revealPublicationQueue}/> : null}
+            <span className={`save-status ${status.startsWith('ERROR') || status.startsWith('CONFLICT') || blockingIssue ? 'error' : ''}`} role="status" aria-live="polite" aria-atomic="true"><span>{blockingIssue ? `BLOCKED — ${blockingIssue.text}` : status}</span>{draftStatus ? <small className={draftStatus.endsWith('ERROR') ? 'error' : ''}>{draftStatus}</small> : null}</span>
+          </div>
+          <button type="button" className={`upload ${imageProcessing ? 'is-busy' : ''}`} aria-label={imageProcessing ? '画像を処理しています' : note.postType === 'photo' && note.photo ? '写真を置き換える' : '画像を選択する'} disabled={imageProcessing || busy} onClick={() => imageInputRef.current?.click()}>{imageProcessing ? 'WORKING…' : note.postType === 'photo' && note.photo ? 'REPLACE' : '＋ IMAGE'}</button><input ref={imageInputRef} className="file-input-proxy" type="file" accept={IMAGE_ACCEPT} multiple={note.postType === 'text'} disabled={imageProcessing || busy} onChange={imageInput}/>
           <button onClick={() => setAdvanced(value => !value)} aria-expanded={advanced} disabled={interactionLocked}>DETAILS {advanced ? '−' : '+'}</button>
           <button onClick={copyMarkdown} disabled={interactionLocked}>{copied ? 'COPIED' : 'COPY MD'}</button>
-          <button className="primary" onClick={publish} disabled={busy || imageProcessing || Boolean(blockingIssue)}>{busy ? 'SAVING…' : imageProcessing ? 'PROCESSING…' : note.draft ? 'SAVE DRAFT' : 'PUBLISH'} <span>⌘↵</span></button>
+          <button className="primary" onClick={publish} disabled={busy || queueing || imageProcessing || Boolean(blockingIssue) || publicationHasSlug(note.slug)}>{queueing ? 'ADDING…' : publicationHasSlug(note.slug) ? 'IN QUEUE' : imageProcessing ? 'PROCESSING…' : note.draft ? 'QUEUE DRAFT' : 'PUBLISH'} <span>⌘↵</span></button>
         </div>
       </section>
       {note.postType === 'text' ? <Inspector note={note} documents={documents} onJump={jumpToLine}/> : null}
