@@ -476,9 +476,9 @@ tags: [思考]
   assert.match(html, /is-unresolved/);
   assert.doesNotMatch(html, /LOCAL GRAPH|mini-graph|entry-side/);
   assert.match(html, /\.entry-layout\{display:block;width:100%;max-width:1180px;margin:0 auto\}/);
-  assert.match(html, /\.text-entry>p,[^}]+width:min\(100%,48em\);margin-left:auto;margin-right:auto/);
+  assert.match(html, /\.text-entry>p,[^}]+width:min\(100%,48em\);margin-left:0;margin-right:auto/);
   assert.match(html, /\.text-entry>\.note-media,\.text-entry>\.video-container,\.text-entry>\.twitter-tweet\{width:100%;max-width:none\}/);
-  assert.match(html, /\.entry \.note-block \{ position: relative; margin: \.5rem auto 1\.15rem;/);
+  assert.match(html, /\.entry \.note-block \{ position: relative; margin: \.5rem 0 1\.15rem;/);
   assert.match(html, /class="relations"/);
   assert.match(html, /Links — この記事から/);
   assert.match(html, /Related — 関連記事/);
