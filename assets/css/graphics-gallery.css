@@ -1,0 +1,30 @@
+.graphics { margin: 0 0 3.6rem; }
+.graphics .sec-head { font-weight: 400; }
+.graphics-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: clamp(1rem, 2.5vw, 2.25rem); align-items: start; }
+.graphic { display: block; grid-column: span 2; min-width: 0; cursor: zoom-in; }
+.graphic[data-format="landscape"] { grid-column: span 3; }
+.graphic[data-format="panorama"] { grid-column: 1 / -1; }
+.graphic img { display: block; width: 100%; height: auto; }
+.graphic:focus-visible { outline: 2px solid var(--red); outline-offset: 6px; }
+.graphic-viewer { position: fixed; inset: 0; box-sizing: border-box; width: 100%; max-width: none; height: 100%; height: 100dvh; max-height: none; margin: 0; padding: 0; border: 0; background: #17140f; color: #f4f3ef; }
+.graphic-viewer[open] { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
+.graphic-viewer::backdrop { background: #17140f; }
+.graphic-viewer-toolbar, .graphic-viewer-navigation { display: flex; align-items: center; gap: .75rem; padding: .65rem max(.8rem, env(safe-area-inset-right)) .65rem max(.8rem, env(safe-area-inset-left)); font: .7rem var(--mono); }
+.graphic-viewer-toolbar { padding-top: max(.65rem, env(safe-area-inset-top)); }
+.graphic-viewer-toolbar > span { margin-right: auto; }
+.graphic-viewer-navigation { justify-content: space-between; padding-bottom: max(.65rem, env(safe-area-inset-bottom)); }
+.graphic-viewer button, .graphic-viewer a { box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: .5rem .8rem; border: 1px solid #8f887a; color: inherit; background: transparent; font: inherit; cursor: pointer; }
+.graphic-viewer button:hover, .graphic-viewer a:hover { background: #f4f3ef; color: #17140f; }
+.graphic-viewer button:focus-visible, .graphic-viewer a:focus-visible { outline: 2px solid #f4f3ef; outline-offset: 3px; }
+.graphic-viewer-stage { min-height: 0; display: flex; justify-content: center; align-items: center; padding: 0 clamp(.5rem, 2vw, 2rem); }
+.graphic-viewer-stage img { display: block; max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; }
+html.graphic-viewer-open { overflow: hidden; }
+@media (max-width: 1000px) {
+  .graphics-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .graphic { grid-column: span 1; }
+  .graphic[data-format="landscape"] { grid-column: span 2; }
+}
+@media (max-width: 600px) {
+  .graphics-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+  .graphic, .graphic[data-format="landscape"], .graphic[data-format="panorama"] { grid-column: 1 / -1; }
+}

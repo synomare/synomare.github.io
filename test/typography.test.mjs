@@ -19,6 +19,7 @@ test('OTTOは大見出し用の表示書体として読み込まれる', async (
   const pages = [
     ['index.html', 'assets/css/type.css'],
     ['works.html', 'assets/css/type.css'],
+    ['gallery.html', 'assets/css/type.css'],
     ['links.html', 'assets/css/type.css'],
     ['profile.html', 'assets/css/type.css'],
     ['notes/index.html', '../assets/css/type.css'],
