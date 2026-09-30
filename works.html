@@ -15,7 +15,6 @@
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@1,400;1,500&family=Space+Mono:wght@400;700&family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
   <link rel="preload" href="/assets/fonts/OTTOATTACTYPE.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="stylesheet" href="assets/css/type.css">
-  <link rel="stylesheet" href="assets/css/graphics-gallery.css">
   <style>
     :root {
       --paper: #f4f3ef;
@@ -278,6 +277,7 @@
     <nav aria-label="site">
         <a href="./">INDEX</a>
         <a href="works.html" aria-current="page">WORKS</a>
+        <a href="gallery.html">GALLERY</a>
         <a href="notes/">NOTES</a>
         <a href="links.html">LINKS</a>
         <a href="profile.html">PROFILE</a>
@@ -301,36 +301,6 @@
       <span class="tag plate-tag"><span class="en">Terpsichora</span><span class="jp">刷りの平面 二〇二五</span></span>
       <div class="thread plate-thread"></div>
     </div>
-
-    <section class="graphics" aria-labelledby="graphicsHeading">
-      <h2 class="sec-head" id="graphicsHeading"><span>Graphics — グラフィック</span></h2>
-      <div class="graphics-grid">
-        <a class="graphic" href="assets/images/graphics/portfolio/01.webp" aria-label="画像 1 を拡大表示">
-          <img src="assets/images/graphics/portfolio/01.webp" alt="グラフィック作品 1" width="1200" height="997" loading="lazy" decoding="async">
-        </a>
-        <a class="graphic" href="assets/images/graphics/portfolio/02.webp" aria-label="画像 2 を拡大表示">
-          <img src="assets/images/graphics/portfolio/02.webp" alt="グラフィック作品 2" width="1200" height="997" loading="lazy" decoding="async">
-        </a>
-        <a class="graphic" href="assets/images/graphics/portfolio/03.webp" aria-label="画像 3 を拡大表示">
-          <img src="assets/images/graphics/portfolio/03.webp" alt="グラフィック作品 3" width="1200" height="884" loading="lazy" decoding="async">
-        </a>
-        <a class="graphic" href="assets/images/graphics/portfolio/04.webp" aria-label="画像 4 を拡大表示">
-          <img src="assets/images/graphics/portfolio/04.webp" alt="グラフィック作品 4" width="848" height="1200" loading="lazy" decoding="async">
-        </a>
-        <a class="graphic" href="assets/images/graphics/portfolio/05.webp" aria-label="画像 5 を拡大表示">
-          <img src="assets/images/graphics/portfolio/05.webp" alt="グラフィック作品 5" width="848" height="1200" loading="lazy" decoding="async">
-        </a>
-        <a class="graphic" href="assets/images/graphics/portfolio/06.webp" aria-label="画像 6 を拡大表示">
-          <img src="assets/images/graphics/portfolio/06.webp" alt="グラフィック作品 6" width="898" height="1200" loading="lazy" decoding="async">
-        </a>
-        <a class="graphic" href="assets/images/graphics/portfolio/07.webp" aria-label="画像 7 を拡大表示">
-          <img src="assets/images/graphics/portfolio/07.webp" alt="グラフィック作品 7" width="766" height="766" loading="lazy" decoding="async">
-        </a>
-        <a class="graphic" href="assets/images/graphics/portfolio/08.webp" aria-label="画像 8 を拡大表示">
-          <img src="assets/images/graphics/portfolio/08.webp" alt="グラフィック作品 8" width="785" height="1200" loading="lazy" decoding="async">
-        </a>
-      </div>
-    </section>
 
     <section class="register" aria-label="作品一覧">
       <div class="sec-head"><span>Registered Works — 収蔵一覧</span></div>
@@ -359,22 +329,9 @@
       <p class="works-empty" id="workNoResults" hidden>条件に一致する作品がありません。</p>
     </section>
 
+    <p class="more"><a href="gallery.html">Gallery — グラフィックを見る →</a></p>
     <p class="more">その他の制作物 — <a href="https://www.instagram.com/syno_mare/?utm_source=qr" target="_blank" rel="noopener">INSTAGRAM</a></p>
   </main>
-
-  <dialog class="graphic-viewer" id="graphicViewer" aria-label="グラフィック拡大表示">
-    <div class="graphic-viewer-toolbar">
-      <span id="graphicPosition" aria-live="polite"></span>
-      <a id="graphicOriginal" target="_blank" rel="noopener">画像を開く ↗</a>
-      <button type="button" id="graphicClose" autofocus aria-label="拡大表示を閉じる">閉じる ×</button>
-    </div>
-    <div class="graphic-viewer-stage"><img id="graphicImage" alt=""></div>
-    <div class="graphic-viewer-navigation">
-      <button type="button" id="graphicPrevious" aria-label="前の画像">← 前へ</button>
-      <button type="button" id="graphicNext" aria-label="次の画像">次へ →</button>
-    </div>
-  </dialog>
-  <script src="assets/js/graphics-gallery.js" defer></script>
 
   <footer class="caption">
     <span>SYNOMARE / WORKS — 作品目録</span>
