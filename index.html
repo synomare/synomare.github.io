@@ -351,6 +351,8 @@
       .ghost { position: absolute; font-size: 20vw; }
     }
   </style>
+  <link rel="stylesheet" href="assets/css/home-field.css?v=1">
+  <script src="assets/js/home-field.js?v=1" defer></script>
 </head>
 
 <body>
@@ -383,35 +385,36 @@
           sizes="100vw" alt="" width="1600" height="2263" loading="eager" fetchpriority="high" decoding="async">
       </figure>
 
-      <div class="ghost" aria-hidden="true">synomare</div>
+      <h1 class="ghost">synomare</h1>
+      <svg class="thread-field" aria-hidden="true" focusable="false"></svg>
 
       <div class="intro">
+        <span class="thread-pin" aria-hidden="true"></span>
         <div class="sec-head"><span>Hello — こんにちは</span></div>
-        synomare<span class="muted">っていいます。</span>テクスト<span class="muted">を書いて、</span>デザイン<span class="muted">をして、</span>グラフィック<span class="muted">をつくります。</span>のんびり<span class="muted">することもあります。</span>
+        synomare<span class="muted">っていいます。</span>テクスト<span class="muted">を書いて、</span>デザイン<span class="muted">をして、</span>グラフィック<span class="muted">をつくります。</span>よろしくね
       </div>
 
-      <a class="tag" href="works.html" style="top: 15vh; right: 8vw;">
+      <a class="tag tag-works" data-thread="works" href="works.html">
+        <span class="thread-pin" aria-hidden="true"></span>
         <span class="en">Works</span><span class="jp">作品目録</span>
       </a>
-      <a class="tag" href="gallery.html" style="top: 28vh; right: 7vw;">
+      <a class="tag tag-gallery" data-thread="gallery" href="gallery.html">
+        <span class="thread-pin" aria-hidden="true"></span>
         <span class="en">Gallery</span><span class="jp">グラフィック展示</span>
       </a>
-      <a class="tag" href="yugun/index.html" style="top: 38vh; right: 22vw;">
-        <span class="en">嶼群（博物館（たち））</span><span class="jp">演劇 二〇二五</span>
-      </a>
-      <a class="tag" href="notes/" style="top: 57vh; left: 9vw;">
+      <a class="tag tag-notes" data-thread="notes" href="notes/">
+        <span class="thread-pin" aria-hidden="true"></span>
         <span class="en">Notes</span><span class="jp">雑記・断章</span>
       </a>
-      <a class="tag" href="profile.html" style="top: 68vh; right: 10vw;">
+      <a class="tag tag-profile" data-thread="profile" href="profile.html">
+        <span class="thread-pin" aria-hidden="true"></span>
         <span class="en">Profile</span><span class="jp">奥付</span>
       </a>
-      <a class="tag" href="links.html" style="top: 44vh; left: 4vw;">
+      <a class="tag tag-links" data-thread="links" href="links.html">
+        <span class="thread-pin" aria-hidden="true"></span>
         <span class="en">Links</span><span class="jp">交遊録</span>
       </a>
 
-      <div class="thread" style="top: 26.05vh; left: 29.9vw; width: 50.83vw; transform: rotate(-7.81deg);"></div>
-      <div class="thread" style="top: 22.2vh; left: 80.26vw; width: 10.13vw; transform: rotate(102.91deg);"></div>
-      <div class="thread" style="top: 57vh; left: 20.74vw; width: 57.94vw; transform: rotate(6.82deg);"></div>
     </section>
 
     <section class="recital" id="introduction" aria-label="自己紹介">

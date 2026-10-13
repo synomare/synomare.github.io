@@ -1,7 +1,9 @@
 .graphics { margin: 0 0 3.6rem; }
 .graphics .sec-head { font-weight: 400; }
-.graphics-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: clamp(1rem, 2.5vw, 2.25rem); align-items: start; }
-.graphic { display: block; grid-column: span 2; min-width: 0; cursor: zoom-in; }
+.graphics-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: clamp(2rem, 4vw, 4rem) clamp(1rem, 2.5vw, 2.25rem); align-items: start; counter-reset: plate; }
+.graphic { display: block; grid-column: span 2; min-width: 0; cursor: zoom-in; counter-increment: plate; }
+.graphic::after { content: counter(plate, decimal-leading-zero); display: block; width: 2.5rem; margin-top: .6rem; padding-top: .4rem; border-top: 1px solid var(--line); font: .58rem/1.5 var(--mono); letter-spacing: .14em; color: var(--red); }
+.graphic:hover::after { width: 4rem; border-color: var(--red); }
 .graphic[data-format="landscape"] { grid-column: span 3; }
 .graphic[data-format="panorama"] { grid-column: 1 / -1; }
 .graphic img { display: block; width: 100%; height: auto; }

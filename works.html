@@ -261,6 +261,7 @@
       .w-type { justify-self: start; }
     }
   </style>
+  <link rel="stylesheet" href="assets/css/works-presentation.css?v=1">
 </head>
 
 <body>
@@ -285,13 +286,19 @@
   </header>
 
   <main>
+    <div class="works-opening">
+    <div class="works-heading">
     <section class="display-row">
       <h1 class="display">Works</h1>
       <span class="jp">Catalogue — 作品目録</span>
     </section>
 
-    <p class="more gallery-entry"><a href="gallery.html">Gallery — グラフィックを見る →</a></p>
+    <nav class="work-views" aria-label="作品の表示">
+      <span class="work-view is-current" aria-current="page"><span class="view-en">Works</span><span class="view-jp">作品一覧</span></span>
+      <a class="work-view" href="gallery.html"><span class="view-en">Gallery</span><span class="view-jp">グラフィックを見る</span></a>
+    </nav>
 
+    </div>
     <div class="plate-wrap">
       <figure class="plate">
         <img src="assets/images/graphics/terpsichora.webp"
@@ -299,6 +306,8 @@
           sizes="(max-width: 700px) calc(100vw - 32px), calc(100vw - 88px)"
           alt="Terpsichora — synomare" width="1600" height="1131" loading="eager" fetchpriority="high" decoding="async">
       </figure>
+    </div>
+
     </div>
 
     <section class="register" aria-label="作品一覧">
@@ -360,8 +369,9 @@
         <span class="w-type">デザイン / Design</span>
       </a>
 
-      <a class="work-row" href="https://x.com/synomare/status/2097203158066041169" target="_blank" rel="noopener" data-search="カギロヒミムスヒ vol.灰・火・仄 tokyo_art studioでの企画。フライヤーのデザインと、会場でのグラフィック展示。 デザイン / design" data-type="デザイン / Design" data-year="2026">
+      <a class="work-row has-image" href="https://x.com/synomare/status/2097203158066041169" target="_blank" rel="noopener" data-search="カギロヒミムスヒ vol.灰・火・仄 tokyo_art studioでの企画。フライヤーのデザインと、会場でのグラフィック展示。 デザイン / design" data-type="デザイン / Design" data-year="2026">
         <span class="w-no">2026</span>
+        <span class="w-thumb"><img src="/assets/images/graphics/portfolio/04.webp" alt="カギロヒミムスヒ vol.灰・火・仄" loading="lazy" decoding="async"></span>
         <span class="w-main">
           <span class="w-title">カギロヒミムスヒ vol.灰・火・仄</span>
           <span class="w-desc">Tokyo_ART STUDIOでの企画。フライヤーのデザインと、会場でのグラフィック展示。</span>

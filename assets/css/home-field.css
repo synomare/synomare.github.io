@@ -1,0 +1,47 @@
+/* A field of images, type and loosely suspended threads. */
+body { grid-template-columns: minmax(0, 1fr); }
+body > main { min-width: 0; }
+.field { min-height: 580px; height: calc(100svh - 2.5rem); isolation: isolate; box-sizing: border-box; }
+.field .sheet img { object-position: 50% 23%; }
+.field .sheet::after { background: linear-gradient(180deg, transparent 55%, rgba(244,243,239,.2) 72%, rgba(244,243,239,.93) 100%); }
+.field .intro { top: 8%; left: 5%; max-width: 20em; padding: 1.2rem 1.45rem; border-top: 2px solid var(--red); box-shadow: 5px 6px 0 rgba(23,20,15,.16); }
+.field .tag { box-sizing: border-box; min-width: 174px; padding: .85rem 1rem .9rem; background: rgba(253,253,251,.96); box-shadow: 4px 5px 0 rgba(23,20,15,.18); transition: transform 200ms ease, box-shadow 200ms ease, background 200ms ease; }
+.field .thread-pin { position: absolute; width: 5px; height: 5px; border-radius: 50%; background: var(--red); left: 0; top: 50%; transform: translate(-50%,-50%); box-shadow: 0 0 0 3px var(--paper); pointer-events: none; }
+.field .intro .thread-pin { left: 100%; top: 78%; }
+.field .tag-notes .thread-pin, .field .tag-links .thread-pin { left: 100%; }
+.field .tag:hover, .field .tag:focus-visible { transform: none; box-shadow: 6px 9px 0 rgba(23,20,15,.18); background: var(--ink); color: var(--paper); }
+.field .tag:focus-visible { outline: 2px solid var(--red); outline-offset: 5px; }
+.field .tag:focus-visible .jp { color: var(--paper); }
+.field .tag-works { top: 12%; right: 7%; }
+.field .tag-gallery { top: 32%; right: 12%; }
+.field .tag-notes { top: 44%; left: 12%; }
+.field .tag-links { top: 60%; left: 5%; }
+.field .tag-profile { top: 55%; right: 6%; }
+.field .ghost { left: 50%; bottom: .18em; transform: translateX(-50%); margin: 0; font-size: 18.2vw; line-height: 1.2; letter-spacing: -.055em; color: rgba(244,243,239,.82); -webkit-text-stroke: 1px var(--ink); mix-blend-mode: normal; filter: none; z-index: 3; }
+.thread-field { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; overflow: visible; pointer-events: none; color: var(--red); }
+.thread-field path { fill: none; stroke: currentColor; stroke-width: .8; opacity: .57; vector-effect: non-scaling-stroke; transition: opacity 200ms ease, stroke-width 200ms ease; }
+.thread-field path.thread-core { stroke-width: 1.35; opacity: .86; }
+.thread-field circle { fill: var(--red); }
+.thread-field g.is-active path { opacity: 1; stroke-width: 1.2; }
+.recital { border-top: 1px solid var(--paper); }
+.recital::before { content: ''; display: block; width: 4rem; height: 2px; background: var(--red); margin-bottom: clamp(2rem,4vw,4rem); }
+@media (min-width: 1600px) { .field .ghost { font-size: 18.5vw; } }
+@media (max-width: 700px) {
+  .field { min-height: 740px; height: auto; padding: 2.2rem 5vw 7rem; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); align-content: start; align-items: start; gap: 1.2rem .75rem; }
+  .field .sheet img { object-position: 55% 22%; }
+  .field .intro { position: relative; grid-column: 1 / -1; top: auto; left: auto; margin: 0 0 .5rem; min-width: 0; max-width: 25em; box-sizing: border-box; padding: 1rem 1.1rem; font-size: .86rem; }
+  .field .tag { position: relative; inset: auto !important; margin: 0; width: 100%; min-width: 0; font-size: .61rem; padding: .85rem .7rem; min-height: 76px; }
+  .field .tag-gallery { margin-top: 2.3rem; }
+  .field .tag-notes { margin-top: .5rem; }
+  .field .tag-profile { margin-top: 2.3rem; }
+  .field .tag-links { margin-top: .5rem; }
+  .field .tag .jp { letter-spacing: .14em; }
+  .field .intro .thread-pin { left: 65%; top: 100%; }
+  .field .ghost { font-size: 21vw; left: 50%; bottom: .25em; letter-spacing: -.055em; line-height: 1.2; -webkit-text-stroke: .7px var(--ink); }
+  .thread-field path { opacity: .65; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .field .tag, .thread-field path { transition: none; }
+  .field .tag:hover, .field .tag:focus-visible { transform: none; }
+  .copy .c { animation: none; opacity: 1; translate: none; scale: none; filter: none; transition: none; }
+}

@@ -19,6 +19,21 @@
   text-rendering: geometricPrecision;
 }
 
+/* Leave room for the display face's long descenders, including Gallery's y. */
+body .display-row { align-items: center; column-gap: clamp(1.5rem, 4vw, 4rem); }
+body .display-row .display { line-height: 1.1; padding-bottom: .22em; margin-bottom: -.14em; filter: none; }
+.topbar a { text-underline-offset: .35em; }
+.topbar a:focus-visible { outline: 2px solid var(--red); outline-offset: 4px; }
+.topbar nav a { transition: color 150ms ease, background-color 150ms ease; }
+.topbar nav a:not([aria-current]):hover { text-decoration: underline; text-decoration-color: var(--red); }
+
+@media (max-width: 700px) {
+  body .display-row { row-gap: .6rem; }
+  body .display-row .display { font-size: 22.5vw; padding-bottom: .25em; margin-bottom: 0; }
+  body .display-row .jp { letter-spacing: .28em; line-height: 1.8; }
+}
+@media (prefers-reduced-motion: reduce) { .topbar nav a { transition: none; } }
+
 @media (max-width: 700px) {
   .topbar nav {
     flex-wrap: nowrap !important;
