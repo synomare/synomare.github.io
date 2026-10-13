@@ -58,12 +58,12 @@ test('modified clicks and unsupported dialogs retain normal image links', () => 
   assert.equal(setup(false).click(0).prevented, undefined);
 });
 
-test('all twenty uncropped images exist with intrinsic dimensions and no visible invented titles', () => {
+test('all twenty-five uncropped images exist with intrinsic dimensions and no visible invented titles', () => {
   const html = fs.readFileSync(new URL('../gallery.html', import.meta.url), 'utf8');
   const gallery = html.match(/<div class="graphics-grid">([\s\S]*?)<\/div>/)[1];
   const images = [...gallery.matchAll(/<img src="([^"]+)" alt="([^"]+)" width="(\d+)" height="(\d+)"/g)];
-  assert.equal(images.length, 20);
-  assert.equal((gallery.match(/class="graphic"/g) || []).length, 20);
+  assert.equal(images.length, 25);
+  assert.equal((gallery.match(/class="graphic"/g) || []).length, 25);
   for (const [, src, alt, width, height] of images) {
     assert.ok(fs.statSync(new URL(`../${src}`, import.meta.url)).size > 0);
     assert.ok(Number(width) > 0 && Number(height) > 0 && alt);
