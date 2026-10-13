@@ -5,9 +5,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Works — synomare</title>
-  <meta name="description" content="synomare 作品目録。テクスト、演劇、グラフィック。">
+  <meta name="description" content="synomare 作品目録。テクスト、デザイン、展示、演劇、制作ツール。">
   <meta property="og:title" content="Works — synomare">
-  <meta property="og:description" content="synomare 作品目録。テクスト、演劇、グラフィック。">
+  <meta property="og:description" content="synomare 作品目録。テクスト、デザイン、展示、演劇、制作ツール。">
   <meta property="og:type" content="website">
   <meta name="theme-color" content="#f4f3ef">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -173,7 +173,10 @@
     }
     .display-row .jp { font-family: var(--mono); font-size: 0.64rem; letter-spacing: 0.5em; text-transform: uppercase; color: var(--red); }
 
-    /* plate with pinned tag */
+    .more.gallery-entry { margin: 0 0 1.5rem; color: var(--ink); }
+    .gallery-entry a { display: inline-flex; align-items: center; min-height: 44px; font-size: .68rem; }
+
+    /* image plate */
     .plate-wrap { position: relative; margin: 0 0 3.6rem; }
     .plate { margin: 0; border: 1px solid var(--ink); box-shadow: 5px 5px 0 rgba(23, 20, 15, 0.18); position: relative; }
     .plate img { width: 100%; height: auto; display: block; }
@@ -187,8 +190,6 @@
       opacity: 0.35;
       pointer-events: none;
     }
-    .plate-tag { position: absolute; right: 2.5vw; bottom: -1.4rem; z-index: 5; }
-    .plate-thread { position: absolute; right: 12vw; bottom: 3rem; width: 18vw; transform: rotate(-32deg); }
 
     /* register */
     .register {
@@ -258,8 +259,6 @@
       .work-row, .work-row.has-image { grid-template-columns: 1fr; gap: 0.6em; }
       .w-thumb { width: min(100%, 24rem); }
       .w-type { justify-self: start; }
-      .plate-tag { position: relative; right: auto; bottom: auto; display: inline-block; margin-top: 0.9rem; }
-      .plate-thread { display: none; }
     }
   </style>
 </head>
@@ -291,6 +290,8 @@
       <span class="jp">Catalogue — 作品目録</span>
     </section>
 
+    <p class="more gallery-entry"><a href="gallery.html">Gallery — グラフィックを見る →</a></p>
+
     <div class="plate-wrap">
       <figure class="plate">
         <img src="assets/images/graphics/terpsichora.webp"
@@ -298,8 +299,6 @@
           sizes="(max-width: 700px) calc(100vw - 32px), calc(100vw - 88px)"
           alt="Terpsichora — synomare" width="1600" height="1131" loading="eager" fetchpriority="high" decoding="async">
       </figure>
-      <span class="tag plate-tag"><span class="en">Terpsichora</span><span class="jp">刷りの平面 二〇二五</span></span>
-      <div class="thread plate-thread"></div>
     </div>
 
     <section class="register" aria-label="作品一覧">
@@ -316,6 +315,96 @@
       </form>
       <div class="work-list" id="workList" aria-live="polite">
       <!-- WORKS:START -->
+      <a class="work-row" href="https://anon-press.com/n72137288560b/" target="_blank" rel="noopener" data-search="cy anon press主催イベントへの展示参加。7月31日・8月1日、北千住buoy。 展示 / exhibition" data-type="展示 / Exhibition" data-year="2026">
+        <span class="w-no">2026</span>
+        <span class="w-main">
+          <span class="w-title">CY</span>
+          <span class="w-desc">anon press主催イベントへの展示参加。7月31日・8月1日、北千住BUoY。</span>
+        </span>
+        <span class="w-type">展示 / Exhibition</span>
+      </a>
+
+      <a class="work-row" href="https://synomare.github.io/glyph-current/" target="_blank" rel="noopener" data-search="glyph current 文字をほどき、捩り、流れへ変える6種類の線的な字形変形を試せるブラウザツール。 ツール / tool" data-type="ツール / Tool" data-year="2026">
+        <span class="w-no">2026</span>
+        <span class="w-main">
+          <span class="w-title">Glyph Current</span>
+          <span class="w-desc">文字をほどき、捩り、流れへ変える6種類の線的な字形変形を試せるブラウザツール。</span>
+        </span>
+        <span class="w-type">ツール / Tool</span>
+      </a>
+
+      <a class="work-row" href="https://synomare.github.io/grain-room/" target="_blank" rel="noopener" data-search="grain room 写真の色や形を、複数のエフェクトを重ねて加工するブラウザツール。 ツール / tool" data-type="ツール / Tool" data-year="2026">
+        <span class="w-no">2026</span>
+        <span class="w-main">
+          <span class="w-title">GRAIN ROOM</span>
+          <span class="w-desc">写真の色や形を、複数のエフェクトを重ねて加工するブラウザツール。</span>
+        </span>
+        <span class="w-type">ツール / Tool</span>
+      </a>
+
+      <a class="work-row" href="https://synomare.github.io/type-deformer/" target="_blank" rel="noopener" data-search="type deformer 文字の形・流れ・版面を変形する、ブラウザ上のグラフィック制作ツール。限定プレビュー版。 ツール / tool" data-type="ツール / Tool" data-year="2026">
+        <span class="w-no">2026</span>
+        <span class="w-main">
+          <span class="w-title">Type Deformer</span>
+          <span class="w-desc">文字の形・流れ・版面を変形する、ブラウザ上のグラフィック制作ツール。限定プレビュー版。</span>
+        </span>
+        <span class="w-type">ツール / Tool</span>
+      </a>
+
+      <a class="work-row" href="https://anonrecords.bandcamp.com/track/when-the-silence-speaks" target="_blank" rel="noopener" data-search="when the silence speaks kidlitの楽曲「when the silence speaks」（anon records）のカバーアート。 デザイン / design" data-type="デザイン / Design" data-year="2026">
+        <span class="w-no">2026</span>
+        <span class="w-main">
+          <span class="w-title">When The Silence Speaks</span>
+          <span class="w-desc">kidlitの楽曲「When The Silence Speaks」（anon records）のカバーアート。</span>
+        </span>
+        <span class="w-type">デザイン / Design</span>
+      </a>
+
+      <a class="work-row" href="https://x.com/synomare/status/2097203158066041169" target="_blank" rel="noopener" data-search="カギロヒミムスヒ vol.灰・火・仄 tokyo_art studioでの企画。フライヤーのデザインと、会場でのグラフィック展示。 デザイン / design" data-type="デザイン / Design" data-year="2026">
+        <span class="w-no">2026</span>
+        <span class="w-main">
+          <span class="w-title">カギロヒミムスヒ vol.灰・火・仄</span>
+          <span class="w-desc">Tokyo_ART STUDIOでの企画。フライヤーのデザインと、会場でのグラフィック展示。</span>
+        </span>
+        <span class="w-type">デザイン / Design</span>
+      </a>
+
+      <a class="work-row" href="https://x.com/synomare/status/2104707509902885317" target="_blank" rel="noopener" data-search="月を歩いてるおばけ xで公開したグラフィック作品。 グラフィック / graphic" data-type="グラフィック / Graphic" data-year="2026">
+        <span class="w-no">2026</span>
+        <span class="w-main">
+          <span class="w-title">月を歩いてるおばけ</span>
+          <span class="w-desc">Xで公開したグラフィック作品。</span>
+        </span>
+        <span class="w-type">グラフィック / Graphic</span>
+      </a>
+
+      <a class="work-row" href="https://anon-press.com/ne3f63400404a/" target="_blank" rel="noopener" data-search="barricade ventriloquism 小説。anon press掲載。本文の執筆とサムネイル画像の制作。 テクスト / text" data-type="テクスト / Text" data-year="2025">
+        <span class="w-no">2025</span>
+        <span class="w-main">
+          <span class="w-title">Barricade Ventriloquism</span>
+          <span class="w-desc">小説。anon press掲載。本文の執筆とサムネイル画像の制作。</span>
+        </span>
+        <span class="w-type">テクスト / Text</span>
+      </a>
+
+      <a class="work-row" href="https://anon-press.com/n176542431e4c/" target="_blank" rel="noopener" data-search="before constructed テクストとレイアウトを組み合わせた作品。anon press掲載。 テクスト / text" data-type="テクスト / Text" data-year="2025">
+        <span class="w-no">2025</span>
+        <span class="w-main">
+          <span class="w-title">Before Constructed</span>
+          <span class="w-desc">テクストとレイアウトを組み合わせた作品。anon press掲載。</span>
+        </span>
+        <span class="w-type">テクスト / Text</span>
+      </a>
+
+      <a class="work-row" href="https://x.com/synomare/status/1955629205473157336" target="_blank" rel="noopener" data-search="架空バンドtシャツ — 絆人間 絆人間の架空バンドtシャツのグラフィックデザイン。 デザイン / design" data-type="デザイン / Design" data-year="2025">
+        <span class="w-no">2025</span>
+        <span class="w-main">
+          <span class="w-title">架空バンドTシャツ — 絆人間</span>
+          <span class="w-desc">絆人間の架空バンドTシャツのグラフィックデザイン。</span>
+        </span>
+        <span class="w-type">デザイン / Design</span>
+      </a>
+
       <a class="work-row" href="/yugun/" data-search="嶼群（博物館（たち）） 博物館を舞台にした、土地と記憶をめぐる戯曲。テキスト全文、座談会、対談を収録。 演劇 / theatre" data-type="演劇 / Theatre" data-year="2025">
         <span class="w-no">2025</span>
         <span class="w-main">
@@ -324,12 +413,20 @@
         </span>
         <span class="w-type">演劇 / Theatre</span>
       </a>
+
+      <a class="work-row" href="https://anon-press.com/n642016f28642/" target="_blank" rel="noopener" data-search="multipotency 複数の書体とレイアウトで構成したテクスト作品。anon press掲載。 テクスト / text" data-type="テクスト / Text" data-year="2023">
+        <span class="w-no">2023</span>
+        <span class="w-main">
+          <span class="w-title">Multipotency</span>
+          <span class="w-desc">複数の書体とレイアウトで構成したテクスト作品。anon press掲載。</span>
+        </span>
+        <span class="w-type">テクスト / Text</span>
+      </a>
       <!-- WORKS:END -->
       </div>
       <p class="works-empty" id="workNoResults" hidden>条件に一致する作品がありません。</p>
     </section>
 
-    <p class="more"><a href="gallery.html">Gallery — グラフィックを見る →</a></p>
     <p class="more">その他の制作物 — <a href="https://www.instagram.com/syno_mare/?utm_source=qr" target="_blank" rel="noopener">INSTAGRAM</a></p>
   </main>
 
