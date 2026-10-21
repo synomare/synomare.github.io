@@ -94,13 +94,25 @@
   let cut = 0;
   const pad = n => String(n).padStart(3, '0');
   if (totalEl) totalEl.textContent = pad(glyphs.length);
+  let scars = 0;
   function setCut(glyph, on) {
     if (glyph.toggled === on) return;
     glyph.toggled = on;
-    glyph.el.classList.toggle('is-cut', on);
+    if (on) {
+      // A fuller dilation holds more ink, so it stays wet a little longer.
+      glyph.el.style.setProperty('--dry', `${(3.4 + (glyph.seedY + 1) * 1.1).toFixed(2)}s`);
+      if (glyph.el.classList.contains('is-scar')) scars--;
+      glyph.el.classList.remove('is-scar');
+      glyph.el.classList.add('is-cut');
+    } else {
+      glyph.el.classList.remove('is-cut');
+      glyph.el.classList.add('is-scar');
+      scars++;
+    }
     cut += on ? 1 : -1;
     if (countEl) countEl.textContent = pad(cut);
-    if (suture) suture.disabled = cut === 0;
+    if (suture) suture.disabled = cut === 0 && scars === 0;
+    document.dispatchEvent(new CustomEvent('lectio:cut', { detail: { count: cut } }));
   }
 
   /* ---------- 3. pointer lens ---------- */
@@ -195,7 +207,13 @@
   root.addEventListener('pointercancel', end);
   root.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') end(e); });
 
-  suture?.addEventListener('click', () => { for (const g of glyphs) setCut(g, false); schedule(); });
+  suture?.addEventListener('click', () => {
+    for (const g of glyphs) { setCut(g, false); g.el.classList.remove('is-scar'); }
+    scars = 0;
+    suture.disabled = true;
+    document.dispatchEvent(new CustomEvent('lectio:suture'));
+    schedule();
+  });
 
   addEventListener('resize', scheduleMeasure, { passive: true });
   document.fonts?.ready.then(scheduleMeasure);

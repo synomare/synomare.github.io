@@ -16,9 +16,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Space+Mono:wght@400;700&family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
   <link rel="preload" href="/assets/fonts/OTTOATTACTYPE.ttf" as="font" type="font/ttf" crossorigin>
-  <link rel="stylesheet" href="assets/css/base.css?v=1">
+  <link rel="stylesheet" href="assets/css/base.css?v=2">
   <link rel="stylesheet" href="assets/css/type.css">
-  <link rel="stylesheet" href="assets/css/graphics-gallery.css?v=4">
+  <link rel="stylesheet" href="assets/css/graphics-gallery.css?v=5">
 </head>
 
 <body>
@@ -41,12 +41,12 @@
       <h1 class="display">Gallery</h1>
       <div class="gallery-note">
         <span class="jp">Tabulae — 図版</span>
-        <p>グラフィック作品を図版として並べています。図版の上ではルーペで細部を観察でき、クリックで拡大表示します。</p>
+        <p>グラフィック作品を図版として並べ、一本の糸で順に綴じています。クリックで拡大表示します。</p>
       </div>
     </section>
 
     <section class="graphics" aria-labelledby="graphicsHeading">
-      <h2 class="sec-head" id="graphicsHeading"><span>Tabulae — グラフィック</span><span class="r">24 plates <button type="button" class="loupe-toggle" id="loupeToggle" aria-pressed="true">Loupe ×2.5</button></span></h2>
+      <h2 class="sec-head" id="graphicsHeading"><span>Tabulae — グラフィック</span><span class="r">24 plates</span></h2>
       <div class="graphics-grid">
         <a class="graphic" data-format="landscape" href="assets/images/graphics/portfolio/01.webp" aria-label="画像 1 を拡大表示">
           <img src="assets/images/graphics/portfolio/01.webp" alt="グラフィック作品 1" width="1200" height="997" loading="eager" fetchpriority="high" decoding="async">
@@ -121,6 +121,7 @@
           <img src="assets/images/graphics/portfolio/25.webp" alt="グラフィック作品 24" width="898" height="1200" loading="lazy" decoding="async">
         </a>
       </div>
+      <svg class="binding" id="binding" aria-hidden="true" focusable="false"></svg>
     </section>
 
   </main>
@@ -138,7 +139,7 @@
     </div>
   </dialog>
   <script src="assets/js/graphics-gallery.js?v=2" defer></script>
-  <script src="assets/js/gallery-loupe.js?v=1" defer></script>
+  <script src="assets/js/gallery-binding.js?v=1" defer></script>
 
   <footer class="caption">
     <span>SYNOMARE / GALLERY — 画像展示</span>

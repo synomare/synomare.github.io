@@ -14,10 +14,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Space+Mono:wght@400;700&family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
   <link rel="preload" href="/assets/fonts/OTTOATTACTYPE.ttf" as="font" type="font/ttf" crossorigin>
-  <link rel="stylesheet" href="assets/css/base.css?v=1">
+  <link rel="stylesheet" href="assets/css/base.css?v=2">
   <link rel="stylesheet" href="assets/css/type.css">
-  <link rel="stylesheet" href="assets/css/works-presentation.css?v=2">
-  <script src="assets/js/works-catalogue.js?v=1" defer></script>
+  <link rel="stylesheet" href="assets/css/works-presentation.css?v=3">
+  <script src="assets/js/works-catalogue.js?v=2" defer></script>
 </head>
 
 <body>
@@ -73,6 +73,9 @@
           <button type="button" data-type="" aria-pressed="true">すべて</button>
         </div>
       </form>
+      <div class="running-head" aria-hidden="true"><span>Index Specimenum</span><span id="runningHead"></span></div>
+      <div class="register-body">
+      <div class="ruler" id="workRuler" aria-hidden="true"></div>
       <div class="work-list" id="workList">
       <!-- WORKS:START -->
       <a class="work-row" href="https://anon-press.com/n72137288560b/" target="_blank" rel="noopener" data-search="cy anon press主催イベントへの展示参加。7月31日・8月1日、北千住buoy。 展示 / exhibition" data-type="展示 / Exhibition" data-year="2026">
@@ -197,17 +200,13 @@
       </a>
       <!-- WORKS:END -->
       </div>
+      </div>
       <p class="works-empty" id="workNoResults" hidden>条件に一致する作品がありません。</p>
     </section>
 
     <p class="more">その他の制作物 — <a href="https://www.instagram.com/syno_mare/?utm_source=qr" target="_blank" rel="noopener">INSTAGRAM</a></p>
   </main>
 
-  <div class="specimen-card" id="specimenCard" aria-hidden="true">
-    <div class="sc-head"><span class="sc-no"></span><span class="sc-year"></span></div>
-    <div class="sc-body"></div>
-    <div class="sc-foot"><span class="sc-type"></span><span class="sc-host"></span></div>
-  </div>
 
   <footer class="caption">
     <span>SYNOMARE / WORKS — 作品目録</span>

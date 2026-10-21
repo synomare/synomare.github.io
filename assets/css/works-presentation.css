@@ -1,4 +1,4 @@
-/* Works: a specimen catalogue. Rows are register entries; hovering lifts a specimen card. */
+/* Works: a specimen catalogue set like the contents page of an old book, with a scale bar in the margin. */
 .works-opening { display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); gap: clamp(2rem, 5vw, 6rem); align-items: end; padding: .5rem 0 clamp(3rem, 6vw, 5.5rem); }
 .works-opening .display-row { display: block; margin-bottom: 1.6rem; }
 .works-opening .display { font-size: clamp(5rem, 11vw, 10rem); line-height: 1.05; padding-bottom: .1em; }
@@ -63,109 +63,88 @@ a.work-view:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; 
 .classes button .n { margin-left: .4em; color: var(--red); }
 .classes button[aria-pressed="true"] .n { color: #ff8c8c; }
 
-/* the register */
+/* the register, set like the contents page of an old book */
+.running-head { position: sticky; top: 2.7rem; z-index: 20; display: flex; justify-content: space-between; gap: 1rem; margin: 0 0 0 calc(2.6rem + 1.4rem); padding: .55rem 0 .5rem; background: var(--paper); border-bottom: 1px solid var(--line); font: var(--cap)/1.4 var(--mono); letter-spacing: .24em; text-transform: uppercase; color: var(--dim); opacity: 0; transition: opacity 200ms ease; }
+.running-head.is-on { opacity: 1; }
+.running-head #runningHead { color: var(--red); }
+.register-body { position: relative; display: grid; grid-template-columns: 2.6rem minmax(0, 1fr); gap: 1.4rem; }
 .work-list { min-height: 3rem; border-top: 1px solid var(--ink); }
-.year-head { display: flex; align-items: baseline; gap: 1.2rem; margin: 0; padding: 2.4rem 0 .6rem; border-bottom: 1px solid var(--line); }
-.year-head .y { font: 400 clamp(3rem, 6vw, 5.2rem)/1 var(--display); color: transparent; -webkit-text-stroke: max(1px, var(--display-stroke)) var(--ink); letter-spacing: -.02em; }
-.year-head .roman { font: var(--cap)/1 var(--mono); letter-spacing: .3em; color: var(--red); }
-.year-head:first-child { padding-top: 1.2rem; }
+
+/* a quiet scale bar in the margin, like the rule laid beside a specimen */
+.ruler { position: relative; border-right: 1px solid rgba(23, 20, 15, .35); }
+.ruler::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 9px;
+  background:
+    repeating-linear-gradient(to bottom, rgba(23, 20, 15, .38) 0 1px, transparent 1px 40px),
+    repeating-linear-gradient(to bottom, rgba(23, 20, 15, .2) 0 1px, transparent 1px 8px) right / 5px 100% no-repeat;
+}
+.ruler .yr { position: absolute; right: 14px; font: var(--cap)/1 var(--mono); letter-spacing: .08em; color: var(--dim); writing-mode: vertical-rl; transform: rotate(180deg); }
+.ruler .tick { position: absolute; right: 0; width: 15px; height: 1px; background: var(--ink); transition: width 300ms var(--ease-out), right 300ms var(--ease-out), background-color 200ms ease; }
+.ruler .tick.is-on { right: -1.4rem; width: calc(15px + 1.4rem); background: var(--red); }
+
+.year-head { display: grid; grid-template-columns: auto 1fr; align-items: end; column-gap: 1.4rem; margin: 0; padding: 2.8rem 0 .9rem; }
+.year-head:first-child { padding-top: 1.6rem; }
+.year-head .pars { grid-column: 1 / -1; margin-bottom: .55rem; font: var(--cap)/1 var(--mono); letter-spacing: .34em; text-transform: uppercase; color: var(--red); }
+.year-head .y { font: 400 clamp(2.6rem, 5vw, 4.4rem)/1 var(--display); color: transparent; -webkit-text-stroke: max(1px, var(--display-stroke)) var(--ink); letter-spacing: -.02em; }
+.year-head .roman { justify-self: end; padding-bottom: .5rem; font: italic 400 1.05rem/1 var(--latin); color: var(--dim); letter-spacing: .06em; }
 
 .work-row {
   position: relative;
   display: grid;
-  grid-template-columns: 5.5rem minmax(0, 1fr) minmax(9rem, auto) 1.6rem;
-  gap: 0 clamp(1rem, 2.5vw, 2.4rem);
+  grid-template-columns: minmax(0, max-content) minmax(2.5rem, 1fr) auto 3.6rem;
+  grid-template-areas: "title leader type no" "desc desc desc .";
+  column-gap: .9rem;
   align-items: baseline;
-  padding: 1.5rem 0 1.55rem;
-  border-bottom: 1px solid var(--line);
+  padding: .95rem 0 1.05rem;
 }
 .work-row[hidden] { display: none; }
-.work-row::before {
-  /* an incision line that runs across the entry on hover */
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -1px;
-  height: 1px;
-  background: var(--red);
-  transform: scaleX(0);
-  transform-origin: 0 50%;
-  transition: transform 520ms var(--ease-out);
+.w-main { display: contents; }
+.w-title { grid-area: title; min-width: 0; font-size: clamp(1.2rem, 2.3vw, 1.75rem); font-weight: 400; letter-spacing: -.005em; line-height: 1.35; transition: color 200ms ease; }
+.w-desc { grid-area: desc; margin: .25em 0 0 1.6em; max-width: 42em; font-size: .82rem; line-height: 1.9; color: var(--dim); }
+.w-type { grid-area: type; font: var(--cap)/1.4 var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--dim); white-space: nowrap; }
+.w-no { grid-area: no; justify-self: end; font: 400 1.05rem/1 var(--latin); font-variant-numeric: oldstyle-nums tabular-nums; color: var(--ink); white-space: nowrap; }
+.w-year, .w-thumb { display: none; }
+
+/* dotted leader; on hover it is sewn through in vermilion */
+.work-row::before, .work-row::after { content: ""; grid-area: leader; align-self: end; height: 2px; margin-bottom: .5em; }
+.work-row::before { background: radial-gradient(circle, rgba(23, 20, 15, .55) 0 .8px, transparent 1.1px) left center / 7px 2px repeat-x; }
+.work-row::after {
+  background: repeating-linear-gradient(90deg, var(--red) 0 6px, transparent 6px 10px);
+  height: 1.5px;
+  margin-bottom: calc(.5em + .25px);
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 700ms var(--ease-out);
 }
-a.work-row::after { content: "↗"; grid-column: 4; grid-row: 1; justify-self: end; font: .9rem var(--mono); color: var(--red); opacity: 0; translate: -6px 4px; transition: opacity 200ms ease, translate 300ms var(--ease-out); }
-a.work-row[href^="/"]::after { content: "→"; }
-.w-no { grid-column: 1; grid-row: 1; font: var(--cap)/1.4 var(--mono); letter-spacing: .14em; color: var(--dim); transition: color 160ms ease; }
-.w-main { grid-column: 2; grid-row: 1; min-width: 0; }
-.w-title { display: inline-block; font-size: clamp(1.25rem, 2.6vw, 2rem); font-weight: 400; letter-spacing: -.005em; line-height: 1.3; transition: translate 360ms var(--ease-out); }
-.w-desc { display: block; margin-top: .45em; max-width: 44em; font-size: .84rem; line-height: 1.9; color: var(--dim); }
-.w-type { grid-column: 3; grid-row: 1; font: var(--cap)/1.4 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--dim); white-space: nowrap; justify-self: end; }
-.w-year { display: none; }
-.w-thumb { display: none; }
-a.work-row:hover::before, a.work-row:focus-visible::before { transform: scaleX(1); }
-a.work-row:hover::after, a.work-row:focus-visible::after { opacity: 1; translate: 0 0; }
+a.work-row:hover::after, a.work-row:focus-visible::after { clip-path: inset(0 0 0 0); }
+a.work-row:hover .w-title, a.work-row:focus-visible .w-title { color: var(--red); }
 a.work-row:hover .w-no, a.work-row:focus-visible .w-no { color: var(--red); }
-a.work-row:hover .w-title, a.work-row:focus-visible .w-title { translate: .35em 0; }
 a.work-row:focus-visible { outline: 2px solid var(--red); outline-offset: 4px; }
 .works-empty { margin: 1.6rem 0; color: var(--dim); }
-.more { margin: 1.6rem 0 0; font: var(--cap) var(--mono); letter-spacing: .2em; text-transform: uppercase; color: var(--dim); }
+.more { margin: 2.4rem 0 0; font: var(--cap) var(--mono); letter-spacing: .2em; text-transform: uppercase; color: var(--dim); }
 .more a { color: var(--ink); }
 .more a:hover { background: var(--ink); color: var(--paper); }
-
-/* the specimen card that follows the pointer */
-.specimen-card {
-  position: fixed;
-  left: 0;
-  top: 0;
-  z-index: 600;
-  width: 17rem;
-  padding: .7rem .75rem .75rem;
-  background: var(--card);
-  box-shadow: 0 0 0 1px var(--ink), 6px 7px 0 rgba(23, 20, 15, .16);
-  pointer-events: none;
-  opacity: 0;
-  scale: .96;
-  transform: translate(var(--cx, 0px), var(--cy, 0px)) rotate(var(--tilt, 0deg));
-  transition: opacity 180ms ease, scale 260ms var(--ease-out);
-}
-.specimen-card.is-shown { opacity: 1; scale: 1; }
-.sc-head, .sc-foot { display: flex; justify-content: space-between; gap: .8rem; font: .625rem/1.4 var(--mono); letter-spacing: .14em; text-transform: uppercase; }
-.sc-head { padding-bottom: .5rem; border-bottom: 1px solid var(--ink); color: var(--red); }
-.sc-foot { padding-top: .5rem; border-top: 1px solid var(--line); color: var(--dim); }
-.sc-host { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.sc-body { display: grid; place-items: center; aspect-ratio: 4 / 3; margin: .6rem 0; overflow: hidden; background: var(--paper); }
-.sc-body img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.sc-body .sc-word {
-  padding: .5rem;
-  font: 400 2.6rem/1 var(--display), var(--jp);
-  text-align: center;
-  color: transparent;
-  -webkit-text-stroke: 1px var(--ink);
-  overflow-wrap: anywhere;
-}
-.sc-body .sc-word.is-jp { font-family: var(--jp); font-size: 2rem; line-height: 1.2; -webkit-text-stroke: .7px var(--ink); }
-.sc-body.is-type { background-image: repeating-linear-gradient(0deg, transparent 0 11px, rgba(196, 31, 31, .12) 11px 12px); }
 
 @media (max-width: 900px) {
   .work-filters { grid-template-columns: minmax(0, 1fr); }
   .classes { justify-content: flex-start; }
-  .work-row { grid-template-columns: 4.2rem minmax(0, 1fr) 1.4rem; }
-  .w-type { grid-column: 2; grid-row: 2; justify-self: start; margin-top: .7rem; }
 }
 @media (max-width: 700px) {
   .works-opening { grid-template-columns: minmax(0, 1fr); padding-bottom: 2.6rem; }
   .works-opening .display { font-size: 22vw; }
   .frontispiece { order: -1; margin-bottom: .4rem; }
-  .work-row { grid-template-columns: minmax(0, 1fr) 1.4rem; padding: 1.3rem 0; }
-  .w-no { grid-column: 1; grid-row: 1; margin-bottom: .4rem; }
-  .w-main { grid-column: 1; grid-row: 2; }
-  .w-type { grid-column: 1; grid-row: 3; }
-  a.work-row::after { grid-column: 2; grid-row: 1 / span 2; opacity: 1; translate: none; align-self: center; }
-  .work-row.has-image .w-thumb { display: block; grid-column: 1; grid-row: 4; width: min(80%, 18rem); margin-top: 1rem; }
+  .register-body { grid-template-columns: 1.2rem minmax(0, 1fr); gap: .8rem; }
+  .running-head { margin-left: 2rem; top: 4.4rem; }
+  .ruler .yr { display: none; }
+  .work-row { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "no no" "title title" "desc desc" "type leader"; row-gap: .35rem; padding: 1.1rem 0 1.2rem; }
+  .w-no { justify-self: start; font-size: .95rem; color: var(--dim); }
+  .w-desc { margin-left: 0; }
+  .work-row::before, .work-row::after { align-self: center; margin-bottom: 0; }
+  .work-row.has-image .w-thumb { display: block; grid-column: 1 / -1; width: min(80%, 18rem); margin-top: .6rem; }
   .w-thumb img { display: block; width: 100%; height: auto; }
-  .specimen-card { display: none; }
 }
-@media (hover: none) { .specimen-card { display: none; } }
 @media (prefers-reduced-motion: reduce) {
-  .work-row::before, a.work-row::after, .w-title, .specimen-card { transition: none; }
+  .work-row::after, .ruler .tick, .running-head { transition: none; }
 }
