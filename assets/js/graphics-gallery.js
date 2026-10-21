@@ -6,6 +6,9 @@
   const image = document.getElementById('graphicImage');
   const original = document.getElementById('graphicOriginal');
   const position = document.getElementById('graphicPosition');
+  const plate = document.getElementById('graphicPlate');
+  const roman = n => [[10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']]
+    .reduce((out, [v, s]) => { while (n >= v) { out += s; n -= v; } return out; }, '');
   let current = 0;
   let trigger = null;
 
@@ -16,6 +19,7 @@
     image.alt = link.querySelector('img').alt;
     original.href = link.href;
     position.textContent = `${current + 1} / ${links.length}`;
+    if (plate) plate.textContent = `Tab. ${roman(current + 1)}`;
   }
 
   links.forEach((link, index) => {

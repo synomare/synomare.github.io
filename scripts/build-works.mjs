@@ -109,7 +109,7 @@ async function readWorks() {
   return sortWorks(works);
 }
 
-function renderWork(work) {
+function renderWork(work, index) {
   const tag = work.url ? 'a' : 'div';
   const external = /^https:\/\//.test(work.url);
   const attributes = work.url
@@ -119,13 +119,15 @@ function renderWork(work) {
     ? `\n        <span class="w-thumb"><img src="${escapeHtml(work.image)}" alt="${escapeHtml(work.title)}" loading="lazy" decoding="async"></span>`
     : '';
   const search = `${work.title} ${work.summary} ${work.type}`.toLocaleLowerCase('ja');
+  const number = String(index + 1).padStart(2, '0');
   return `      <${tag} class="work-row${work.image ? ' has-image' : ''}"${attributes} data-search="${escapeHtml(search)}" data-type="${escapeHtml(work.type)}" data-year="${escapeHtml(work.year)}">
-        <span class="w-no">${escapeHtml(work.year)}</span>${image}
+        <span class="w-no">N° ${number}</span>${image}
         <span class="w-main">
           <span class="w-title">${escapeHtml(work.title)}</span>
           <span class="w-desc">${escapeHtml(work.summary)}</span>
         </span>
         <span class="w-type">${escapeHtml(work.type)}</span>
+        <span class="w-year">${escapeHtml(work.year)}</span>
       </${tag}>`;
 }
 
@@ -138,7 +140,7 @@ async function writeWorks(works) {
   }
   const publishedWorks = works.filter(work => !work.draft);
   const rendered = publishedWorks.length
-    ? publishedWorks.map(renderWork).join('\n\n')
+    ? publishedWorks.map((work, index) => renderWork(work, index)).join('\n\n')
     : '      <p class="works-empty">まだ作品が登録されていません。</p>';
   const nextHtml = `${html.slice(0, start + startMarker.length)}\n${rendered}\n      ${html.slice(end)}`;
   await fs.writeFile(worksHtmlPath, nextHtml, 'utf8');

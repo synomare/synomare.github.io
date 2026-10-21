@@ -1,0 +1,192 @@
+/* Shared foundation: tokens, chrome and the plate vocabulary (Theatrum Anatomicum). */
+@property --lx { syntax: "<length>"; inherits: true; initial-value: 0px; }
+@property --ly { syntax: "<length>"; inherits: true; initial-value: 0px; }
+@property --lr { syntax: "<length>"; inherits: true; initial-value: 0px; }
+
+:root {
+  --paper: #f4f3ef;
+  --ink: #17140f;
+  --red: #c41f1f;
+  --dim: #6e685c;
+  --faint: #a49d8f;
+  --line: #d9d5c9;
+  --card: #fdfdfb;
+  --mono: "Space Mono", Menlo, Consolas, monospace;
+  --jp: "Zen Old Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  --latin: "EB Garamond", "Times New Roman", serif;
+  --cap: .6875rem;
+  --gutter: clamp(16px, 3.4vw, 44px);
+  --ease-out: cubic-bezier(.2, .9, .25, 1);
+}
+
+@view-transition { navigation: auto; }
+
+html, body { overflow-x: hidden; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--jp);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 100svh;
+}
+
+body > main { min-width: 0; }
+::selection { background: var(--red); color: #fff; }
+a { color: inherit; text-decoration: none; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.sr-only:focus { position: fixed; z-index: 1000; top: .5rem; left: .5rem; width: auto; height: auto; margin: 0; padding: .5rem .8rem; clip: auto; background: var(--ink); color: var(--paper); font: var(--cap) var(--mono); }
+
+/* topbar */
+.topbar {
+  display: flex;
+  align-items: baseline;
+  gap: .4em 1.6em;
+  padding: .75rem var(--gutter);
+  border-bottom: 1px solid var(--ink);
+  font-family: var(--mono);
+  font-size: var(--cap);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  position: sticky;
+  top: 0;
+  background: var(--paper);
+  z-index: 500;
+  view-transition-name: topbar;
+}
+.topbar .brand { font-weight: 700; }
+.topbar .date { color: var(--red); }
+.topbar nav { margin-left: auto; display: flex; gap: .4em 1.2em; }
+.topbar nav a { padding: 0 .3em; transition: color 150ms ease, background-color 150ms ease; }
+.topbar nav a:hover { background: var(--ink); color: var(--paper); }
+.topbar nav a[aria-current] { background: var(--ink); color: var(--paper); }
+.topbar a:focus-visible { outline: 2px solid var(--red); outline-offset: 4px; }
+
+/* section head */
+.sec-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  margin: 0 0 1.2em;
+  padding-bottom: .55em;
+  border-bottom: 1px solid var(--ink);
+  font-family: var(--mono);
+  font-size: var(--cap);
+  font-weight: 400;
+  letter-spacing: .26em;
+  text-transform: uppercase;
+  color: var(--red);
+}
+.sec-head .r { color: var(--dim); }
+
+/* page heading in the display face */
+main { position: relative; padding: clamp(20px, 4vw, 56px) var(--gutter) clamp(3rem, 6vw, 4.5rem); }
+.display-row { display: flex; align-items: baseline; gap: 2rem; flex-wrap: wrap; margin: 0 0 clamp(1.6rem, 4vw, 2.8rem); }
+.display {
+  margin: 0;
+  font-family: var(--display);
+  font-style: normal;
+  font-weight: 400;
+  font-size: clamp(4rem, 14vw, 11rem);
+  letter-spacing: -.03em;
+  line-height: .8;
+  color: transparent;
+  -webkit-text-stroke: var(--display-stroke) var(--ink);
+  view-transition-name: page-title;
+}
+.display-row .jp { font-family: var(--mono); font-size: var(--cap); letter-spacing: .4em; text-transform: uppercase; color: var(--red); }
+
+/* plate mark: the pressed rectangle around an engraving */
+.plate-mark { position: relative; }
+.plate-mark::before {
+  content: "";
+  position: absolute;
+  inset: -7px;
+  border: 1px solid rgba(23, 20, 15, .28);
+  pointer-events: none;
+}
+
+/* footer caption */
+footer.caption {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: .4em 2em;
+  padding: .8rem var(--gutter);
+  border-top: 1px solid var(--ink);
+  font-family: var(--mono);
+  font-size: var(--cap);
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  background: var(--paper);
+}
+footer.caption .r { color: var(--red); }
+footer.caption .d { color: var(--dim); }
+
+/* paper grain */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 950;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: 260px 260px;
+  mix-blend-mode: multiply;
+  opacity: .05;
+}
+
+/* loupe: a reticle that follows the pointer over a plate */
+.loupe {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: calc(var(--lr) * 2);
+  height: calc(var(--lr) * 2);
+  translate: calc(var(--lx) - var(--lr)) calc(var(--ly) - var(--lr));
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 8;
+  box-shadow: 0 0 0 1px var(--ink), 0 0 0 5px rgba(244, 243, 239, .7), 0 0 0 6px rgba(23, 20, 15, .5);
+}
+.loupe::before {
+  /* graduated ring, like the scale on an anatomist's glass */
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: repeating-conic-gradient(from -1deg, var(--ink) 0 2deg, transparent 2deg 15deg);
+  -webkit-mask: radial-gradient(circle, transparent calc(100% - 9px), #000 calc(100% - 8px));
+  mask: radial-gradient(circle, transparent calc(100% - 9px), #000 calc(100% - 8px));
+  opacity: .8;
+}
+.loupe::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 22px;
+  height: 22px;
+  translate: -50% -50%;
+  background:
+    linear-gradient(var(--red), var(--red)) center / 1px 100% no-repeat,
+    linear-gradient(var(--red), var(--red)) center / 100% 1px no-repeat;
+}
+
+@media (max-width: 700px) {
+  .topbar { flex-wrap: wrap; row-gap: .35rem; padding-top: .6rem; padding-bottom: .6rem; }
+  .topbar nav { margin-left: 0; width: 100%; overflow-x: auto; scrollbar-width: none; gap: .9em; }
+  .topbar nav::-webkit-scrollbar { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
+  .topbar nav a { transition: none; }
+}
