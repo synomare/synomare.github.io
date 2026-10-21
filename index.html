@@ -137,7 +137,7 @@
     .instrument { position: sticky; top: 4.2rem; align-self: start; display: grid; gap: 1rem; font: var(--cap)/1.8 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--dim); }
     .instrument .how { margin: 0; text-transform: none; letter-spacing: .06em; font-family: var(--jp); font-size: .82rem; line-height: 2; color: var(--ink); }
     .instrument .count { color: var(--ink); font-variant-numeric: tabular-nums; }
-    .instrument .count b { font: 400 2.4rem/1 var(--latin); color: var(--rust); letter-spacing: 0; }
+    .instrument .count b { font: 400 2.4rem/1 var(--latin); color: var(--red); letter-spacing: 0; }
     .instrument button {
       justify-self: start;
       min-height: 44px;
@@ -205,31 +205,6 @@
     .copy a:hover { color: var(--red); }
     .muted { color: var(--dim); }
 
-    /*
-      Drying vermilion. A fresh cut is wet and glossy, bleeds a hair into the paper,
-      darkens first at its rim (the ring a drying drop leaves), then oxidises to rust.
-      Real blood or iron-gall ink takes hours; here it is compressed into a few seconds.
-    */
-    .copy .c.is-cut {
-      animation: dry var(--dry, 4.5s) cubic-bezier(.3, .6, .2, 1) forwards;
-    }
-    .copy .muted .c.is-cut { animation-name: dry-thin; }
-    @keyframes dry {
-      0%   { color: #e8341f; filter: brightness(1.18) saturate(1.1); text-shadow: 0 0 0 rgba(214, 44, 28, 0); -webkit-text-stroke: 0 transparent; }
-      9%   { color: #df2f1d; filter: brightness(1.06); text-shadow: 0 0 .045em rgba(214, 44, 28, .5); -webkit-text-stroke: .006em #b8241a; }
-      28%  { color: #b9261c; filter: none; text-shadow: 0 0 .06em rgba(176, 40, 26, .32); -webkit-text-stroke: .014em #84201a; }
-      58%  { color: #8e2c1f; filter: none; text-shadow: 0 0 .06em rgba(140, 52, 34, .22); -webkit-text-stroke: .016em #5e2016; }
-      100% { color: #6d3324; filter: none; text-shadow: 0 0 .055em rgba(120, 62, 42, .16); -webkit-text-stroke: .014em #47201a; }
-    }
-    @keyframes dry-thin {
-      0%   { color: #ec5a45; filter: brightness(1.12); text-shadow: 0 0 0 rgba(214, 44, 28, 0); -webkit-text-stroke: 0 transparent; }
-      12%  { color: #e0503c; filter: none; text-shadow: 0 0 .045em rgba(214, 60, 40, .35); -webkit-text-stroke: .005em #c2402e; }
-      40%  { color: #b85a46; filter: none; text-shadow: 0 0 .055em rgba(176, 70, 50, .2); -webkit-text-stroke: .01em #8f3a2a; }
-      100% { color: #9a6a58; filter: none; text-shadow: 0 0 .05em rgba(140, 90, 70, .14); -webkit-text-stroke: .01em #6e4334; }
-    }
-    /* a closed cut leaves a faint stain in the paper until it is sutured */
-    .copy .c.is-scar { animation: none; text-shadow: 0 0 .06em rgba(130, 70, 48, .2); }
-
     /* ---------- narrow sheets ---------- */
     @media (min-width: 1600px) { .ghost { font-size: 18.5vw; } }
     @media (max-width: 700px) {
@@ -252,12 +227,10 @@
     @media (prefers-reduced-motion: reduce) {
       .ghost::before, .reg.r { transition: none; }
       .copy .c { animation: none; transition: none; }
-      .copy .c.is-cut { animation: dry .01s forwards; }
-      .copy .muted .c.is-cut { animation: dry-thin .01s forwards; }
     }
   </style>
-  <script src="assets/js/threads.js?v=1" defer></script>
-  <script src="assets/js/lectio.js?v=2" defer></script>
+  <script src="assets/js/threads.js?v=2" defer></script>
+  <script src="assets/js/lectio.js?v=3" defer></script>
 </head>
 
 <body>
@@ -321,7 +294,7 @@
       <h2 class="sec-head" id="lectioHeading"><span>Lectio — 自己紹介</span><span class="r">trace to cut</span></h2>
       <div class="lectio-body">
         <aside class="instrument" aria-label="なぞり操作">
-          <p class="how">文字をなぞると切り開かれて膨らみ、朱はすぐに乾いていきます。切った数だけ、上の図版に糸が垂れていきます。</p>
+          <p class="how">文字をなぞると切り開かれて膨らみます。もう一度なぞると閉じます。切った数だけ、上の図版の糸が増えていきます。</p>
           <span class="count" aria-live="polite"><b id="cutCount">000</b> / <span id="glyphTotal">000</span> glyphs</span>
           <button type="button" id="suture" disabled>縫合する — Suture</button>
         </aside>
